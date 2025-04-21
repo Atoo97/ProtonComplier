@@ -2,5 +2,6 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ActiveDebugProfile>https</ActiveDebugProfile>
+    <NameOfLastUsedPublishProfile>C:\Users\kunha\OneDrive\Asztali gép\ELTE\Szakdolgozat\ProtonComplier\ProtonComplier\src\ProtonComplierUI\Properties\PublishProfiles\ProtonComplier - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>

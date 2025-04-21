@@ -10,4 +10,10 @@
     <ProjectReference Include="..\ProtonComplier.Lexer\ProtonComplier.Lexer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\Proton_favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
