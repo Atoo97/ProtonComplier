@@ -4,5 +4,150 @@
         <name>ProtonComplier.ErrorHandler</name>
     </assembly>
     <members>
+        <member name="T:Proton.ErrorHandler.AnalyzerError">
+            <summary>
+            Represents a error that occurs during analysis in the Proton project.
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.ErrorHandler.AnalyzerError"/> class with the specified ID and message.
+            </remarks>
+            <param name="id">The unique identifier for the error.</param>
+            <param name="message">The descriptive message for the error.</param>
+        </member>
+        <member name="M:Proton.ErrorHandler.AnalyzerError.#ctor(System.String,System.String)">
+            <summary>
+            Represents a error that occurs during analysis in the Proton project.
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.ErrorHandler.AnalyzerError"/> class with the specified ID and message.
+            </remarks>
+            <param name="id">The unique identifier for the error.</param>
+            <param name="message">The descriptive message for the error.</param>
+        </member>
+        <member name="P:Proton.ErrorHandler.AnalyzerError.ErrorType">
+            <summary>
+            Gets the type of error (in this case, always "WARNING").
+            </summary>
+        </member>
+        <member name="M:Proton.ErrorHandler.AnalyzerError.ToString">
+            <summary>
+            Represents the current AnalyzerError.
+            </summary>
+            <returns>Returns a string that represents the current AnalyzerError.</returns>
+        </member>
+        <member name="T:Proton.ErrorHandler.AnalyzerWarning">
+            <summary>
+            Represents a warning that occurs during analysis in the Proton project.
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.ErrorHandler.AnalyzerWarning"/> class with the specified ID and message.
+            </remarks>
+            <param name="id">The unique identifier for the warning.</param>
+            <param name="message">The descriptive message for the warning.</param>
+        </member>
+        <member name="M:Proton.ErrorHandler.AnalyzerWarning.#ctor(System.String,System.String)">
+            <summary>
+            Represents a warning that occurs during analysis in the Proton project.
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.ErrorHandler.AnalyzerWarning"/> class with the specified ID and message.
+            </remarks>
+            <param name="id">The unique identifier for the warning.</param>
+            <param name="message">The descriptive message for the warning.</param>
+        </member>
+        <member name="P:Proton.ErrorHandler.AnalyzerWarning.ErrorType">
+            <summary>
+            Gets the type of warning (in this case, always "WARNING").
+            </summary>
+        </member>
+        <member name="M:Proton.ErrorHandler.AnalyzerWarning.ToString">
+            <summary>
+            Represents the current AnalyzerWarning.
+            </summary>
+            <returns>Returns a string that represents the current AnalyzerWarning.</returns>
+        </member>
+        <member name="T:Proton.ErrorHandler.BaseException">
+            <summary>
+            Represents the base class for errors and warnings encountered during analysis in the Proton project.
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.ErrorHandler.BaseException"/> class with the specified ID and message.
+            </remarks>
+            <param name="id">The unique identifier for the error or warning.</param>
+            <param name="message">The descriptive message for the error or warning.</param>
+        </member>
+        <member name="M:Proton.ErrorHandler.BaseException.#ctor(System.String,System.String)">
+            <summary>
+            Represents the base class for errors and warnings encountered during analysis in the Proton project.
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.ErrorHandler.BaseException"/> class with the specified ID and message.
+            </remarks>
+            <param name="id">The unique identifier for the error or warning.</param>
+            <param name="message">The descriptive message for the error or warning.</param>
+        </member>
+        <member name="P:Proton.ErrorHandler.BaseException.ID">
+            <summary>
+            Gets the unique identifier for the error or warning.
+            </summary>
+        </member>
+        <member name="P:Proton.ErrorHandler.BaseException.Message">
+            <summary>
+            Gets the descriptive message for the error or warning.
+            </summary>
+        </member>
+        <member name="P:Proton.ErrorHandler.BaseException.ErrorType">
+            <summary>
+            Gets the type of error or warning (e.g., "WARNING" or "ERROR").
+            </summary>
+        </member>
+        <member name="T:Proton.ErrorHandler.Message">
+            <summary>
+            Represents a structured message used in analysis exceptions.
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.ErrorHandler.Message"/> class.
+            </remarks>
+            <param name="id">ID of the message.</param>
+            <param name="text">text of the message.</param>
+        </member>
+        <member name="M:Proton.ErrorHandler.Message.#ctor(System.String,System.String)">
+            <summary>
+            Represents a structured message used in analysis exceptions.
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.ErrorHandler.Message"/> class.
+            </remarks>
+            <param name="id">ID of the message.</param>
+            <param name="text">text of the message.</param>
+        </member>
+        <member name="P:Proton.ErrorHandler.Message.Id">
+            <summary>
+            Gets the ID of the message.
+            </summary>
+        </member>
+        <member name="P:Proton.ErrorHandler.Message.Text">
+            <summary>
+            Gets the text of the message.
+            </summary>
+        </member>
+        <member name="T:Proton.ErrorHandler.MessageRegistry">
+            <summary>
+            Maintains a registry of predefined error and warning messages used by analyzers during the processing of the Proton project.
+            </summary>
+        </member>
+        <member name="F:Proton.ErrorHandler.MessageRegistry.Messages">
+            <summary>
+            A static dictionary that stores messages indexed by their unique integer ID.
+            </summary>
+        </member>
+        <member name="M:Proton.ErrorHandler.MessageRegistry.GetMessage(System.Int32)">
+            <summary>
+            Retrieves a message by its unique integer ID.
+            </summary>
+            <param name="id">The unique ID of the message to retrieve.</param>
+            <returns>A <see cref="T:Proton.ErrorHandler.Message"/> instance containing the message details.</returns>
+            <exception cref="T:System.ArgumentException">Thrown if the provided ID does not exist in the registry.</exception>
+        </member>
     </members>
 </doc>
