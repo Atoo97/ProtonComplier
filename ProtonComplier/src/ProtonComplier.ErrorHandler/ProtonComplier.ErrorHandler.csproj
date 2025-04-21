@@ -15,8 +15,4 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\ProtonComplier.ErrorHandler\ProtonComplier.ErrorHandler.csproj" />
-	</ItemGroup>
-
 </Project>
