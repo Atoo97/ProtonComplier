@@ -945,7 +945,7 @@
             <param name="tokenizer">An instance of <see cref="T:Proton.Lexer.Interfaces.ITokenizer"/> responsible for breaking input into tokens.</param>
             <param name="analyzer">An instance of <see cref="T:Proton.Lexer.Interfaces.ILexicalAnalyzer"/> responsible for analyzing token structure and validity.</param>
         </member>
-        <member name="M:Proton.Lexer.Services.LexicalService.Complie(System.String)">
+        <member name="M:Proton.Lexer.Services.LexicalService.Compile(System.String)">
             <summary>
             Performs the complete lexical analysis process on the provided source code.
             First tokenizes the input, then analyzes the tokens for structure, macro sections,
