@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DocumentationFile>$(OutputPath)$(Program).xml</DocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProtonComplier.ErrorHandler\ProtonComplier.ErrorHandler.csproj" />
+    <ProjectReference Include="..\ProtonComplier.Lexer\ProtonComplier.Lexer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Expressions\" />
+    <Folder Include="Statements\" />
+  </ItemGroup>
+
+</Project>

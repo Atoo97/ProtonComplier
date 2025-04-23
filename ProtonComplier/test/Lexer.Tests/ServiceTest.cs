@@ -95,5 +95,53 @@ namespace TestProject1
             var result = service.Compile(code);
             Assert.That(result.errors, Is.Not.Empty);
         }
+
+        [Test]
+        public void Tokenize_Should_Return_Exact_Token_Sequence()
+        {
+            var input = "#StatePlace\r\n_var1:N;\r\n_var2:R;\r";
+            var tokens = new Tokenizer().Tokenize(input);
+
+            var expectedTokens = new List<(TokenType, string)>
+            {
+                (TokenType.Macro, "StatePlace"),
+                (TokenType.Newline, "\n"),
+                (TokenType.Identifier, "_var1"),
+                (TokenType.Colon, ":"),
+                (TokenType.Natural, "N"),
+                (TokenType.Semicolon, ";"),
+                (TokenType.Newline, "\n"),
+                (TokenType.Identifier, "_var2"),
+                (TokenType.Colon, ":"),
+                (TokenType.Real, "R"),
+                (TokenType.Semicolon, ";"),
+                (TokenType.Newline, "\n"),
+            };
+
+            Assert.That(tokens.Count, Is.EqualTo(expectedTokens.Count));
+
+            for (int i = 0; i < expectedTokens.Count; i++)
+            {
+                // Console.WriteLine(tokens[i].ToString());
+                Assert.That(tokens[i].TokenType, Is.EqualTo(expectedTokens[i].Item1));
+                Assert.That(tokens[i].TokenValue, Is.EqualTo(expectedTokens[i].Item2));
+            }
+        }
+
+        [Test]
+        public void Tokenize_Should_Return_Correct_Tokens_From_File()
+        {
+            var filePath = "TestFiles/LexicalTestFiles/ok.prtn";
+            var input = File.ReadAllText(filePath) + "\r";
+            var tokens = new Tokenizer().Tokenize(input);
+
+            Assert.IsNotEmpty(tokens);
+            Assert.IsTrue(tokens.Exists(t => t.TokenType == TokenType.Macro && t.TokenValue == "StatePlace"));
+            Assert.IsTrue(tokens.Exists(t => t.TokenType == TokenType.Identifier && t.TokenValue == "_var1"));
+            Assert.IsTrue(tokens.Exists(t => t.TokenType == TokenType.Natural));
+            Assert.IsTrue(tokens.Exists(t => t.TokenType == TokenType.Identifier && t.TokenValue == "_var2"));
+            Assert.IsTrue(tokens.Exists(t => t.TokenType == TokenType.Real));
+        }
+
     }
 }
