@@ -3,6 +3,8 @@
 // </copyright>
 namespace Proton.Lexer
 {
+    using Proton.Lexer.Enums;
+
     /// <summary>
     /// Token class holding: Type, Value, Metadata.
     /// </summary>
@@ -12,6 +14,11 @@ namespace Proton.Lexer
         /// Gets or Sets the type of the token (e.g., identifier, keyword, literal, etc.)
         /// </summary>
         public TokenType TokenType { get; set; }
+
+        /// <summary>
+        /// Gets or Sets the lexical category of the token, grouping similar types for parsing and classification.
+        /// </summary>
+        public TokenCategory TokenCategory { get; set; }
 
         /// <summary>
         /// Gets or Sets the value of the token (e.g., actual text of the token).

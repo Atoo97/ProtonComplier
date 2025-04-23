@@ -3,6 +3,7 @@
 // </copyright>
 namespace Proton.Lexer
 {
+    using Proton.Lexer.Enums;
     using Proton.Lexer.Interfaces;
 
     /// <summary>
@@ -111,6 +112,7 @@ namespace Proton.Lexer
                         lineTokens.Add(new Token
                         {
                             TokenType = def.TokenName,
+                            TokenCategory = def.TokenCategory,
                             TokenValue = value,
                             TokenLine = this.line,
                             TokenColumn = startColumn,
@@ -132,6 +134,7 @@ namespace Proton.Lexer
                     lineTokens.Add(new Token
                     {
                         TokenType = TokenType.Unknown,
+                        TokenCategory = TokenCategory.Special,
                         TokenValue = unknownChar.ToString(),
                         TokenLine = this.line,
                         TokenColumn = this.column + linePosition,

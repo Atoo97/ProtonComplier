@@ -5,8 +5,8 @@ namespace Proton.Lexer
 {
     using System.Collections.Generic;
     using Proton.ErrorHandler;
+    using Proton.Lexer.Enums;
     using Proton.Lexer.Interfaces;
-    using Proton.Lexer.Macro;
 
     /// <summary>
     /// Provides functionality to analyze a sequence of tokens and identify macros, validate structure,

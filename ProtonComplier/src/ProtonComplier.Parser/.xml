@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ProtonComplier.Parser</name>
+    </assembly>
+    <members>
+        <member name="T:Proton.Parser.ParseNode">
+            <summary>
+            Represents a node in the parse tree used during syntax analysis.
+            Each node may contain a single token or a list of tokens, and optional left and right child nodes.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.ParseNode.#ctor(Proton.Lexer.Token)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.ParseNode"/> class with a single token.
+            </summary>
+            <param name="symbol">The token this node represents.</param>
+        </member>
+        <member name="M:Proton.Parser.ParseNode.#ctor(System.Collections.Generic.List{Proton.Lexer.Token})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.ParseNode"/> class with a list of tokens.
+            </summary>
+            <param name="symbols">The list of tokens this node represents.</param>
+        </member>
+        <member name="P:Proton.Parser.ParseNode.ParseSymbol">
+            <summary>
+            Gets or sets the primary token represented by this parse tree node.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.ParseNode.ParseSymbolsList">
+            <summary>
+            Gets or sets the list of tokens associated with this node, used when the node represents a collection of tokens.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.ParseNode.Left">
+            <summary>
+            Gets the left child node in the parse tree.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.ParseNode.Right">
+            <summary>
+            Gets the right child node in the parse tree.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.ParseNode.SetLeft(Proton.Parser.ParseNode)">
+            <summary>
+            Sets the left child of this node. Can be overridden by derived classes.
+            </summary>
+            <param name="child">The node to set as the left child.</param>
+        </member>
+        <member name="M:Proton.Parser.ParseNode.SetRight(Proton.Parser.ParseNode)">
+            <summary>
+            Sets the right child of this node. Can be overridden by derived classes.
+            </summary>
+            <param name="child">The node to set as the right child.</param>
+        </member>
+        <member name="M:Proton.Parser.ParseNode.ToCode">
+            <summary>
+            Converts the contents of the token list to a formatted code string.
+            </summary>
+            <returns>A string representation of the node's token values.</returns>
+        </member>
+    </members>
+</doc>

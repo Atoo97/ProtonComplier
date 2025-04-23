@@ -4,6 +4,7 @@
 namespace Proton.Lexer
 {
     using System.Text.RegularExpressions;
+    using Proton.Lexer.Enums;
 
     /// <summary>
     /// Provides a collection of regex patterns used to tokenize the input.
@@ -22,72 +23,72 @@ namespace Proton.Lexer
             [
 
                 // Higher Level Tokens
-                new (TokenType.Comment, CommentRegex()),
-
-                // Keyword Tokens
-                new (TokenType.Options, OptionsRegex()),
-                new (TokenType.Min, MinRegex()),
-                new (TokenType.Max, MaxRegex()),
-                new (TokenType.Length, LengthRegex()),
+                new (TokenType.Comment, TokenCategory.Special, CommentRegex()),
 
                 // Identifier Tokens
-                new (TokenType.Natural, NatIdentRegex()),
-                new (TokenType.Integer, IntIdentRegex()),
-                new (TokenType.Real, RealIdentRegex()),
-                new (TokenType.Character, CharIdentRegex()),
-                new (TokenType.Text, StrIdentRegex()),
-                new (TokenType.Boolean, BoolIdentRegex()),
+                new (TokenType.Options, TokenCategory.Identifier, OptionsRegex()),
+                new (TokenType.Min, TokenCategory.Identifier, MinRegex()),
+                new (TokenType.Max, TokenCategory.Identifier, MaxRegex()),
+                new (TokenType.Length, TokenCategory.Identifier, LengthRegex()),
+
+                // Keyword Tokens
+                new (TokenType.Natural, TokenCategory.Keyword, NatIdentRegex()),
+                new (TokenType.Integer, TokenCategory.Keyword, IntIdentRegex()),
+                new (TokenType.Real, TokenCategory.Keyword, RealIdentRegex()),
+                new (TokenType.Character, TokenCategory.Keyword, CharIdentRegex()),
+                new (TokenType.Text, TokenCategory.Keyword, StrIdentRegex()),
+                new (TokenType.Boolean, TokenCategory.Keyword, BoolIdentRegex()),
 
                 // Literal Tokens
-                new (TokenType.Double, DoubleRegex()),
-                new (TokenType.Uint, UIntegerRegex()),
-                new (TokenType.Int, IntegerRegex()),
+                new (TokenType.Double, TokenCategory.Literal, DoubleRegex()),
+                new (TokenType.Uint, TokenCategory.Literal, UIntegerRegex()),
+                new (TokenType.Int, TokenCategory.Literal, IntegerRegex()),
 
-                new (TokenType.Identifier, IdentifierRegex()), // Identifier token
+                new (TokenType.Identifier, TokenCategory.Identifier, IdentifierRegex()), // Identifier token
 
-                new (TokenType.Char, CharacterRegex()),
-                new (TokenType.String, StringRegex()),
-                new (TokenType.Bool, BooleanRegex()),
+                new (TokenType.Char, TokenCategory.Literal, CharacterRegex()),
+                new (TokenType.String, TokenCategory.Literal, StringRegex()),
+                new (TokenType.Bool, TokenCategory.Literal, BooleanRegex()),
 
                 // Operator Tokens
-                new (TokenType.Addition, AdditionRegex()),
-                new (TokenType.Multiplication, MultiplicationRegex()),
-                new (TokenType.Division, DivisionRegex()),
-                new (TokenType.Modulus, ModulusRegex()),
-                new (TokenType.Equal, EqualRegex()),
-                new (TokenType.Assign, AssignRegex()),
-                new (TokenType.NotEqual, NotEqualRegex()),
-                new (TokenType.GreaterThan, GreaterThanRegex()),
-                new (TokenType.LessThan, LessThanRegex()),
-                new (TokenType.GreaterThanOrEqual, GreaterThanOrEqualRegex()),
-                new (TokenType.LessThanOrEqual, LessThanOrEqualRegex()),
-                new (TokenType.LogicalAnd, LogicalAndRegex()),
-                new (TokenType.LogicalOr, LogicalOrRegex()),
-                new (TokenType.LogicalNot, LogicalNotRegex()),
-                new (TokenType.Implication, ImplicationRegex()),
-                new (TokenType.UniversalQuant, UniversalQuantRegex()),
-                new (TokenType.ExistentialQuant, ExistentialQuantRegex()),
-                new (TokenType.Product, ProductRegex()),
-                new (TokenType.Summation, SummationRegex()),
+                new (TokenType.Addition, TokenCategory.Operator, AdditionRegex()),
+                new (TokenType.Subtraction, TokenCategory.Operator, SubtractionRegex()),
+                new (TokenType.Multiplication, TokenCategory.Operator, MultiplicationRegex()),
+                new (TokenType.Division, TokenCategory.Operator, DivisionRegex()),
+                new (TokenType.Modulus, TokenCategory.Operator, ModulusRegex()),
+                new (TokenType.Equal, TokenCategory.Operator, EqualRegex()),
+                new (TokenType.Assign, TokenCategory.Operator, AssignRegex()),
+                new (TokenType.NotEqual, TokenCategory.Operator, NotEqualRegex()),
+                new (TokenType.GreaterThan, TokenCategory.Operator, GreaterThanRegex()),
+                new (TokenType.LessThan, TokenCategory.Operator, LessThanRegex()),
+                new (TokenType.GreaterThanOrEqual, TokenCategory.Operator, GreaterThanOrEqualRegex()),
+                new (TokenType.LessThanOrEqual, TokenCategory.Operator, LessThanOrEqualRegex()),
+                new (TokenType.LogicalAnd, TokenCategory.Operator, LogicalAndRegex()),
+                new (TokenType.LogicalOr, TokenCategory.Operator, LogicalOrRegex()),
+                new (TokenType.LogicalNot, TokenCategory.Operator, LogicalNotRegex()),
+                new (TokenType.Implication, TokenCategory.Operator, ImplicationRegex()),
+                new (TokenType.UniversalQuant, TokenCategory.Operator, UniversalQuantRegex()),
+                new (TokenType.ExistentialQuant, TokenCategory.Operator, ExistentialQuantRegex()),
+                new (TokenType.Product, TokenCategory.Operator, ProductRegex()),
+                new (TokenType.Summation, TokenCategory.Operator, SummationRegex()),
 
                 // Punctuator Tokens
-                new (TokenType.Semicolon, SemicolonRegex()),
-                new (TokenType.Colon, ColonRegex()),
-                new (TokenType.Subtraction, SubtractionRegex()),
-                new (TokenType.Comma, CommaRegex()),
-                new (TokenType.OpenParen, OpenParenRegex()),
-                new (TokenType.CloseParen, CloseParenRegex()),
-                new (TokenType.OpenBrace, OpenBraceRegex()),
-                new (TokenType.CloseBrace, CloseBraceRegex()),
-                new (TokenType.ListSpecifier, ListSpecifierRegex()),
-                new (TokenType.OpenSqrBrace, OpenSqrBraceRegex()),
-                new (TokenType.CloseSqrBrace, CloseSqrBraceRegex()),
+                new (TokenType.Semicolon, TokenCategory.Punctuator, SemicolonRegex()),
+                new (TokenType.Colon, TokenCategory.Punctuator, ColonRegex()),
+                new (TokenType.Comma, TokenCategory.Punctuator, CommaRegex()),
+                new (TokenType.OpenParen, TokenCategory.Punctuator, OpenParenRegex()),
+                new (TokenType.CloseParen, TokenCategory.Punctuator, CloseParenRegex()),
+                new (TokenType.OpenBrace, TokenCategory.Punctuator, OpenBraceRegex()),
+                new (TokenType.CloseBrace, TokenCategory.Punctuator, CloseBraceRegex()),
+                new (TokenType.ListSpecifier, TokenCategory.Punctuator, ListSpecifierRegex()),
+                new (TokenType.OpenSqrBrace, TokenCategory.Punctuator, OpenSqrBraceRegex()),
+                new (TokenType.CloseSqrBrace, TokenCategory.Punctuator, CloseSqrBraceRegex()),
 
                 // Special Tokens
-                new (TokenType.Macro, MacroRegex()),
-                new (TokenType.QuestionMarks, QuestionMarksRegex()),
-                new (TokenType.Period, PeriodRegex()),
-                new (TokenType.Whitespace, WhitespaceRegex()),
+                new (TokenType.Macro, TokenCategory.Special, MacroRegex()),
+                new (TokenType.QuestionMarks, TokenCategory.Special, QuestionMarksRegex()),
+                new (TokenType.Period, TokenCategory.Special, PeriodRegex()),
+                new (TokenType.Whitespace, TokenCategory.Special, WhitespaceRegex()),
 
                 // new (TokenType.EndOfInput, EndOfInputRegex()),
                 // new (TokenType.Unknown, UnknownRegex())
@@ -121,10 +122,10 @@ namespace Proton.Lexer
         [GeneratedRegex("\\G(0|[1-9][0-9]*)", RegexOptions.Compiled)]
         private static partial Regex UIntegerRegex(); // Matches unsigned integers (0, 1, 2, ...)
 
-        [GeneratedRegex("\\G(-?(?!-)(?<!\\d)(0|[1-9][0-9]*))", RegexOptions.Compiled)]
-        private static partial Regex IntegerRegex();  // Matches integers, ensuring the minus sign is valid
+        [GeneratedRegex("\\G(?<![\\w\\d])(-?(?!-)(0|[1-9][0-9]*))", RegexOptions.Compiled)]
+        private static partial Regex IntegerRegex(); // Matches integers, ensuring the minus sign is valid
 
-        [GeneratedRegex("\\G(-?(?!-)(?<!\\d)(0|[1-9][0-9]*)\\.[0-9]+)", RegexOptions.Compiled)]
+        [GeneratedRegex("\\G(?<![\\w\\d])(-?(?!-)(0|[1-9][0-9]*)\\.[0-9]+)", RegexOptions.Compiled)]
         private static partial Regex DoubleRegex(); // Matches floating-point numbers, allowing a valid negative sign
 
         [GeneratedRegex("\\G'([^'])'", RegexOptions.Compiled)]

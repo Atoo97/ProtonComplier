@@ -4,6 +4,357 @@
         <name>ProtonComplier.Lexer</name>
     </assembly>
     <members>
+        <member name="T:Proton.Lexer.Enums.MacroTypes">
+            <summary>
+            Represents predefined macro section types.
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.MacroTypes.StateSpace">
+            <summary>
+            Represents predefined macro section types used in the context of macros.
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.MacroTypes.Input">
+            <summary>
+            Represents the input section of a macro.
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.MacroTypes.Precondition">
+            <summary>
+            Represents the precondition section of a macro.
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.MacroTypes.Postcondition">
+            <summary>
+            Represents the postcondition section of a macro.
+            </summary>
+        </member>
+        <member name="T:Proton.Lexer.Enums.MacroType">
+            <summary>
+            Provides mappings between <see cref="T:Proton.Lexer.Enums.MacroType"/> values and their corresponding string representations.
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.MacroType.ExpectedMacros">
+            <summary>
+            A mapping of MacroType to their respective string values.
+            </summary>
+        </member>
+        <member name="T:Proton.Lexer.Enums.TokenCategory">
+            <summary>
+            Defines the main lexical categories for tokens in the Proton language.
+            Used to classify tokens during lexical analysis.
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenCategory.Keyword">
+            <summary>
+            Reserved language keywords (e.g., N, $, B, ).
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenCategory.Identifier">
+            <summary>
+            User-defined identifiers such as variable names, function names, etc.
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenCategory.Literal">
+            <summary>
+            Constant values like numbers, strings, booleans, and characters.
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenCategory.Operator">
+            <summary>
+            Arithmetic, logical, and comparison operators (e.g., +, -, ==).
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenCategory.Punctuator">
+            <summary>
+            Structural symbols used for grouping and separating (e.g., ; , ( ) { }).
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenCategory.Special">
+            <summary>
+            Special tokens not fitting into other categories (e.g., macro, comment).
+            </summary>
+        </member>
+        <member name="T:Proton.Lexer.Enums.TokenType">
+            <summary>
+            Extended token types for Proton language.
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Natural">
+            <summary>
+            N (uint) = 0, 1, 2, 3, 4, 5..
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Integer">
+            <summary>
+            Z (int)  = .. −2, −1, 0, 1, 2..
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Real">
+            <summary>
+            R (double) = .. −2.1, −1.5, 0, 1.6, 2.9..
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Character">
+            <summary>
+            C (char)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Text">
+            <summary>
+            $ (string)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Boolean">
+            <summary>
+            B (bool)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Identifier">
+            <summary>
+            Variable names (e.g. _varName, _number, Num)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Options">
+            <summary>
+            (Opt) - option for conditional statements
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Min">
+            <summary>
+             Min(a,b)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Max">
+            <summary>
+            Max(a,b)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Length">
+            <summary>
+            Length
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Uint">
+            <summary>
+            UInt literal (e.g. 0, 1, 2...)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Int">
+            <summary>
+            Integer literal (e.g. 1-1, 0, 42)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Double">
+            <summary>
+            Double literal (e.g. 3.14)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Char">
+            <summary>
+            Char literal (e.g. 'a')
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.String">
+            <summary>
+            String literal (e.g. "abc")
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Bool">
+            <summary>
+            Boolean literal (e.g. True/False)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Addition">
+            <summary>
+            +
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Subtraction">
+            <summary>
+            -
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Multiplication">
+            <summary>
+            *
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Division">
+            <summary>
+            /
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Modulus">
+            <summary>
+            %
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Assign">
+            <summary>
+            =
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Equal">
+            <summary>
+            ==
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.NotEqual">
+            <summary>
+            ≠
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.GreaterThan">
+            <summary>
+            >
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.LessThan">
+            <summary>
+            opposite of >
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.GreaterThanOrEqual">
+            <summary>
+            ≥
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.LessThanOrEqual">
+            <summary>
+            ≤
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.LogicalAnd">
+            <summary>
+            ∧
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.LogicalOr">
+            <summary>
+            ∨
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.LogicalNot">
+            <summary>
+            ┐
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Implication">
+            <summary>
+            →
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.UniversalQuant">
+            <summary>
+            ∀
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.ExistentialQuant">
+            <summary>
+            ∃
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Product">
+            <summary>
+            ∏
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Summation">
+            <summary>
+            ∑
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Semicolon">
+            <summary>
+            ; to terminate statements (optional)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Colon">
+            <summary>
+            : to assign statements
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Comma">
+            <summary>
+            , to terminate statements, variables (optional)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.OpenParen">
+            <summary>
+            (
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.CloseParen">
+            <summary>
+            )
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.OpenBrace">
+            <summary>
+            {
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.CloseBrace">
+            <summary>
+            }
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.ListSpecifier">
+            <summary>
+            []
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.OpenSqrBrace">
+            <summary>
+            [
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.CloseSqrBrace">
+            <summary>
+            ]
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Macro">
+            <summary>
+            #   to separate logical parts (#StatePlace..)
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.QuestionMarks">
+            <summary>
+            ??  to parameter spaceholder
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Period">
+            <summary>
+            .   to function call on variables
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Comment">
+            <summary>
+            //  one line comments
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Whitespace">
+            <summary>
+            any whitespace
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Newline">
+            <summary>
+            NewLine
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.EndOfInput">
+            <summary>
+             End of input.
+            </summary>
+        </member>
+        <member name="F:Proton.Lexer.Enums.TokenType.Unknown">
+            <summary>
+            Unknown specaial token
+            </summary>
+        </member>
         <member name="T:Proton.Lexer.Interfaces.ILexicalAnalyzer">
             <summary>
             Defines the contract for a lexical analyzer responsible for validating token sequences,
@@ -83,41 +434,6 @@
         <member name="M:Proton.Lexer.LexicalResult.#ctor(System.Collections.Generic.List{Proton.ErrorHandler.BaseException},System.Collections.Generic.List{Proton.ErrorHandler.BaseException},System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Lexer.Token}},System.Boolean)">
             <summary>
             Represents the result of lexical analysis, including tokens, errors, and macro sections.
-            </summary>
-        </member>
-        <member name="T:Proton.Lexer.Macro.MacroTypes">
-            <summary>
-            Represents predefined macro section types.
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.Macro.MacroTypes.StateSpace">
-            <summary>
-            Represents predefined macro section types used in the context of macros.
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.Macro.MacroTypes.Input">
-            <summary>
-            Represents the input section of a macro.
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.Macro.MacroTypes.Precondition">
-            <summary>
-            Represents the precondition section of a macro.
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.Macro.MacroTypes.Postcondition">
-            <summary>
-            Represents the postcondition section of a macro.
-            </summary>
-        </member>
-        <member name="T:Proton.Lexer.Macro.MacroType">
-            <summary>
-            Provides mappings between <see cref="T:Proton.Lexer.Macro.MacroType"/> values and their corresponding string representations.
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.Macro.MacroType.ExpectedMacros">
-            <summary>
-            A mapping of MacroType to their respective string values.
             </summary>
         </member>
         <member name="T:Proton.Lexer.RegexGrammar">
@@ -262,18 +578,18 @@
         <member name="M:Proton.Lexer.RegexGrammar.IntegerRegex">
             <remarks>
             Pattern:<br/>
-            <code>\\G(-?(?!-)(?&lt;!\\d)(0|[1-9][0-9]*))</code><br/>
+            <code>\\G(?&lt;![\\w\\d])(-?(?!-)(0|[1-9][0-9]*))</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the start position.<br/>
+            ○ Zero-width negative lookbehind.<br/>
+                ○ Match a character in the set [\w\d] right-to-left.<br/>
             ○ 1st capture group.<br/>
                 ○ Match '-' greedily, optionally.<br/>
                 ○ Zero-width negative lookahead.<br/>
                     ○ Match '-'.<br/>
-                ○ Zero-width negative lookbehind.<br/>
-                    ○ Match a Unicode digit right-to-left.<br/>
                 ○ 2nd capture group.<br/>
                     ○ Match with 2 alternative expressions, atomically.<br/>
                         ○ Match '0'.<br/>
@@ -286,18 +602,18 @@
         <member name="M:Proton.Lexer.RegexGrammar.DoubleRegex">
             <remarks>
             Pattern:<br/>
-            <code>\\G(-?(?!-)(?&lt;!\\d)(0|[1-9][0-9]*)\\.[0-9]+)</code><br/>
+            <code>\\G(?&lt;![\\w\\d])(-?(?!-)(0|[1-9][0-9]*)\\.[0-9]+)</code><br/>
             Options:<br/>
             <code>RegexOptions.Compiled</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the start position.<br/>
+            ○ Zero-width negative lookbehind.<br/>
+                ○ Match a character in the set [\w\d] right-to-left.<br/>
             ○ 1st capture group.<br/>
                 ○ Match '-' greedily, optionally.<br/>
                 ○ Zero-width negative lookahead.<br/>
                     ○ Match '-'.<br/>
-                ○ Zero-width negative lookbehind.<br/>
-                    ○ Match a Unicode digit right-to-left.<br/>
                 ○ 2nd capture group.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Match '0'.<br/>
@@ -964,6 +1280,11 @@
             Gets or Sets the type of the token (e.g., identifier, keyword, literal, etc.)
             </summary>
         </member>
+        <member name="P:Proton.Lexer.Token.TokenCategory">
+            <summary>
+            Gets or Sets the lexical category of the token, grouping similar types for parsing and classification.
+            </summary>
+        </member>
         <member name="P:Proton.Lexer.Token.TokenValue">
             <summary>
             Gets or Sets the value of the token (e.g., actual text of the token).
@@ -1001,9 +1322,10 @@
             Initializes a new instance of the <see cref="T:Proton.Lexer.TokenDefinition"/> class.
             </remarks>
             <param name="tokenName">The token's type (e.g., identifier, keyword, literal).</param>
+            <param name="category">The high-level category the token belongs to (e.g., Keyword, Literal, Operator).</param>
             <param name="pattern">The regex pattern that defines the structure of the token.</param>
         </member>
-        <member name="M:Proton.Lexer.TokenDefinition.#ctor(Proton.Lexer.TokenType,System.Text.RegularExpressions.Regex)">
+        <member name="M:Proton.Lexer.TokenDefinition.#ctor(Proton.Lexer.Enums.TokenType,Proton.Lexer.Enums.TokenCategory,System.Text.RegularExpressions.Regex)">
             <summary>
             Defines a token's type and the regular expression pattern used to recognize it.
             </summary>
@@ -1011,11 +1333,17 @@
             Initializes a new instance of the <see cref="T:Proton.Lexer.TokenDefinition"/> class.
             </remarks>
             <param name="tokenName">The token's type (e.g., identifier, keyword, literal).</param>
+            <param name="category">The high-level category the token belongs to (e.g., Keyword, Literal, Operator).</param>
             <param name="pattern">The regex pattern that defines the structure of the token.</param>
         </member>
         <member name="P:Proton.Lexer.TokenDefinition.TokenName">
             <summary>
             Gets the type of the token (e.g., identifier, keyword, literal, etc.)
+            </summary>
+        </member>
+        <member name="P:Proton.Lexer.TokenDefinition.TokenCategory">
+            <summary>
+            Gets the lexical category of the token, grouping similar types for parsing and classification.
             </summary>
         </member>
         <member name="P:Proton.Lexer.TokenDefinition.TokenPattern">
@@ -1045,286 +1373,6 @@
             </summary>
             <param name="line">The line of input to tokenize.</param>
             <returns>A list of <see cref="T:Proton.Lexer.Token"/> representing the tokens found in the line.</returns>
-        </member>
-        <member name="T:Proton.Lexer.TokenType">
-            <summary>
-            Extended token types for Proton language.
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Options">
-            <summary>
-            (Opt) - option for conditional statements
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Min">
-            <summary>
-             Min(a,b)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Max">
-            <summary>
-            Max(a,b)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Length">
-            <summary>
-            Length
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Identifier">
-            <summary>
-            Variable names (e.g. _varName, _number, Num)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Natural">
-            <summary>
-            N (uint) = 0, 1, 2, 3, 4, 5..
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Integer">
-            <summary>
-            Z (int)  = .. −2, −1, 0, 1, 2..
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Real">
-            <summary>
-            R (double) = .. −2.1, −1.5, 0, 1.6, 2.9..
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Character">
-            <summary>
-            C (char)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Text">
-            <summary>
-            $ (string)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Boolean">
-            <summary>
-            B (bool)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Uint">
-            <summary>
-            UInt literal (e.g. 0, 1, 2...)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Int">
-            <summary>
-            Integer literal (e.g. 1-1, 0, 42)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Double">
-            <summary>
-            Double literal (e.g. 3.14)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Char">
-            <summary>
-            Char literal (e.g. 'a')
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.String">
-            <summary>
-            String literal (e.g. "abc")
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Bool">
-            <summary>
-            Boolean literal (e.g. True/False)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Addition">
-            <summary>
-            +
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Subtraction">
-            <summary>
-            -
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Multiplication">
-            <summary>
-            *
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Division">
-            <summary>
-            /
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Modulus">
-            <summary>
-            %
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Assign">
-            <summary>
-            =
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Equal">
-            <summary>
-            ==
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.NotEqual">
-            <summary>
-            ≠
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.GreaterThan">
-            <summary>
-            >
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.LessThan">
-            <summary>
-            opposite of >
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.GreaterThanOrEqual">
-            <summary>
-            ≥
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.LessThanOrEqual">
-            <summary>
-            ≤
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.LogicalAnd">
-            <summary>
-            ∧
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.LogicalOr">
-            <summary>
-            ∨
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.LogicalNot">
-            <summary>
-            ┐
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Implication">
-            <summary>
-            →
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.UniversalQuant">
-            <summary>
-            ∀
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.ExistentialQuant">
-            <summary>
-            ∃
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Product">
-            <summary>
-            ∏
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Summation">
-            <summary>
-            ∑
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Semicolon">
-            <summary>
-            ; to terminate statements (optional)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Colon">
-            <summary>
-            : to assign statements
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Comma">
-            <summary>
-            , to terminate statements, variables (optional)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.OpenParen">
-            <summary>
-            (
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.CloseParen">
-            <summary>
-            )
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.OpenBrace">
-            <summary>
-            {
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.CloseBrace">
-            <summary>
-            }
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.ListSpecifier">
-            <summary>
-            []
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.OpenSqrBrace">
-            <summary>
-            [
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.CloseSqrBrace">
-            <summary>
-            ]
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Macro">
-            <summary>
-            #   to separate logical parts (#StatePlace..)
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.QuestionMarks">
-            <summary>
-            ??  to parameter spaceholder
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Period">
-            <summary>
-            .   to function call on variables
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Comment">
-            <summary>
-            //  one line comments
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Whitespace">
-            <summary>
-            any whitespace
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Newline">
-            <summary>
-            NewLine
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.EndOfInput">
-            <summary>
-             End of input.
-            </summary>
-        </member>
-        <member name="F:Proton.Lexer.TokenType.Unknown">
-            <summary>
-            Unknown specaial token
-            </summary>
         </member>
         <member name="T:System.Text.RegularExpressions.Generated.NatIdentRegex_0">
             <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the NatIdentRegex method.</summary>

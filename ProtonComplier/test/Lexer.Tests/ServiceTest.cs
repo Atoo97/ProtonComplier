@@ -1,6 +1,7 @@
 global using NUnit.Framework;
 using Moq;
 using Proton.Lexer;
+using Proton.Lexer.Enums;
 using Proton.Lexer.Interfaces;
 using Proton.Lexer.Services;
 
@@ -54,12 +55,14 @@ namespace TestProject1
             {
                 Assert.That(result.isSuccessful, Is.True);
                 Assert.That(result.sections.ContainsKey("StatePlace"));
-                Assert.That(result.sections["StatePlace"].Count, Is.EqualTo(1));
+                Assert.That(result.sections["StatePlace"], Has.Count.EqualTo(1));
             });
 
-            Assert.That(result.errors, Is.Empty);
-            Assert.That(result.warnings, Is.Empty);
-
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.errors, Is.Empty);
+                Assert.That(result.warnings, Is.Empty);
+            });
         }
 
         [Test]
@@ -118,13 +121,16 @@ namespace TestProject1
                 (TokenType.Newline, "\n"),
             };
 
-            Assert.That(tokens.Count, Is.EqualTo(expectedTokens.Count));
+            Assert.That(tokens, Has.Count.EqualTo(expectedTokens.Count));
 
             for (int i = 0; i < expectedTokens.Count; i++)
             {
-                // Console.WriteLine(tokens[i].ToString());
-                Assert.That(tokens[i].TokenType, Is.EqualTo(expectedTokens[i].Item1));
-                Assert.That(tokens[i].TokenValue, Is.EqualTo(expectedTokens[i].Item2));
+                Assert.Multiple(() =>
+                {
+                    // Console.WriteLine(tokens[i].ToString());
+                    Assert.That(tokens[i].TokenType, Is.EqualTo(expectedTokens[i].Item1));
+                    Assert.That(tokens[i].TokenValue, Is.EqualTo(expectedTokens[i].Item2));
+                });
             }
         }
 
@@ -135,13 +141,15 @@ namespace TestProject1
             var input = File.ReadAllText(filePath) + "\r";
             var tokens = new Tokenizer().Tokenize(input);
 
-            Assert.IsNotEmpty(tokens);
-            Assert.IsTrue(tokens.Exists(t => t.TokenType == TokenType.Macro && t.TokenValue == "StatePlace"));
-            Assert.IsTrue(tokens.Exists(t => t.TokenType == TokenType.Identifier && t.TokenValue == "_var1"));
-            Assert.IsTrue(tokens.Exists(t => t.TokenType == TokenType.Natural));
-            Assert.IsTrue(tokens.Exists(t => t.TokenType == TokenType.Identifier && t.TokenValue == "_var2"));
-            Assert.IsTrue(tokens.Exists(t => t.TokenType == TokenType.Real));
+            Assert.That(tokens, Is.Not.Empty);
+            Assert.Multiple(() =>
+            {
+                Assert.That(tokens.Exists(t => t.TokenType == TokenType.Macro && t.TokenValue == "StatePlace"), Is.True);
+                Assert.That(tokens.Exists(t => t.TokenType == TokenType.Identifier && t.TokenValue == "_var1"), Is.True);
+                Assert.That(tokens.Exists(t => t.TokenType == TokenType.Natural), Is.True);
+                Assert.That(tokens.Exists(t => t.TokenType == TokenType.Identifier && t.TokenValue == "_var2"), Is.True);
+                Assert.That(tokens.Exists(t => t.TokenType == TokenType.Real), Is.True);
+            });
         }
-
     }
 }

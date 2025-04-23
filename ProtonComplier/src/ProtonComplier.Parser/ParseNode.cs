@@ -4,6 +4,7 @@
 namespace Proton.Parser
 {
     using Proton.Lexer;
+    using Proton.Lexer.Enums;
 
     /// <summary>
     /// Represents a node in the parse tree used during syntax analysis.
