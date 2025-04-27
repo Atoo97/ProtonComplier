@@ -108,6 +108,26 @@ namespace Proton.Lexer
                             matchLength = value.Length + 2;
                         }
 
+                        // Check if negative numbers comes after ")" token:
+                        if ((def.TokenName == TokenType.Double || def.TokenName == TokenType.Int) && value.StartsWith('-'))
+                        {
+                            if (lineTokens.Count > 0 && lineTokens.Last().TokenType == TokenType.CloseParen)
+                            {
+                                // Then it will be (-) token and (2) token instead of (-2) token:
+                                lineTokens.Add(new Token
+                                {
+                                    TokenType = TokenType.Subtraction,
+                                    TokenCategory = TokenCategory.Operator,
+                                    TokenValue = "-",
+                                    TokenLine = this.line,
+                                    TokenColumn = startColumn,
+                                });
+
+                                value = value.StartsWith('-') ? value[1..] : value; // Remove -
+                                startColumn += 1;
+                            }
+                        }
+
                         // Create token with line and column data
                         lineTokens.Add(new Token
                         {
