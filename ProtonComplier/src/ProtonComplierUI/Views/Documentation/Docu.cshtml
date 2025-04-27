@@ -1,0 +1,228 @@
+﻿@{
+    ViewData["Title"] = "Proton Documentation";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+    .docs-header {
+        background-color: #f5f4fa;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .docs-header-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .docs-header-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        text-decoration: none;
+        margin-bottom: 0.5rem;
+    }
+
+    .docs-header-version {
+        font-size: 1rem;
+        font-weight: normal;
+        color: #fff;
+        margin-left: 0.5rem;
+        background-color: #8d74e7;
+        border-radius: 4px;
+        padding: 0.2em 0.3em;
+        line-height: 100%;
+    }
+
+    .docs-header-right {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .docs-header-nav {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .docs-header-link {
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .docs-header-link.active {
+        font-weight: 700;
+        color: #8d74e7;
+    }
+
+    .docs-main {
+        padding: 1rem;
+        background-color: #fff;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .docs-main-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    .docs-main-subtitle {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 2rem 0 1rem 0;
+        color: #555;
+    }
+
+    .link-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .link-box {
+        display: flex;
+        align-items: center;
+        background-color: #f5f4fa;
+        padding: 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #333;
+        transition: background-color 0.3s ease;
+    }
+
+    .link-box:hover {
+        background-color: #e5e4ea;
+    }
+
+    .link-icon {
+        font-size: 2rem;
+        margin-right: 1rem;
+    }
+
+    .link-text {
+        flex: 1;
+        font-size: 1rem;
+    }
+
+    .docs-main-paragraph {
+        font-size: 1rem;
+        color: #666;
+    }
+
+    .docs-main-paragraph a {
+        color: #0078d4;
+        text-decoration: underline;
+    }
+
+    .docs-main-paragraph a:hover {
+        color: #005fa3;
+    }
+
+    /* Responsive tweaks */
+    @@media (max-width: 768px) {
+
+        .docs-header-container {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .docs-header-right {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .docs-header-nav {
+            gap: 0.5rem;
+        }
+
+        .link-list {
+            gap: 0.5rem;
+        }
+
+        .link-box {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .link-icon {
+            margin-bottom: 0.5rem;
+        }
+    }
+    </style>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="docs-header-container">
+
+            <!-- Title -->
+            <a asp-controller="Documentation" asp-action="Docu" class="docs-header-title">
+                ProtonComplier Documentation
+                <span class="docs-header-version">1.0 beta 2</span>
+            </a>
+
+            <!-- Right Side -->
+            <div class="docs-header-right">
+
+                <!-- Navigation -->
+                <nav class="docs-header-nav">
+                    <a href="/docs/guides" class="docs-header-link">Guides</a>
+                    <a asp-controller="Documentation" asp-action="Reference" class="docs-header-link">Language Reference</a>
+                    <a href="/docs/upgrades" class="docs-header-link">Errors & Warnings</a>
+                </nav>
+
+            </div>
+        </div>
+    </header>
+
+    <section class="docs-main">
+        <h1 class="docs-main-title">The ProtonComplier Documentation</h1>
+        <h2 class="docs-main-subtitle">Where to go from here?</h2>
+
+        <div class="link-list">
+            <a href="guides" class="link-box">
+                <div class="link-icon">🙋</div>
+                <div class="link-text">
+                    If you want dive into ProtonComplier, learn how to use the compiler and the engine, you should take this way.
+                </div>
+            </a>
+
+            <a href="reference" class="link-box">
+                <div class="link-icon">📗</div>
+                <div class="link-text">
+                    If you want to learn about Proton from the slightly dressy but still very nice Language Reference &amp; Guide, you’re right here.
+                </div>
+            </a>
+
+            <a href="errorswarnings" class="link-box">
+                <div class="link-icon">📦</div>
+                <div class="link-text">
+                    Go this way if you want to learn about the advance error handling that ship with ProtonComplier.
+                </div>
+            </a>
+        </div>
+
+        <h2 class="docs-main-subtitle">Improve the Documentation</h2>
+        <p class="docs-main-paragraph">
+            If you found a mistake or something else that could be improved, you can find this
+            <a href="https://github.com/Atoo97/ProtonComplier" target="_blank" rel="noopener">documentation on GitHub</a>.
+        </p>
+    </section>
+
+</body>
+</html>

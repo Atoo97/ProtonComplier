@@ -19,12 +19,6 @@ public class HomeController : Controller
     }
 
     [HttpGet]
-    public IActionResult Documentation()
-    {
-        return View();
-    }
-
-    [HttpGet]
     public IActionResult Editor()
     {
         return View();

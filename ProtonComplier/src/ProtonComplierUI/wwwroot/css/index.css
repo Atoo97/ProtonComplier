@@ -64,9 +64,9 @@
     margin-top: 2rem;
 }
 
-    .socialize iframe {
-        border: none;
-    }
+.socialize iframe {
+    border: none;
+}
 
 .feature-icon {
     width: 70px; /* Set the width of the icon */

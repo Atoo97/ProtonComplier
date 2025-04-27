@@ -1,0 +1,452 @@
+﻿@{
+    ViewData["Title"] = "Proton Documentation";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        .docs-header {
+            background-color: #f5f4fa;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .docs-header-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .docs-header-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+        }
+
+        .docs-header-version {
+            font-size: 1rem;
+            font-weight: normal;
+            color: #fff;
+            margin-left: 0.5rem;
+            background-color: #8d74e7;
+            border-radius: 4px;
+            padding: 0.2em 0.3em;
+            line-height: 100%;
+        }
+
+        .docs-header-right {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .docs-header-nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .docs-header-link {
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            .docs-header-link.active {
+                font-weight: 700;
+                color: #8d74e7;
+            }
+
+        .docs-main {
+            padding: 1rem;
+            background-color: #fff;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            display: none; /* Hide all sections by default */
+        }
+
+        pre.syntax {
+            font-family: 'Roboto Mono', Monaco, monospace;
+            background-color: #f9f9fb;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+            /* Additional styles for the code and span elements if needed */
+            pre.syntax code {
+                display: block;
+                white-space: pre-wrap; /* Wraps long lines */
+                word-wrap: break-word; /* Ensures long lines break correctly */
+            }
+
+        .syntax-placeholder {
+            color: #007bff; /* You can change the color to suit your design */
+            text-decoration: none;
+        }
+
+            .syntax-placeholder:hover {
+                text-decoration: underline; /* Optional: adds underline on hover */
+            }
+
+        /* Responsive tweaks */
+        @@media (max-width: 768px) {
+
+            .docs-header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .docs-header-right {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .docs-header-nav {
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="docs-header">
+        <div class="docs-header-container">
+
+            <!-- Title -->
+            <a asp-controller="Documentation" asp-action="Docu" class="docs-header-title">
+                ProtonComplier Documentation
+                <span class="docs-header-version">1.0 beta 2</span>
+            </a>
+
+            <!-- Right Side -->
+            <div class="docs-header-right">
+
+                <!-- Navigation -->
+                <nav class="docs-header-nav">
+                    <a href="/docs/guides" class="docs-header-link">Guides</a>
+                    <a asp-controller="Documentation" asp-action="Reference" class="docs-header-link active">Language Reference</a>
+                    <a href="/docs/upgrades" class="docs-header-link">Upgrades</a>
+                </nav>
+
+            </div>
+        </div>
+    </header>
+
+    <section class="docs-main">
+        <div class="row">
+            <!-- Left Sidebar (Table of Contents) -->
+            <nav class="col-md-3 d-none d-md-block bg-light sidebar p-3" style="overflow-y: auto; height: 100vh;">
+                <h5>The Language Reference & Guide</h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#document-welcome">Welcome to Emojicode</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#document-syntax">Syntax</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#document-basics">The Basics</a>
+                    </li>
+                    <!--
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Literals</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Variables and Assignment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Control Flow</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Classes & Value Types</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Overloading</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Operators</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Optionals</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Errors</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Inheritance and Overriding</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Protocols</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Enumerations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Types and Namespaces</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Types as Values</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Documentation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Generics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Callables</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Packages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Threads</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Safe and Unsafe Code</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Memory Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">References</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Appendix: The Emojicode Compiler</a>
+                    </li>
+                    -->
+                </ul>
+            </nav>
+
+            <!-- Mobile TOC toggle (Text centered with color) -->
+            <div class="d-md-none mb-3 text-center">
+                <span class="text-primary" style="color: #8d74e7; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#mobileToc" aria-expanded="false" aria-controls="mobileToc">
+                    Table of Contents
+                </span>
+                <div class="collapse mt-2" id="mobileToc">
+                    <nav class="bg-light p-3">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#document-welcome">Welcome to Emojicode</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#document-syntax">Syntax</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#document-basics">The Basics</a>
+                            </li>
+                            <!--
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Literals</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Variables and Assignment</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Control Flow</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Classes & Value Types</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Overloading</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Operators</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Optionals</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Errors</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Inheritance and Overriding</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Protocols</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Enumerations</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Types and Namespaces</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Types as Values</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Documentation</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Generics</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Callables</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Packages</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Threads</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Safe and Unsafe Code</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Memory Management</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">References</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Appendix: The Emojicode Compiler</a>
+                            </li>
+                            -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Right Main Content -->
+            <main class="col-md-9 main-content" id="document-welcome">
+                <h1>Welcome to Emojicode</h1>
+                <p><strong>Hint:</strong> Looking for a tutorial? See “Compile and Run Your First Program”.</p>
+                <p>Emojicode is a language that aims to provide the most modern and powerful features to make it easy, fast and fun to write programs. These powerful features include classes, optionals, which can handle the absence of a value, generics, closures and much more.</p>
+                <p>The Language Reference & Guide assumes that you have a basic understanding of programming. It is not a tutorial but mainly describes the features of Emojicode and its use cases. It is both a guide, in that it contains examples and tips on how to use features, and is the authoritative source that prescribes how to interpret and execute Emojicode source code.</p>
+                <p>Emojicode is a strongly typed language, which means that the compiler will verify that all of your operations are correct.</p>
+                <p>Although Emojicode only uses Emojis to express the program’s structure, it is similar to programming languages you might know, like C.</p>
+
+                <hr />
+                <!-- Navigation and buttons -->
+                <div class="d-flex justify-content-between">
+                    <a class="nav-link" href="#document-syntax">Next Up: “Syntax” →</a>
+                </div>
+            </main>
+
+
+
+            <main class="col-md-9 main-content" id="document-syntax">
+                <h1>Syntax</h1>
+                <p>The Language Reference & Guide aims to be – as the title suggests – a reference and guide in one. Since a programming language needs formal definitions, you’ll see syntactic definitions from time to time. The notation used and the most basic syntactic definitions are described in this chapter. The meaning of these structures will be described in detail in the following chapters.</p>
+
+                <p><strong>Hint:</strong> If you don’t really care about syntactic definitions, no worries! You should be able to follow along without problems. Just skip this chapter and ignore them.</p>
+
+                <p>Note that the grammar specified in the Language Reference & Guide is not a complete description of the Emojicode language. The grammar alone allows programs that are not valid. The accompanying text will outline further rules that programs must obey.</p>
+
+                <h3>Document Syntax</h3>
+                <p>Every Emojicode source code document consists of any number of document-statements.</p>
+                <pre class="syntax"><code><span class="syntax-placeholder" id="srule-document-statement">document-statement</span> ⟶ <a class="syntax-placeholder" href="/docs/reference/packages#srule-package-import">package-import</a> | <a class="syntax-placeholder" href="/docs/reference/syntax#srule-include">include</a> | <a class="syntax-placeholder" href="/docs/reference/documentation#srule-package-documentation-comment">package-documentation-comment</a>
+                    <span class="syntax-placeholder" id="srule-document-statement">document-statement</span> ⟶ <a class="syntax-placeholder" href="/docs/reference/classes-valuetypes#srule-type-definition">type-definition</a> | <a class="syntax-placeholder" href="/docs/reference/packages#srule-link-hints">link-hints</a>
+                    <span class="syntax-placeholder" id="srule-document-statement">document-statement</span> ⟶ <a class="syntax-placeholder" href="/docs/reference/syntax#srule-start-flag">start-flag</a>
+                    <span class="syntax-placeholder" id="srule-include">include</span> ⟶ 📜 <a class="syntax-placeholder" href="/docs/reference/literals#srule-string-literal">string-literal</a>
+                    <span class="syntax-placeholder" id="srule-start-flag">start-flag</span> ⟶ 🏁 [<a class="syntax-placeholder" href="/docs/reference/classes-valuetypes#srule-return-type">return-type</a>] <a class="syntax-placeholder" href="/docs/reference/controlflow#srule-block">block</a>
+                    </code>
+                </pre>
+
+                <!-- Navigation and buttons -->
+                <div class="d-flex justify-content-between">
+                    <a class="nav-link" href="#document-welcome">← Previous</a>
+                    <a class="nav-link" href="#document-basics">Next Up: “The Basics” →</a>
+                </div>
+
+            </main>
+
+
+            <main class="col-md-9 main-content" id="document-basics">
+                <h1>The Basics</h1>
+                <p>This chapter reviews the basics of Emojicode that occur in most programs or are of importance in the following sections of this Language Reference & Guide.</p>
+
+                <h3>Source Files</h3>
+                <p>Emojicode source files are UTF-8 encoded text documents in accordance with the syntax specified by the grammar in this documentation.</p>
+                <p>Source code files must have the extension <code>.🍇</code> or <code>.emojic</code>.</p>
+
+                <h3>The 🏁 Block</h3>
+                <p>The 🏁 block is an important part of any Emojicode program as it is the part of the program that is executed when it is started.</p>
+                <p>Here’s an example of a 🏁 block:</p>
+                <pre class="syntax"><code>🏁 🍇
+                   💭 Get things up and running here...
+                🍉</code></pre>
+                                <p>The 🏁 block can also return an integer which is then used as the exit code:</p>
+                                <pre class="syntax"><code>🏁 ➡️ 🔢 🍇
+                   💭 Get things up and running here...
+                  ↩️ 0  💭 Return a code here.
+                🍉</code></pre>
+
+                <h3>Comments</h3>
+                <p>We have seen examples of comments in the previous code samples. Comments allow you to include non-executable text in your code.</p>
+                <p>Comments begin with 💭 and end at the end of the line. For example:</p>
+                <pre class="syntax"><code>💭 This is a comment in Emojicode.</code></pre>
+
+                <!-- Navigation and buttons -->
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-secondary" id="previousButton">← Previous</button>
+                    <button class="btn btn-primary" id="nextButton">Next Up: “The Basics” →</button>
+                </div>
+            </main>
+
+        </div>
+    </section>
+
+   
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.main-content');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    // Check if the clicked link corresponds to the Home or Index button
+                    if (link.getAttribute('href') === '/' || link.getAttribute('href') === '/Home/Index') {
+                        return; // Allow default behavior (no script interference)
+                    }
+
+                    if (link.getAttribute('href') === '/' || link.getAttribute('href') === '/Home/Editor') {
+                        return; // Allow default behavior (no script interference)
+                    }
+
+                    e.preventDefault(); // Prevent the default link behavior for all other links
+
+                    // Hide all sections
+                    sections.forEach(section => {
+                        section.style.display = 'none';
+                    });
+
+                    // Show the selected section
+                    const targetId = link.getAttribute('href').substring(1); // Get the target section id
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.style.display = 'block';
+                    }
+                });
+            });
+        });
+    </script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Make the first section visible by default
+            const firstSection = document.querySelector('.main-content');
+            if (firstSection) {
+                firstSection.style.display = 'block';
+            }
+        });
+    </script>
+
+
+</body>
+</html>
