@@ -20,6 +20,19 @@ public class DocumentationController : Controller
 
     public IActionResult Reference()
     {
+        ViewData["ActiveLink"] = "Reference";
+        return View();
+    }
+
+    public IActionResult ErrorsAndWarnings()
+    {
+        ViewData["ActiveLink"] = "Errors&Warnings";
+        return View();
+    }
+
+    public IActionResult Guides()
+    {
+        ViewData["ActiveLink"] = "Guides";
         return View();
     }
 
