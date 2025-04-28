@@ -1,4 +1,9 @@
-﻿.docs-header {
+﻿nav {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.docs-header {
     background-color: #f5f4fa;
     padding-left: 1rem;
     padding-right: 1rem;
@@ -76,7 +81,7 @@
     color: #555;
 }
 
-.nav-link {
+.nav-link-item {
     display: block;
     padding: 8px;
     margin: 4px 0;
@@ -86,7 +91,7 @@
     border-radius: 4px;
 }
 
-.nav-link a:hover {
+.nav-link-item a:hover {
     background-color: #ccc;
 }
 

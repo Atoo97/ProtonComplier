@@ -15,18 +15,112 @@ header {
     background-color: #312d67;
 }
 
+/* Dark Mode */
+header.dark-mode {
+    background-color: black;
+}
+
 .navbar-proton .navbar-brand,
 .navbar-proton .nav-link {
     color: white !important;
-    background-color: #312d67;
+    background-color: transparent;
+}
+
+/* Dark Mode */
+.navbar-proton.dark-mode .navbar-brand,
+.navbar-proton.dark-mode .nav-link {
+    color: #318e80 !important;
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+/* Switch styling */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 58px;
+    height: 28px;
+    vertical-align: middle; /* <--- Align with nav links */
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1d1e23;
+    transition: 0.4s;
+    border-radius: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px;
+}
+
+.slider-icon {
+    font-size: 24px;
+    transition: 0.4s;
+}
+
+/* Color for sun and moon icons */
+.slider-icon.left {
+    color: #3498db; /* Sun (Dark mode) color */
+}
+
+.slider-icon.right {
+    color: #f39c12; /* Moon (Light mode) color */
+}
+
+/* When checked, slide the circle */
+input:checked + .slider {
+    background-color: whitesmoke;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    border-radius: 50%;
+    background-color: #8d74e7;
+    transition: 0.4s;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* Ensure both sun and moon are always visible */
+.slider-icon.left,
+.slider-icon.right {
+    visibility: visible;
+}
+
+/* When checked, slide the circle */
+input:checked + .slider .slider-icon.left {
+    visibility: visible;
+}
+
+input:checked + .slider .slider-icon.right {
+    visibility: visible;
+}
+
 @media (max-width: 768px) {
     html {
         font-size: 16px;
+    }
+
+    .switch {
+        margin: 10px 0; /* Adds space around the theme switcher */
     }
 }

@@ -1,0 +1,75 @@
+﻿body {
+    background: linear-gradient(135deg, #3a0ca3, #5f0f40);
+    color: white;
+}
+
+.nav-header {
+    padding: 0px;
+}
+
+.nav-container {
+    background-color: rgb(0 0 0 / 28%); /* Gray color with 30% opacity */
+    padding-right: 9px;
+    padding-left: 3px;
+}
+
+#compileForm,
+#compileAndRunForm, 
+#clearForm {
+    margin: 3px;
+}
+
+/* General button styles */
+#compileButton,
+#compileAndRunButton,
+#clearButton {
+    padding: 0 3px;
+    width: 4rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+/* General hover effect */
+#compileButton:hover,
+#compileAndRunButton:hover,
+#clearButton:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* Image inside buttons */
+#compileButton img,
+#compileAndRunButton img,
+#clearButton img {
+    width: 35px;
+    height: 22px;
+    margin: 5px;
+    transition: filter 0.3s;
+}
+
+/* Hover effect for images */
+#compileButton:hover img,
+#compileAndRunButton:hover img,
+#clearButton:hover img {
+    filter: brightness(1.2);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .nav-container {
+        padding-right: 3px;
+        padding-left: 3px;
+    }
+
+    #compileForm,
+    #compileAndRunForm,
+    #clearForm {
+        margin: 2px;
+    }
+
+    .navbar-collapse {
+        padding: 10px; /* Add space around the entire collapse section */
+    }
+}

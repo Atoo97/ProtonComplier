@@ -1,6 +1,6 @@
 ﻿// JavaScript to auto - close mobile TOC after clicking a link
 document.addEventListener('DOMContentLoaded', function () {
-    const tocLinks = document.querySelectorAll('#mobileToc .nav-link');
+    const tocLinks = document.querySelectorAll('#mobileToc .nav-link-item');
     const mobileToc = document.getElementById('mobileToc');
 
     tocLinks.forEach(function (link) {
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    const navLinks = document.querySelectorAll('.nav-link');
+    const navLinks = document.querySelectorAll('.nav-link-item');
     const sections = document.querySelectorAll('.main-content');
 
     navLinks.forEach(link => {
@@ -26,7 +26,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 return; // Allow default behavior (no script interference)
             }
 
-            if (link.getAttribute('href') === '/' || link.getAttribute('href') === '/Home/Editor') {
+            if (link.getAttribute('href') === '/' || link.getAttribute('href') === '/Editor') {
+                return; // Allow default behavior (no script interference)
+            }
+
+            if (link.getAttribute('href') === '/' || link.getAttribute('href') === '/Documentation/Docu') {
                 return; // Allow default behavior (no script interference)
             }
 
