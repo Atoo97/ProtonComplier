@@ -1,9 +1,4 @@
-﻿body {
-    background: linear-gradient(135deg, #3a0ca3, #5f0f40);
-    color: white;
-}
-
-.nav-header {
+﻿.nav-header {
     padding: 0px;
 }
 
@@ -11,6 +6,11 @@
     background-color: rgb(0 0 0 / 28%); /* Gray color with 30% opacity */
     padding-right: 9px;
     padding-left: 3px;
+}
+
+/* Dark Mode */
+.nav-container.dark-mode {
+    background-color: rgb(0 0 0 / 70%);
 }
 
 #compileForm,

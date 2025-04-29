@@ -9,7 +9,16 @@ html {
 
 body {
     margin-bottom: 60px;
+    background: linear-gradient(135deg, #3a0ca3, #5f0f40);
+    color: white;
 }
+
+/* Dark Mode */
+body.dark-mode {
+    background: linear-gradient(135deg, #180b36f7, #5f0f40);
+    color: white;
+}
+
 
 header {
     background-color: #312d67;
@@ -26,14 +35,8 @@ header.dark-mode {
     background-color: transparent;
 }
 
-/* Dark Mode */
-.navbar-proton.dark-mode .navbar-brand,
-.navbar-proton.dark-mode .nav-link {
-    color: #318e80 !important;
-}
-
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 /* Switch styling */
@@ -115,12 +118,133 @@ input:checked + .slider .slider-icon.right {
     visibility: visible;
 }
 
+
+
+
+
+/*Inner Render part*/
+.header {
+    margin-left: 20%;
+    margin-right: 20%;
+    color: white;
+}
+
+.header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8%;
+}
+
+.header-inner {
+    flex: 1 1 60%;
+}
+
+.header-inner h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.header-inner h2 {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.btn-primary {
+    background-color: #4cc9f0;
+    border: none;
+    margin-right: 1rem;
+}
+
+.l-button {
+    appearance: none;
+    border-radius: 4px;
+    padding: 0.7em 1.2em;
+    color: #fff;
+    display: inline-block;
+    background: linear-gradient(to top, #8d74e7, #9774e7);
+    line-height: normal;
+    text-decoration: none
+}
+
+.l-button:hover {
+    background-color: #744eaa;
+}
+
+.btn-outline-light {
+    border: 1px solid white;
+}
+
+.social-buttons {
+    margin-top: 2rem;
+}
+
+.socialize {
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.socialize iframe {
+    border: none;
+}
+
+.feature-icon {
+    width: 70px; /* Set the width of the icon */
+    height: 70px; /* Set the height of the icon */
+    margin-bottom: 1rem;
+}
+
+.code-image {
+    max-width: 100%;
+    height: auto;
+}
+
+.image-container {
+    flex: 1 1 35%;
+    text-align: center;
+}
+
+.features-section {
+    padding-left: 20%;
+    padding-right: 20%;
+    padding-bottom: 5%;
+    background-color: white;
+    color: black;
+}
+
+/* Dark Mode */
+.features-section.dark-mode {
+    background-color: #1d1e23;
+    color: white;
+}
+
+
+
+/*Mobibel view layout:*/
 @media (max-width: 768px) {
     html {
         font-size: 16px;
     }
 
     .switch {
-        margin: 10px 0; /* Adds space around the theme switcher */
+        margin: 10px 0;
+    }
+
+
+    /*Inner Render part*/
+    .header {
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+
+    .image-container {
+        display: none;
+    }
+
+    .features-section {
+        padding-left: 0px;
+        padding-right: 0px;
     }
 }

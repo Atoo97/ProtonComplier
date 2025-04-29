@@ -2,3 +2,10 @@
     ViewData["Title"] = "Editor";
 }
 
+@section EditorBar {
+    @await Html.PartialAsync("EditorBar")
+}
+
+<div class="editor-container">
+    @* Your editor will render here *@
+</div>

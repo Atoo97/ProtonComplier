@@ -2,20 +2,48 @@
 function applySavedTheme() {
     const theme = localStorage.getItem('theme');
     const themeToggle = document.getElementById('themeToggle');
+    const body = document.querySelector('body');
     const header = document.querySelector('header');
     const navbar = document.querySelector('.navbar-proton');
     const logo = document.querySelector('.navbar-brand img');
+    const wavePath = document.querySelector('.wave-bottom path');
+    const featuresSections = document.querySelectorAll('.features-section'); // <-- changed to querySelectorAll
+    const navContainer = document.querySelectorAll('.nav-container');
+    const docsHeader = document.querySelectorAll('.docs-header');
+    const docuBody = document.querySelectorAll('.DocuBody');
+    const docsMain = document.querySelectorAll('.docs-main');
+    const docuMainTitle = document.querySelectorAll('.docs-main-title');
+    const linkbox = document.querySelectorAll('.link-box');
+    const docsSidebar = document.querySelectorAll('.sidebar');
 
     if (theme === 'dark') {
-        document.body.classList.add('dark-mode');
+        body.classList.add('dark-mode');
         header.classList.add('dark-mode');
         navbar.classList.add('dark-mode');
+        if (wavePath) wavePath.setAttribute('fill', '#1d1e23');
+        featuresSections.forEach(section => section.classList.add('dark-mode')); // <-- loop through all
+        navContainer.forEach(section => section.classList.add('dark-mode')); 
+        docsHeader.forEach(section => section.classList.add('dark-mode')); 
+        docuBody.forEach(section => section.classList.add('dark-mode')); 
+        docsMain.forEach(section => section.classList.add('dark-mode')); 
+        docuMainTitle.forEach(section => section.classList.add('dark-mode')); 
+        linkbox.forEach(section => section.classList.add('dark-mode')); 
+        docsSidebar.forEach(section => section.classList.add('dark-mode')); 
         themeToggle.checked = true;
-        if (logo) logo.src = '/images/proton_logo_dark.png';
+        if (logo) logo.src = '/images/proton_logo_darkmode.png';
     } else {
-        document.body.classList.remove('dark-mode');
+        body.classList.remove('dark-mode');
         header.classList.remove('dark-mode');
         navbar.classList.remove('dark-mode');
+        if (wavePath) wavePath.setAttribute('fill', '#ffffff');
+        featuresSections.forEach(section => section.classList.remove('dark-mode')); // <-- loop through all
+        navContainer.forEach(section => section.classList.remove('dark-mode')); 
+        docsHeader.forEach(section => section.classList.remove('dark-mode'));
+        docuBody.forEach(section => section.classList.remove('dark-mode')); 
+        docsMain.forEach(section => section.classList.remove('dark-mode')); 
+        docuMainTitle.forEach(section => section.classList.remove('dark-mode')); 
+        linkbox.forEach(section => section.classList.remove('dark-mode')); 
+        docsSidebar.forEach(section => section.classList.remove('dark-mode')); 
         themeToggle.checked = false;
         if (logo) logo.src = '/images/proton_logo.png';
     }
@@ -23,30 +51,58 @@ function applySavedTheme() {
 
 // Function to toggle theme and save to localStorage
 function toggleTheme() {
+    const body = document.querySelector('body');
     const header = document.querySelector('header');
     const navbar = document.querySelector('.navbar-proton');
     const logo = document.querySelector('.navbar-brand img');
+    const wavePath = document.querySelector('.wave-bottom path');
+    const featuresSections = document.querySelectorAll('.features-section'); // <-- changed to querySelectorAll
+    const navContainer = document.querySelectorAll('.nav-container');
+    const docsHeader = document.querySelectorAll('.docs-header');
+    const docuBody = document.querySelectorAll('.DocuBody');
+    const docsMain = document.querySelectorAll('.docs-main');
+    const docuMainTitle = document.querySelectorAll('.docs-main-title');
+    const linkbox = document.querySelectorAll('.link-box');
     const isDark = document.getElementById('themeToggle').checked;
+    const docsSidebar = document.querySelectorAll('.sidebar');
 
     if (isDark) {
-        document.body.classList.add('dark-mode');
+        body.classList.add('dark-mode');
         header.classList.add('dark-mode');
         navbar.classList.add('dark-mode');
-        if (logo) logo.src = '/images/proton_logo_dark.png';
+        if (wavePath) wavePath.setAttribute('fill', '#1d1e23');
+        featuresSections.forEach(section => section.classList.add('dark-mode')); // <-- loop through all
+        navContainer.forEach(section => section.classList.add('dark-mode')); 
+        docsHeader.forEach(section => section.classList.add('dark-mode'));
+        docuBody.forEach(section => section.classList.add('dark-mode')); 
+        docsMain.forEach(section => section.classList.add('dark-mode')); 
+        docuMainTitle.forEach(section => section.classList.add('dark-mode')); 
+        linkbox.forEach(section => section.classList.add('dark-mode')); 
+        docsSidebar.forEach(section => section.classList.add('dark-mode')); 
+        if (logo) logo.src = '/images/proton_logo_darkmode.png';
         localStorage.setItem('theme', 'dark');
     } else {
-        document.body.classList.remove('dark-mode');
+        body.classList.remove('dark-mode');
         header.classList.remove('dark-mode');
         navbar.classList.remove('dark-mode');
+        if (wavePath) wavePath.setAttribute('fill', '#ffffff');
+        featuresSections.forEach(section => section.classList.remove('dark-mode')); // <-- loop through all
+        navContainer.forEach(section => section.classList.remove('dark-mode')); 
+        docsHeader.forEach(section => section.classList.remove('dark-mode'));
+        docuBody.forEach(section => section.classList.remove('dark-mode')); 
+        docsMain.forEach(section => section.classList.remove('dark-mode')); 
+        docuMainTitle.forEach(section => section.classList.remove('dark-mode')); 
+        linkbox.forEach(section => section.classList.remove('dark-mode')); 
+        docsSidebar.forEach(section => section.classList.remove('dark-mode')); 
         if (logo) logo.src = '/images/proton_logo.png';
         localStorage.setItem('theme', 'light');
     }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    applySavedTheme(); // Apply theme when page loads
+    applySavedTheme();
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
-        themeToggle.addEventListener('change', toggleTheme); // Listen for toggle changes
+        themeToggle.addEventListener('change', toggleTheme);
     }
 });

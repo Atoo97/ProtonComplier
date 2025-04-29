@@ -17,7 +17,7 @@
     <Content Update="wwwroot\images\Execute.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="wwwroot\images\proton_logo_dark.png">
+    <Content Update="wwwroot\images\proton_logo_darkmode.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="wwwroot\images\RunOutline.svg">

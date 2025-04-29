@@ -58,3 +58,81 @@ document.addEventListener("DOMContentLoaded", function () {
         firstSection.style.display = 'block';
     }
 });
+
+// Define error messages in an object
+const messages = {
+    P001: {
+        code: 'P001',
+        severity: 'Error',
+        text: 'Internal compiler error',
+        example: '.....',
+    },
+    P002: {
+        code: 'P002',
+        severity: 'Error',
+        text: 'Deprecated token usage',
+        example: '.....',
+    },
+    P004: {
+        code: 'P004',
+        severity: 'Error',
+        text: 'Invalid macro definition',
+        example: '.....',
+    },
+    P006: {
+        code: 'P006',
+        severity: 'Warning',
+        text: 'Multiple macro definition',
+        example: '.....',
+    },
+    P007: {
+        code: 'P007',
+        severity: 'Error',
+        text: 'Unknown error',
+        example: '.....',
+    }
+};
+
+// Function to display error details in the content section
+function showMessage(code) {
+    const msg = messages[code];
+    if (!msg) {
+        console.error(`Unknown error code: ${code}`);
+        return;
+    } else { console.error(`Error code: ${code}`); }
+
+    // Dynamically update the content area with error details
+    const content = document.getElementById('content');
+    content.innerHTML = `
+                        <h2>Error ${msg.code}</h2>
+                        <table>
+                            <tr><th>Code</th><td><b>${msg.code}</b></td></tr>
+                            <tr><th>Severity</th><td>${msg.severity}</td></tr>
+                            <tr><th>Message</th><td>${msg.text}</td></tr>
+                        </table>
+                        <p>Example <br>
+                           The following example generates ${msg.code}: <br>
+                           ${msg.example}
+                        </p>
+                        <hr />
+                        <div class="d-flex justify-content-between">
+                                            <a class="nav-link-item" href="#P002" onclick="showMessage('P002'); return false;"> ← Previous: “${msg.code}” </a>
+                                            <a class="nav-link-item" href="#P004" onclick="showMessage('P004'); return false;"> Next Up: “${msg.code}” →</a>
+                        </div>
+                    `;
+}
+
+// Handle initial load for hash-based error display
+window.addEventListener('load', () => {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith("#P")) {
+        const code = hash.substring(1); // "P001"
+        showMessage(code);
+    }
+});
+
+// Optional: Add dynamic toggling for the sidebar (responsive behavior)
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}

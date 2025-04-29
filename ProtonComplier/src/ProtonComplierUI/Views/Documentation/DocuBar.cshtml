@@ -1,0 +1,23 @@
+﻿<!-- Options Section (Top Docu Navbar) -->
+<header class="docs-header">
+    <div class="docs-header-container">
+
+        <!-- Title -->
+        <a asp-controller="Documentation" asp-action="Docu" class="docs-header-title">
+            ProtonComplier Documentation
+            <span class="docs-header-version">1.0 beta 2</span>
+        </a>
+
+        <!-- Right Side -->
+        <div class="docs-header-right">
+
+            <!-- Navigation -->
+            <nav class="docs-header-nav">
+                <a asp-controller="Documentation" asp-action="Guides" class="docs-header-link @(ViewData["ActiveLink"]?.ToString() == "Guides" ? "active" : "")">Guides</a>
+                <a asp-controller="Documentation" asp-action="Reference" class="docs-header-link @(ViewData["ActiveLink"]?.ToString() == "Reference" ? "active" : "")">Language Reference</a>
+                <a asp-controller="Documentation" asp-action="ErrorsAndWarnings" class="docs-header-link @(ViewData["ActiveLink"]?.ToString() == "Errors&Warnings" ? "active" : "")">Errors & Warnings</a>
+            </nav>
+
+        </div>
+    </div>
+</header>

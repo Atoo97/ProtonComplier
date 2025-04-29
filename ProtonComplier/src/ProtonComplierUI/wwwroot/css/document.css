@@ -1,4 +1,16 @@
-﻿nav {
+﻿.DocuBody {
+    min-height: 87.4vh; /* full viewport height */
+    flex-direction: column;
+    background-color: white; /* or dark depending on theme */
+    box-sizing: border-box;
+}
+
+/* Dark Mode */
+.DocuBody.dark-mode {
+    background-color: #1d1e23;
+}
+
+nav {
     padding-top: 0px;
     padding-bottom: 0px;
 }
@@ -9,6 +21,11 @@
     padding-right: 1rem;
     position: sticky;
     top: 0;
+}
+
+/* Dark Mode */
+.docs-header.dark-mode {
+    background-color: #cecece;
 }
 
 .docs-header-container {
@@ -67,11 +84,22 @@
     margin: 0 auto;
 }
 
+/* Dark Mode */
+.docs-main.dark-mode {
+    background-color: #1d1e23;
+       
+}
+
 .docs-main-title {
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 1rem;
     color: #333;
+}
+
+/* Dark Mode */
+.docs-main-title.dark-mode {
+    color: white;
 }
 
 .docs-main-subtitle {
@@ -113,6 +141,11 @@
     transition: background-color 0.3s ease;
 }
 
+/* Dark Mode */
+.link-box.dark-mode {
+    background-color: #cecece;
+}
+
 .link-box:hover {
     background-color: #e5e4ea;
 }
@@ -150,6 +183,12 @@
     height: 75vh;
     position: sticky;
     top: 3.5rem;
+    background-color: lightgrey;
+}
+
+/* Dark Mode */
+.sidebar.dark-mode {
+    background-color: transparent;
 }
 
 pre.syntax {
