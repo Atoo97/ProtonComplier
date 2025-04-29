@@ -1,4 +1,6 @@
-﻿@{
+﻿@model EditorViewModel
+
+@{
     ViewData["Title"] = "Editor";
 }
 
@@ -6,6 +8,28 @@
     @await Html.PartialAsync("EditorBar")
 }
 
-<div class="editor-container">
-    @* Your editor will render here *@
-</div>
+<section class="DocuBodyEditor">
+    <!-- Main content with Monaco Editor Panels -->
+    <div class="wrapper">
+        <div id="editor-container" class="box">
+            <div id="editor-inner"></div>
+        </div>
+        <div class="handler"></div>
+        <div class="right-container box">
+            <!-- Right container with two inner rows -->
+            <div id="right-editor-container" class="row">
+                <div id="right-editor-inner"></div>
+            </div>
+            <div id="consolePanel" class="alert-secondary row">
+                <span id="compilerOutput">
+                    @if (!string.IsNullOrEmpty(Model.ConsoleMessage))
+                    {
+                        <span>@Model.ConsoleMessage </span>
+                        <br />
+                    }
+                    <span id="blinkingArrow">ProtonCompiler >> </span>
+                </span>
+            </div>
+        </div>
+    </div>
+</section>

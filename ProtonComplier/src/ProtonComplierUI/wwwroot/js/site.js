@@ -11,6 +11,7 @@ function applySavedTheme() {
     const navContainer = document.querySelectorAll('.nav-container');
     const docsHeader = document.querySelectorAll('.docs-header');
     const docuBody = document.querySelectorAll('.DocuBody');
+    const docuBodyEditor = document.querySelectorAll('.DocuBodyEditor');
     const docsMain = document.querySelectorAll('.docs-main');
     const docuMainTitle = document.querySelectorAll('.docs-main-title');
     const linkbox = document.querySelectorAll('.link-box');
@@ -25,6 +26,7 @@ function applySavedTheme() {
         navContainer.forEach(section => section.classList.add('dark-mode')); 
         docsHeader.forEach(section => section.classList.add('dark-mode')); 
         docuBody.forEach(section => section.classList.add('dark-mode')); 
+        docuBodyEditor.forEach(section => section.classList.add('dark-mode')); 
         docsMain.forEach(section => section.classList.add('dark-mode')); 
         docuMainTitle.forEach(section => section.classList.add('dark-mode')); 
         linkbox.forEach(section => section.classList.add('dark-mode')); 
@@ -40,6 +42,7 @@ function applySavedTheme() {
         navContainer.forEach(section => section.classList.remove('dark-mode')); 
         docsHeader.forEach(section => section.classList.remove('dark-mode'));
         docuBody.forEach(section => section.classList.remove('dark-mode')); 
+        docuBodyEditor.forEach(section => section.classList.remove('dark-mode')); 
         docsMain.forEach(section => section.classList.remove('dark-mode')); 
         docuMainTitle.forEach(section => section.classList.remove('dark-mode')); 
         linkbox.forEach(section => section.classList.remove('dark-mode')); 
@@ -60,6 +63,7 @@ function toggleTheme() {
     const navContainer = document.querySelectorAll('.nav-container');
     const docsHeader = document.querySelectorAll('.docs-header');
     const docuBody = document.querySelectorAll('.DocuBody');
+    const docuBodyEditor = document.querySelectorAll('.DocuBodyEditor');
     const docsMain = document.querySelectorAll('.docs-main');
     const docuMainTitle = document.querySelectorAll('.docs-main-title');
     const linkbox = document.querySelectorAll('.link-box');
@@ -74,7 +78,8 @@ function toggleTheme() {
         featuresSections.forEach(section => section.classList.add('dark-mode')); // <-- loop through all
         navContainer.forEach(section => section.classList.add('dark-mode')); 
         docsHeader.forEach(section => section.classList.add('dark-mode'));
-        docuBody.forEach(section => section.classList.add('dark-mode')); 
+        docuBody.forEach(section => section.classList.add('dark-mode'));
+        docuBodyEditor.forEach(section => section.classList.add('dark-mode')); 
         docsMain.forEach(section => section.classList.add('dark-mode')); 
         docuMainTitle.forEach(section => section.classList.add('dark-mode')); 
         linkbox.forEach(section => section.classList.add('dark-mode')); 
@@ -90,6 +95,7 @@ function toggleTheme() {
         navContainer.forEach(section => section.classList.remove('dark-mode')); 
         docsHeader.forEach(section => section.classList.remove('dark-mode'));
         docuBody.forEach(section => section.classList.remove('dark-mode')); 
+        docuBodyEditor.forEach(section => section.classList.remove('dark-mode')); 
         docsMain.forEach(section => section.classList.remove('dark-mode')); 
         docuMainTitle.forEach(section => section.classList.remove('dark-mode')); 
         linkbox.forEach(section => section.classList.remove('dark-mode')); 
@@ -104,5 +110,16 @@ window.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.addEventListener('change', toggleTheme);
+    }
+});
+
+
+// Listen for changes to the dark mode toggle checkbox to modify ProtonComplier theme
+document.getElementById('themeToggle').addEventListener('change', function () {
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle.checked) {
+        monaco.editor.setTheme('proton-dark');
+    } else {
+        monaco.editor.setTheme('proton-light'); // Switch Monaco to light theme
     }
 });

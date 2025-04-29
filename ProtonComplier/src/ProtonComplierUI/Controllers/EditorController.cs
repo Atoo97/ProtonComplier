@@ -13,9 +13,9 @@ public class EditorController : Controller
         _logger = logger;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(EditorViewModel model)
     {
-        return View();
+        return View(model);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

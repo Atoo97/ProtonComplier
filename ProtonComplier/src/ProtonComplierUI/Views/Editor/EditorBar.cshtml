@@ -1,8 +1,7 @@
 ﻿<!-- Options Section (Top Navbar) -->
-<nav class="navbar navbar-expand-md nav-header">
-    <div class="container-fluid nav-container">
+<nav class="navbar navbar-expand-md nav-container">
+    <div>
         <div class="d-flex align-items-center">
-
             <input type="hidden" id="InputText" name="InputText" />
 
             <!-- Compile Form -->
@@ -42,8 +41,63 @@
             <input type="text" id="fileNameInputDesktop" name="fileNameInputDesktop"
                    class="form-control ms-2 d-none d-md-block"
                    placeholder="Enter file name..."
-                   style="max-width: 200px; background-color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.3);">
+                   style="max-width: 200px; background-color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.3);" />
+            
+            <div class="d-none d-md-flex align-items-center">
+                <!-- Upload Form (Desktop Only) -->
+                <form id="upLoadFormDesktop" asp-controller="Editor" asp-action="Upload"
+                      method="post" class="d-flex align-items-center">
+                    <button id="uploadButton" type="submit" style="margin-left: 20px;"
+                            class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom"
+                            title="Upload Proton source file">
+                        <img src="@Url.Content("~/images/UploadDocument.svg")" alt="Upload">
+                    </button>
+                </form>
 
+                <!-- Download Form (Desktop Only) -->
+                <form id="downloadFormDesktop" asp-controller="Editor" asp-action="Download"
+                      method="post" class="d-flex align-items-center">
+                    <button id="downloadButton" type="submit"
+                            class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom"
+                            title="Download Proton source file">
+                        <img src="@Url.Content("~/images/DownloadDocument.svg")" alt="Download">
+                    </button>
+                </form>
+
+                <!-- Analyzer Toggles (Desktop Only) -->
+                <div id="TogglesDesktop" class="analyzer-container" style="display: flex">
+                    <span class="analyzer-title">Analyzer Display Stages:</span>
+                    <label class="analyzer-toggle">
+                        <input class="form-check-input" type="checkbox" value="true" id="toggleLexicalAnalyzer">
+                        LexicalAnalyzer
+                    </label>
+                    <label class="analyzer-toggle">
+                        <input class="form-check-input" type="checkbox" value="true" id="toggleSyntaxAnalyzer">
+                        SyntaxAnalyzer
+                    </label>
+                    <label class="analyzer-toggle mb-0">
+                        <input class="form-check-input" type="checkbox" value="true" id="toggleSemanticalAnalyzer">
+                        SemanticalAnalyzer
+                    </label>
+                </div>
+
+                <!-- Copy Form (Desktop Only) -->
+                <form id="copydFormDesktop" asp-controller="Editor" asp-action="Copy"
+                      method="post" class="d-flex align-items-center">
+                    <button id="copyButton" type="submit"
+                            class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom"
+                            title="Copy code">
+                        <img src="@Url.Content("~/images/Copy.svg")" alt="Copy">
+                    </button>
+                </form>
+            </div>
+            </div>
         </div>
 
         <!-- Hamburger Menu Button (For Small Screens) -->
@@ -63,6 +117,67 @@
                            style="background-color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.3);">
                 </li>
 
+
+                <!-- Upload / Download / Analyzer Toggles (Mobile Only, inside Hamburger Menu) -->
+                <li class="nav-item d-block d-md-none mt-2">
+                    <div class="d-flex flex-wrap align-items-center">
+
+                        <!-- Upload Form -->
+                        <form id="upLoadFormMobile" asp-controller="Editor" asp-action="Upload"
+                              method="post" class="d-flex align-items-center">
+                            <button id="uploadButton" type="submit"
+                                    class="btn btn-primary d-flex justify-content-center align-items-center"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom"
+                                    title="Upload Proton source file">
+                                <img src="@Url.Content("~/images/UploadDocument.svg")" alt="Upload">
+                            </button>
+                        </form>
+
+                        <!-- Download Form -->
+                        <form id="downloadFormMobile" asp-controller="Editor" asp-action="Download"
+                              method="post" class="d-flex align-items-center">
+                            <button id="downloadButton" type="submit"
+                                    class="btn btn-primary d-flex justify-content-center align-items-center"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom"
+                                    title="Download Proton source file">
+                                <img src="@Url.Content("~/images/DownloadDocument.svg")" alt="Download">
+                            </button>
+                        </form>
+
+                        <!-- Copy Form (Desktop Only) -->
+                        <form id="copydFormMobile" asp-controller="Editor" asp-action="Copy"
+                              method="post" class="d-flex align-items-center">
+                            <button id="copyButton" type="submit"
+                                    class="btn btn-primary d-flex justify-content-center align-items-center"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom"
+                                    title="Copy code">
+                                <img src="@Url.Content("~/images/Copy.svg")" alt="Copy">
+                            </button>
+                        </form>
+                    </div>
+                </li>
+
+                <!-- Analyzer Toggles (Mobile Only, inside Hamburger Menu) -->
+                <li class="nav-item d-block d-md-none mt-2">
+                    <div id="TogglesMobile" class="analyzer-container">
+                        <span class="analyzer-title">Analyzer Display Stages:</span>
+                        <label class="analyzer-toggle">
+                            <input class="form-check-input" type="checkbox" value="true" id="toggleLexicalAnalyzer">
+                            LexicalAnalyzer
+                        </label>
+                        <label class="analyzer-toggle">
+                            <input class="form-check-input" type="checkbox" value="true" id="toggleSyntaxAnalyzer">
+                            SyntaxAnalyzer
+                        </label>
+                        <label class="analyzer-toggle mb-0">
+                            <input class="form-check-input" type="checkbox" value="true" id="toggleSemanticalAnalyzer">
+                            SemanticalAnalyzer
+                        </label>
+                    </div>
+                </li>
             </ul>
         </div>
     </div>
