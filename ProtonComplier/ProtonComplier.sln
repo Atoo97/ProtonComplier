@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtonComplier.Parser", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtonComplier.Semantic", "src\ProtonComplier.Semantic\ProtonComplier.Semantic.csproj", "{C63B95A3-871E-4E0B-91C9-2B45B05EDF1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtonComplier.CodeGenerator", "src\ProtonComplier.CodeGenerator\ProtonComplier.CodeGenerator.csproj", "{FC471020-9518-4F57-BD29-DC7782753251}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,10 @@ Global
 		{C63B95A3-871E-4E0B-91C9-2B45B05EDF1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C63B95A3-871E-4E0B-91C9-2B45B05EDF1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C63B95A3-871E-4E0B-91C9-2B45B05EDF1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC471020-9518-4F57-BD29-DC7782753251}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC471020-9518-4F57-BD29-DC7782753251}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC471020-9518-4F57-BD29-DC7782753251}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC471020-9518-4F57-BD29-DC7782753251}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DCC9350B-F5A8-4263-9F18-702AEFB0AB1E} = {5F48250E-8B3B-49DD-9ED1-C1E6C6FA6297}
@@ -60,5 +66,6 @@ Global
 		{BF586B3B-B506-4EC6-9914-6E1EFE1F8CC4} = {5F48250E-8B3B-49DD-9ED1-C1E6C6FA6297}
 		{23635B1E-8F66-42A0-8AEC-568F4AA81744} = {5F48250E-8B3B-49DD-9ED1-C1E6C6FA6297}
 		{C63B95A3-871E-4E0B-91C9-2B45B05EDF1B} = {5F48250E-8B3B-49DD-9ED1-C1E6C6FA6297}
+		{FC471020-9518-4F57-BD29-DC7782753251} = {5F48250E-8B3B-49DD-9ED1-C1E6C6FA6297}
 	EndGlobalSection
 EndGlobal
