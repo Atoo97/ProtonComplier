@@ -1,11 +1,13 @@
 using Proton.Lexer.Interfaces;
 using Proton.Lexer.Services;
 using Proton.Lexer;
+using ProtonComplierUI.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 
 // Register lexical services
 builder.Services.AddScoped<ITokenizer, Tokenizer>();
@@ -28,6 +30,9 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.MapControllers();
+app.MapHub<CompilerHub>("/compilerhub"); // SignalR endpoint
 
 app.MapControllerRoute(
     name: "default",

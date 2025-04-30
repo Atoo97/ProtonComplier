@@ -1,16 +1,18 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ProtonComplierUI.Models;
+using Microsoft.AspNetCore.SignalR;
+using ProtonComplierUI.Hubs;
 
 namespace ProtonComplierUI.Controllers;
 
 public class EditorController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
+    private readonly IHubContext<CompilerHub> _hubContext;
 
-    public EditorController(ILogger<HomeController> logger)
+    public EditorController(IHubContext<CompilerHub> hubContext)
     {
-        _logger = logger;
+        _hubContext = hubContext;
     }
 
     public async Task<IActionResult> Index(EditorViewModel model)
@@ -30,7 +32,7 @@ public class EditorController : Controller
                     throw new FileNotFoundException("Default template file not found.", path);
 
                 model.InputText = await System.IO.File.ReadAllTextAsync(path);
-                model.OutputText = "// Output C# code display here";
+                model.OutputText = "// Output C# code display here\n";
             }
         }
         catch (Exception)
@@ -45,48 +47,49 @@ public class EditorController : Controller
     [HttpPost]
     public async Task<IActionResult> Compile(EditorViewModel model)
     {
-
-
+        await Task.Delay(1000);
         return View("Index", model);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CompileAndRun(EditorViewModel model)
+    public async Task<IActionResult> CompileAndRun([FromForm] string code, [FromForm] string connectionId)
     {
+        // Insted of: Clients.All.. this now support multiple users simultaneously:
+        await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveOutput", $"Code from complier {code}");
+        await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveOutput", "🔧 Compilation started...");
+        await Task.Delay(1000);
+        await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveOutput", "📄 Lexical Analyzing syntax...");
+        await Task.Delay(1000);
+        await _hubContext.Clients.Client(connectionId).SendAsync("ReceiveOutput", "✅ Compilation successful!");
 
-
-        return View("Index", model);
+        return Ok();
     }
 
     [HttpPost]
     public async Task<IActionResult> Clear(EditorViewModel model)
     {
-
-
+        await Task.Delay(1000);
         return View("Index", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> Upload(EditorViewModel model)
     {
-
-
+        await Task.Delay(1000);
         return View("Index", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> Download(EditorViewModel model)
     {
-
-
+        await Task.Delay(1000);
         return View("Index", model);
     }
 
     [HttpPost]
     public async Task<IActionResult> Copy(EditorViewModel model)
     {
-
-
+        await Task.Delay(1000);
         return View("Index", model);
     }
 

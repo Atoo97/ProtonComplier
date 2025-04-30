@@ -251,7 +251,8 @@
 
 /* Default (dark) theme */
 #consolePanel {
-    height: 100px;
+    height: 150px;
+    overflow-y: auto;
     margin-bottom: 0px;
     border: 1px solid #328f81;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);

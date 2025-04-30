@@ -16,15 +16,15 @@
             </form>
 
             <!-- Compile & Run Form -->
-            <form id="compileAndRunForm" asp-controller="Editor" asp-action="CompileAndRun" method="post" class="d-flex align-items-center">
-                <button id="compileAndRunButton" type="submit"
+            <div id="compileAndRunForm" class="d-flex align-items-center">
+                <button id="compileAndRunButton" type="button"
                         class="btn btn-success me-1 d-flex justify-content-center align-items-center"
                         data-bs-toggle="tooltip"
                         data-bs-placement="bottom"
                         title="Compile & Run">
                     <img src="@Url.Content("~/images/RunOutline.svg")" alt="Compile & Run">
                 </button>
-            </form>
+            </div>
 
             <!-- Clear Editor Form -->
             <form id="clearForm" asp-controller="Editor" asp-action="Clear" method="post" class="d-flex align-items-center">
