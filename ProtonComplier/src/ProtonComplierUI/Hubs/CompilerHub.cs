@@ -12,7 +12,11 @@
 
         public async Task SendOutput(string message)
         {
-            await Clients.All.SendAsync("ReceiveOutput", message); // Optional public method
+            await Clients.All.SendAsync("EditorOutput", message);
+
+            await Clients.All.SendAsync("ConsoleOutput", message);
+
+            await Clients.All.SendAsync("ResetEditor", message);
         }
     }
 

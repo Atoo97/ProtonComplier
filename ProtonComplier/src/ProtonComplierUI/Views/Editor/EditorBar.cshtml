@@ -5,7 +5,7 @@
             <input type="hidden" id="InputText" name="InputText" />
 
             <!-- Compile Form -->
-            <form id="compileForm" asp-controller="Editor" asp-action="Compile" method="post" class="d-flex align-items-center">
+            <div id="compileForm" class="d-flex align-items-center">
                 <button id="compileButton" type="submit"
                         class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
                         data-bs-toggle="tooltip"
@@ -13,7 +13,7 @@
                         title="Compile">
                     <img src="@Url.Content("~/images/Execute.svg")" alt="Compile">
                 </button>
-            </form>
+            </div>
 
             <!-- Compile & Run Form -->
             <div id="compileAndRunForm" class="d-flex align-items-center">
@@ -27,7 +27,7 @@
             </div>
 
             <!-- Clear Editor Form -->
-            <form id="clearForm" asp-controller="Editor" asp-action="Clear" method="post" class="d-flex align-items-center">
+            <div id="clearForm" class="d-flex align-items-center">
                 <button id="clearButton" type="submit"
                         class="btn btn-danger me-1 d-flex justify-content-center align-items-center"
                         data-bs-toggle="tooltip"
@@ -35,12 +35,13 @@
                         title="Clear editor">
                     <img src="@Url.Content("~/images/ClearWindowContent.svg")" alt="Clear">
                 </button>
-            </form>
+            </div>
 
             <!-- File Name TextBox (Desktop Only) -->
             <input type="text" id="fileNameInputDesktop" name="fileNameInputDesktop"
                    class="form-control ms-2 d-none d-md-block"
                    placeholder="Enter file name..."
+                   value="@ViewBag.DefaultFileName"
                    style="max-width: 200px; background-color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.3);" />
             
             <div class="d-none d-md-flex align-items-center">

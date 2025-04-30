@@ -34,28 +34,6 @@
 
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    const lexicalToggle = document.getElementById("toggleLexicalAnalyzer");
-    const syntaxToggle = document.getElementById("toggleSyntaxAnalyzer");
-    const semanticalToggle = document.getElementById("toggleSemanticalAnalyzer");
-
-    lexicalToggle.addEventListener("change", () => {
-        console.log("LexicalAnalyzer:", lexicalToggle.checked);
-        // Add logic to enable/disable lexical analyzer
-    });
-
-    syntaxToggle.addEventListener("change", () => {
-        console.log("SyntaxAnalyzer:", syntaxToggle.checked);
-        // Add logic to enable/disable syntax analyzer
-    });
-
-    semanticalToggle.addEventListener("change", () => {
-        console.log("SemanticalAnalyzer:", semanticalToggle.checked);
-        // Add logic to enable/disable semantical analyzer
-    });
-});
-
-
 /*EDITOR SETTINGS:*/
 require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.38.0/min/vs' } });
 
@@ -358,5 +336,138 @@ require(['vs/editor/editor.main'], function () {
     } else {
         monaco.editor.setTheme('proton-light'); // Switch Monaco to light theme
     }
+});
 
+
+/*ADDITIONAL COMPLIE LOGIC*/
+let outputString = "";
+
+const connection = new signalR.HubConnectionBuilder()
+    .withUrl("/compilerhub")
+    .build();
+
+connection.on("ConsoleOutput", function (message) {
+    const output = document.getElementById("compilerOutput");
+    const blinkingArrow = document.getElementById("blinkingArrow");
+
+    if (output && blinkingArrow) {
+        const formattedMessage = document.createElement("span");
+        formattedMessage.textContent = message;
+
+        output.insertBefore(formattedMessage, blinkingArrow);
+        output.insertBefore(document.createElement("br"), blinkingArrow);
+
+        // Scroll to bottom of the console panel
+        output.parentElement.scrollTop = output.parentElement.scrollHeight;
+    }
+});
+
+connection.on("EditorOutput", function (message) {
+    window.outputText += message + "\n";
+
+    if (typeof rightEditor !== 'undefined') {
+        rightEditor.setValue(window.outputText);
+    }
+});
+
+connection.on("ResetEditor", function (defaultCode, defaultOutput) {
+    if (typeof editor !== 'undefined') {
+        editor.setValue(defaultCode);
+    }
+
+    if (typeof rightEditor !== 'undefined') {
+        rightEditor.setValue(defaultOutput);
+    }
+
+    // Also clear the console visually
+    const output = document.getElementById("compilerOutput");
+    if (output) {
+        output.innerHTML = '<span id="blinkingArrow">ProtonCompiler &gt;&gt; </span>';
+    }
+});
+
+let connectionId = null;
+
+connection.start()
+    .then(() => connection.invoke("GetConnectionId"))
+    .then(id => {
+        connectionId = id;
+        console.log("Connected with ID:", connectionId);
+    })
+    .catch(err => console.error(err.toString()));
+
+
+document.getElementById("compileButton").addEventListener("click", function () {
+    const editorContent = editor.getValue();
+    document.getElementById("InputText").value = editorContent;
+
+    const lexicalEnabled = document.getElementById("toggleLexicalAnalyzer").checked;
+
+    // Reset outputText and right editor
+    window.outputText = "";
+    if (typeof rightEditor !== 'undefined') {
+        rightEditor.setValue("");
+    }
+
+    // Reset HTML console output
+    const output = document.getElementById("compilerOutput");
+    if (output) {
+        output.innerHTML = '<span id="blinkingArrow">ProtonCompiler &gt;&gt; </span>';
+    }
+
+    // Trigger backend compile action
+    fetch("/Editor/Compile", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            code: editorContent,
+            connectionId: connectionId,
+            lexical: lexicalEnabled
+        })
+    });
+});
+
+document.getElementById("compileAndRunButton").addEventListener("click", async function () {
+    const editorContent = editor.getValue();
+    const fileName = document.getElementById("fileNameInputDesktop").value;
+    const lexicalEnabled = document.getElementById("toggleLexicalAnalyzer").checked;
+
+    // Sync editor content to hidden input if needed
+    document.getElementById("InputText").value = editorContent;
+
+    // Clear right editor
+    if (typeof rightEditor !== 'undefined') {
+        rightEditor.setValue("");
+    }
+
+    // Reset console output
+    const output = document.getElementById("compilerOutput");
+    if (output) {
+        output.innerHTML = '<span id="blinkingArrow">ProtonCompiler &gt;&gt; </span>';
+    }
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append("Code", editorContent);
+    formData.append("ConnectionId", connectionId);
+    formData.append("FileName", fileName);
+    formData.append("Lexical", lexicalEnabled);
+
+    // Post to backend
+    const response = await fetch("/Editor/CompileAndRun", {
+        method: "POST",
+        body: formData, // do NOT set Content-Type manually
+    });
+});
+
+document.getElementById("clearButton").addEventListener("click", function () {
+        const confirmed = confirm("Are you sure you want to clear both the editor and console output?");
+    if (!confirmed) return;
+
+    // Trigger backend clear action
+    fetch("/Editor/Clear", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ connectionId: connectionId })
+    });
 });
