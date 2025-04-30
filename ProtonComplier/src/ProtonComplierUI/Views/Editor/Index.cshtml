@@ -2,10 +2,18 @@
 
 @{
     ViewData["Title"] = "Editor";
+    var outputString = (string)null!;
 }
 
 @section EditorBar {
     @await Html.PartialAsync("EditorBar")
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div id="tempErrorMessage" class="error-banner">
+        @TempData["ErrorMessage"]
+    </div>
 }
 
 <section class="DocuBodyEditor">
@@ -33,3 +41,9 @@
         </div>
     </div>
 </section>
+
+<script>
+    // Serialize values from Razor into global JS variables
+    window.editorInputText = @Html.Raw(Json.Serialize(Model.InputText));
+    window.outputText = @Html.Raw(Json.Serialize(outputString ?? Model.OutputText ?? "No output"));
+</script>

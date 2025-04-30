@@ -341,7 +341,7 @@ require(['vs/editor/editor.main'], function () {
         value: window.editorInputText,
         language: 'proton',
         theme: 'proton-light',
-        automaticLayout: false
+        automaticLayout: true
     });
 
     rightEditor = monaco.editor.create(rightContainer, {

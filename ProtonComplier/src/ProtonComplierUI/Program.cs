@@ -1,7 +1,16 @@
+using Proton.Lexer.Interfaces;
+using Proton.Lexer.Services;
+using Proton.Lexer;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Register lexical services
+builder.Services.AddScoped<ITokenizer, Tokenizer>();
+builder.Services.AddScoped<ILexicalAnalyzer, LexicalAnalyzer>();
+builder.Services.AddScoped<LexicalService>();
 
 var app = builder.Build();
 

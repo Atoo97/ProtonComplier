@@ -123,3 +123,98 @@ document.getElementById('themeToggle').addEventListener('change', function () {
         monaco.editor.setTheme('proton-light'); // Switch Monaco to light theme
     }
 });
+
+// For error messgae display
+setTimeout(() => {
+    const msg = document.getElementById("tempErrorMessage");
+    if (msg) {
+        msg.style.transition = "opacity 0.5s ease-out";
+        msg.style.opacity = 0;
+        setTimeout(() => msg.remove(), 300); // remove from DOM
+    }
+}, 3000);
+
+// DragHandler
+const handler = document.querySelector('.handler');
+const wrapper = handler.closest('.wrapper');
+const boxA = wrapper.querySelectorAll('.box')[0];
+const boxB = wrapper.querySelectorAll('.box')[1];
+let isHandlerDragging = false;
+const originalWidthA = boxA.offsetWidth;
+const originalWidthB = boxB.offsetWidth;
+const minWidthPercentage = 0.3;
+
+document.addEventListener('mousedown', e => {
+    if (e.target === handler) isHandlerDragging = true;
+});
+
+document.addEventListener('mousemove', e => {
+    if (!isHandlerDragging) return;
+
+    const containerOffsetLeft = wrapper.offsetLeft;
+    const pointerRelativeXpos = e.clientX - containerOffsetLeft;
+    const minWidth = wrapper.offsetWidth * minWidthPercentage;
+
+    const boxALeftWidth = Math.max(minWidth, pointerRelativeXpos - 8);
+    const boxBRightWidth = Math.max(minWidth, wrapper.offsetWidth - boxALeftWidth - handler.offsetWidth);
+
+    boxA.style.width = boxALeftWidth + 'px';
+    boxB.style.width = boxBRightWidth + 'px';
+
+    boxA.style.flexGrow = 0;
+    boxB.style.flexGrow = 0;
+});
+
+document.addEventListener('mouseup', () => {
+    isHandlerDragging = false;
+
+    // Save current widths to localStorage
+    localStorage.setItem('boxAWidth', boxA.style.width);
+    localStorage.setItem('boxBWidth', boxB.style.width);
+});
+
+
+window.addEventListener('resize', () => {
+    if (window.innerWidth <= 768) {
+        // Reset widths for mobile layout
+        boxA.style.width = '';
+        boxB.style.width = '';
+
+        // Optional: Clear stored widths
+        localStorage.removeItem('boxAWidth');
+        localStorage.removeItem('boxBWidth');
+    } else {
+        // Restore saved widths only if none are currently set
+        if (boxA.style.width === '' && boxB.style.width === '') {
+            const savedWidthA = localStorage.getItem('boxAWidth');
+            const savedWidthB = localStorage.getItem('boxBWidth');
+
+            if (savedWidthA && savedWidthB) {
+                boxA.style.width = savedWidthA;
+                boxB.style.width = savedWidthB;
+            } else {
+                boxA.style.width = originalWidthA + 'px';
+                boxB.style.width = originalWidthB + 'px';
+            }
+
+            boxA.style.flexGrow = 0;
+            boxB.style.flexGrow = 0;
+        }
+    }
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    const savedWidthA = localStorage.getItem('boxAWidth');
+    const savedWidthB = localStorage.getItem('boxBWidth');
+
+    if (savedWidthA && savedWidthB && window.innerWidth > 768) {
+        boxA.style.width = savedWidthA;
+        boxB.style.width = savedWidthB;
+        boxA.style.flexGrow = 0;
+        boxB.style.flexGrow = 0;
+    }
+
+    // Also apply theme
+    applySavedTheme();
+});
+
