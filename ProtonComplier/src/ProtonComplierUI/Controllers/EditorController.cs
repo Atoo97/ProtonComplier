@@ -12,6 +12,8 @@ using System.Text;
 using Proton.Parser.Statements;
 using Newtonsoft.Json.Linq;
 using Proton.Semantic.Services;
+using Proton.CodeGenerator.Services;
+using Proton.CodeGenerator;
 
 namespace ProtonComplierUI.Controllers;
 
@@ -21,15 +23,17 @@ public class EditorController : Controller
     private readonly LexicalService lexicalService;
     private readonly ParserService parserService;
     private readonly SemanticService semanticService;
+    private readonly CodeGeneratorService codeGeneratorService;
     private readonly string path;
     private readonly object _sbLock;
 
-    public EditorController(LexicalService lexicalService, ParserService parserService, SemanticService semanticService, IHubContext<CompilerHub> hubContext)
+    public EditorController(LexicalService lexicalService, ParserService parserService, SemanticService semanticService, CodeGeneratorService codeGeneratorService, IHubContext<CompilerHub> hubContext)
     {
         this.hubContext = hubContext;
         this.lexicalService = lexicalService;
         this.parserService = parserService;
         this.semanticService = semanticService;
+        this.codeGeneratorService = codeGeneratorService;
         path = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "ProtonTemplate.txt");
         _sbLock = new ();
     }
@@ -191,6 +195,45 @@ public class EditorController : Controller
                             .ForEach(macro => AppendMacroSection(sb, macro.Value, semanticalresult.sections[macro.Value]));     //TODO: to midfy display logic here
 
                         await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", sb.ToString());
+                    }
+
+                    // ===== CODE GENERATOR =====
+                    await Task.Delay(1000);
+                    stopwatch.Start();
+                    var codegeneratorresult = await codeGeneratorService.GenerateAndExecute(semanticalresult.table);
+                    stopwatch.Stop();
+                    var elapsedTimeCodeGen = stopwatch.Elapsed;
+                    elapsedTimeCodeGen -= (elapsedTimeLexical + elapsedTimeParser + elapsedTimeSemantic);
+                    timeMessage = $"[ProtonComplier]: Total Code Generation time: {elapsedTimeCodeGen.TotalSeconds:F8} seconds";
+
+                    if (codegeneratorresult.errors.Count == 0)
+                    {
+                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: CodeGeneeation ({request.FileName}.ptrn) complete | Status: SuccessFull");
+                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
+
+                        lock (_sbLock)
+                        {
+                            sb.AppendLine($"|===== GENERATED C# CODE =====|");
+                            sb.AppendLine(codegeneratorresult.code);
+                        }
+                        
+                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", sb.ToString());
+                        var text = $"[ProtonComplier]: Executed code result: {codegeneratorresult.result}";
+                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", text);
+                    }
+                    else
+                    {
+                        await Task.Delay(500);
+                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: CodeGeneration ({request.FileName}.ptrn) complete | Status: Denied");
+                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
+                        lock (_sbLock)
+                        {
+                            sb.AppendLine($"|===== GENERATED C# CODE =====|");
+                            sb.AppendLine(codegeneratorresult.code);
+                        }
+
+                        var text = $"[ProtonComplier]: Executed code errors:\n{string.Join("\n", codegeneratorresult.errors)}";
+                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput",text);
                     }
                 }
                 else

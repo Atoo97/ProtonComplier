@@ -1,0 +1,192 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ProtonComplier.CodeGenerator</name>
+    </assembly>
+    <members>
+        <member name="T:Proton.CodeGenerator.CodeExecutor">
+            <summary>
+            Provides functionality to dynamically compile and execute C# source code in-memory using Roslyn.
+            </summary>
+        </member>
+        <member name="M:Proton.CodeGenerator.CodeExecutor.ExecuteCode(System.String)">
+            <summary>
+            Compiles and executes the provided C# code. Captures any compilation or runtime errors.
+            </summary>
+            <param name="code">The C# code to compile and execute.</param>
+            <returns>
+            A <see cref="T:Proton.CodeGenerator.GeneratorResult"/> containing the output of the executed code,
+            or an empty result if compilation or execution fails.
+            </returns>
+        </member>
+        <member name="T:Proton.CodeGenerator.GenerateCode">
+            <summary>
+            Provides the implementation for generating code based on semantic information
+            and a predefined expression shell template.
+            </summary>
+        </member>
+        <member name="M:Proton.CodeGenerator.GenerateCode.Generate(Proton.Semantic.SymbolTable,System.String)">
+            <summary>
+            Generates target code by processing the provided <see cref="T:Proton.Semantic.SymbolTable"/> and
+            inserting generated output into the specified <paramref name="expressionShell"/>.
+            </summary>
+            <param name="symbolTable">
+            The semantic symbol table containing variables, types, and values used in code generation.
+            </param>
+            <param name="expressionShell">
+            A string template containing a placeholder ('$') where the generated code will be inserted.
+            </param>
+            <returns>
+            A <see cref="T:Proton.CodeGenerator.GeneratorResult"/> containing the final output string with generated content
+            injected into the template.
+            </returns>
+        </member>
+        <member name="M:Proton.CodeGenerator.GenerateCode.MyRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^(\\s*)\\$\\s*$</code><br/>
+            Options:<br/>
+            <code>RegexOptions.Multiline</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of a line.<br/>
+            ○ 1st capture group.<br/>
+                ○ Match a whitespace character atomically any number of times.<br/>
+            ○ Match '$'.<br/>
+            ○ Match a whitespace character greedily any number of times.<br/>
+            ○ Match if at the end of a line.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="T:Proton.CodeGenerator.GeneratorResult">
+            <summary>
+            Represents the result of code generator.
+            </summary>
+        </member>
+        <member name="M:Proton.CodeGenerator.GeneratorResult.#ctor(System.String,System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            Represents the result of code generator.
+            </summary>
+        </member>
+        <member name="T:Proton.CodeGenerator.Interfaces.ICodeExecutor">
+            <summary>
+            Defines the contract for executing generated code and capturing execution results or errors.
+            </summary>
+        </member>
+        <member name="M:Proton.CodeGenerator.Interfaces.ICodeExecutor.ExecuteCode(System.String)">
+            <summary>
+            Executes the provided code string and collects any runtime errors that occur during execution.
+            </summary>
+            <param name="code">The generated code to be executed.</param>
+            <returns>
+            A <see cref="T:Proton.CodeGenerator.GeneratorResult"/> representing the output produced by executing the code,
+            or an empty result if execution fails.
+            </returns>
+        </member>
+        <member name="T:Proton.CodeGenerator.Interfaces.IGenerateCode">
+            <summary>
+            Defines the contract for a code generator responsible for transforming validated semantic data
+            into target code using a specified formatting shell.
+            </summary>
+        </member>
+        <member name="M:Proton.CodeGenerator.Interfaces.IGenerateCode.Generate(Proton.Semantic.SymbolTable,System.String)">
+            <summary>
+            Generates target code using the provided semantic symbol table and formatting shell.
+            </summary>
+            <param name="symbolTable">
+            A <see cref="T:Proton.Semantic.SymbolTable"/> representing the semantic structure of the program,
+            including variable definitions and their associated values and types.
+            </param>
+            <param name="expressionShell">
+            A template string used to format the generated code expressions.
+            </param>
+            <returns>
+            A <see cref="T:Proton.CodeGenerator.GeneratorResult"/> containing the final generated code as a single formatted string.
+            </returns>
+        </member>
+        <member name="T:Proton.CodeGenerator.Services.CodeGeneratorService">
+            <summary>
+            Provides a service for generating and executing code based on a symbol table and a code template.
+            It utilizes the code generator to create code and the code executor to compile and run the generated code.
+            </summary>
+        </member>
+        <member name="M:Proton.CodeGenerator.Services.CodeGeneratorService.#ctor(Proton.CodeGenerator.Interfaces.IGenerateCode,Proton.CodeGenerator.Interfaces.ICodeExecutor)">
+            <summary>
+            Provides a service for generating and executing code based on a symbol table and a code template.
+            It utilizes the code generator to create code and the code executor to compile and run the generated code.
+            </summary>
+        </member>
+        <member name="M:Proton.CodeGenerator.Services.CodeGeneratorService.GenerateAndExecute(Proton.Semantic.SymbolTable)">
+            <summary>
+            Generates code based on the provided symbol table, executes it, and returns the result.
+            </summary>
+            <param name="symbolTable">The symbol table containing the parsed elements used for generating the code.</param>
+            <returns>
+            A <see cref="T:Proton.CodeGenerator.GeneratorResult"/> containing the output of the executed code.
+            If any errors occur during generation or execution, they will be reflected in the result.
+            </returns>
+            <exception cref="T:System.IO.FileNotFoundException">
+            Thrown if the default code template file is not found at the expected path.
+            </exception>
+        </member>
+        <member name="T:Proton.CodeGenerator.TypeMapping">
+            <summary>
+            Represents a type mapping from custom language types to C# code types.
+            </summary>
+        </member>
+        <member name="M:Proton.CodeGenerator.TypeMapping.ToCSharpType(System.String)">
+            <summary>
+            Converts a custom type name (e.g., "N", "R") to its equivalent C# type.
+            </summary>
+            <param name="customType">The type from the custom language.</param>
+            <returns>The equivalent C# type as a string.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MyRegex_0">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the MyRegex method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.MyRegex_0.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MyRegex_0.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.Utilities">
+            <summary>Helper methods used by generated <see cref="T:System.Text.RegularExpressions.Regex"/>-derived implementations.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout">
+            <summary>Default timeout value set in <see cref="T:System.AppContext"/>, or <see cref="F:System.Text.RegularExpressions.Regex.InfiniteMatchTimeout"/> if none was set.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_hasTimeout">
+            <summary>Whether <see cref="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout"/> is non-infinite.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.Utilities.IndexOfNonAsciiOrAny_6A637974C9573F417391E2E18FB9730F2E89A5B5E8B9AB9CFCA66ECB54024E6C(System.ReadOnlySpan{System.Char})">
+            <summary>Finds the next index of any character that matches a character in the set [$\s].</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_FFC1FFFFEEFFFFFFFFFFFFFFFFFFFFFF">
+            <summary>Supports searching for characters in or not in "\0\u0001\u0002\u0003\u0004\u0005\u0006\a\b\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f!\"#%&amp;'()*+,-./0123456789:;&lt;=&gt;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~\u007f".</summary>
+        </member>
+    </members>
+</doc>

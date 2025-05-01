@@ -11,16 +11,21 @@
 	</ItemGroup>
 
   <ItemGroup>
+    <None Remove="App_Data\codestructure.txt" />
     <None Remove="App_Data\ProtonTemplate.txt" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="App_Data\codestructure.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="App_Data\ProtonTemplate.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ProtonComplier.CodeGenerator\ProtonComplier.CodeGenerator.csproj" />
     <ProjectReference Include="..\ProtonComplier.Lexer\ProtonComplier.Lexer.csproj" />
     <ProjectReference Include="..\ProtonComplier.Parser\ProtonComplier.Parser.csproj" />
     <ProjectReference Include="..\ProtonComplier.Semantic\ProtonComplier.Semantic.csproj" />

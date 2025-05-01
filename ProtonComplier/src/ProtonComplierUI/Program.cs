@@ -8,6 +8,10 @@ using ProtonComplierUI.Hubs;
 using Proton.Semantic.Interfaces;
 using Proton.Semantic;
 using Proton.Semantic.Services;
+using Proton.CodeGenerator;
+using System.CodeDom.Compiler;
+using Proton.CodeGenerator.Interfaces;
+using Proton.CodeGenerator.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +32,10 @@ builder.Services.AddScoped<ParserService>();
 builder.Services.AddScoped<ISemanticAnalyzer, SemanticAnalyzer>();
 builder.Services.AddScoped<SemanticService>();
 
+// Register codegenerator services
+builder.Services.AddScoped<IGenerateCode, GenerateCode>();
+builder.Services.AddScoped<ICodeExecutor, CodeExecutor>();
+builder.Services.AddScoped<CodeGeneratorService>();
 
 var app = builder.Build();
 
