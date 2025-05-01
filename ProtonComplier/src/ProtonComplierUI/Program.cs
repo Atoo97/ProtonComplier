@@ -1,7 +1,13 @@
 using Proton.Lexer.Interfaces;
 using Proton.Lexer.Services;
 using Proton.Lexer;
+using Proton.Parser;
+using Proton.Parser.Service;
+using Proton.Parser.Interfaces;
 using ProtonComplierUI.Hubs;
+using Proton.Semantic.Interfaces;
+using Proton.Semantic;
+using Proton.Semantic.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +19,15 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<ITokenizer, Tokenizer>();
 builder.Services.AddScoped<ILexicalAnalyzer, LexicalAnalyzer>();
 builder.Services.AddScoped<LexicalService>();
+
+// Register parser services
+builder.Services.AddScoped<ISyntaxAnalyzer, SyntaxAnalyzer>();
+builder.Services.AddScoped<ParserService>();
+
+// Register semantic services
+builder.Services.AddScoped<ISemanticAnalyzer, SemanticAnalyzer>();
+builder.Services.AddScoped<SemanticService>();
+
 
 var app = builder.Build();
 

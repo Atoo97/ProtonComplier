@@ -1,8 +1,7 @@
 ﻿// <copyright file="ParserService.cs" company="PlaceholderCompany">
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
-
-namespace Proton.Parser
+namespace Proton.Parser.Service
 {
     using Proton.Lexer;
     using Proton.Parser.Interfaces;

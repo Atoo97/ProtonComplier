@@ -4,6 +4,48 @@
         <name>ProtonComplier.Parser</name>
     </assembly>
     <members>
+        <member name="T:Proton.Parser.Expressions.Expression">
+            <summary>
+            Represents the base class for all expression nodes in the parse tree.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.Expression.#ctor(Proton.Lexer.Token)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.Expression"/> class using a single token.
+            </summary>
+            <param name="symbol">The token that represents the expression.</param>
+        </member>
+        <member name="M:Proton.Parser.Expressions.Expression.ToCode(System.Int32)">
+            <summary>
+            Converts the expression to its string representation for code generation.
+            </summary>
+            <param name="ident">Set the ident size of display.</param>
+            <returns>A string representation of the expression prefixed with "Exp:".</returns>
+        </member>
+        <member name="T:Proton.Parser.Interfaces.ISyntaxAnalyzer">
+            <summary>
+            Defines the contract for a syntax analyzer responsible for validating tokenized sections,
+            ensuring their proper syntactical structure, and collecting any syntax-related diagnostics.
+            </summary>
+            <remarks>
+            This interface is typically used after lexical analysis to validate the syntax of the parsed code,
+            ensuring that it adheres to the expected grammatical rules, and providing feedback for developers.
+            </remarks>
+        </member>
+        <member name="M:Proton.Parser.Interfaces.ISyntaxAnalyzer.Analyze(System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Lexer.Token}})">
+            <summary>
+            Analyzes the provided tokenized sections, checking for proper syntactical structure and
+            identifying any syntax errors or warnings encountered during the analysis.
+            </summary>
+            <param name="sections">A dictionary containing tokenized input grouped by sections.</param>
+            <returns>
+            A <see cref="T:Proton.Parser.ParserResult"/> containing:
+            <list type="bullet">
+              <item><description>Detected syntax errors and warnings</description></item>
+              <item><description>Validation result indicating whether the code is syntactically correct</description></item>
+            </list>
+            </returns>
+        </member>
         <member name="T:Proton.Parser.ParseNode">
             <summary>
             Represents a node in the parse tree used during syntax analysis.
@@ -16,28 +58,17 @@
             </summary>
             <param name="symbol">The token this node represents.</param>
         </member>
-        <member name="M:Proton.Parser.ParseNode.#ctor(System.Collections.Generic.List{Proton.Lexer.Token})">
-            <summary>
-            Initializes a new instance of the <see cref="T:Proton.Parser.ParseNode"/> class with a list of tokens.
-            </summary>
-            <param name="symbols">The list of tokens this node represents.</param>
-        </member>
         <member name="P:Proton.Parser.ParseNode.ParseSymbol">
             <summary>
             Gets or sets the primary token represented by this parse tree node.
             </summary>
         </member>
-        <member name="P:Proton.Parser.ParseNode.ParseSymbolsList">
-            <summary>
-            Gets or sets the list of tokens associated with this node, used when the node represents a collection of tokens.
-            </summary>
-        </member>
-        <member name="P:Proton.Parser.ParseNode.Left">
+        <member name="P:Proton.Parser.ParseNode.LeftNode">
             <summary>
             Gets the left child node in the parse tree.
             </summary>
         </member>
-        <member name="P:Proton.Parser.ParseNode.Right">
+        <member name="P:Proton.Parser.ParseNode.RightNode">
             <summary>
             Gets the right child node in the parse tree.
             </summary>
@@ -54,11 +85,146 @@
             </summary>
             <param name="child">The node to set as the right child.</param>
         </member>
-        <member name="M:Proton.Parser.ParseNode.ToCode">
+        <member name="M:Proton.Parser.ParseNode.ToCode(System.Int32)">
             <summary>
             Converts the contents of the token list to a formatted code string.
             </summary>
+            <param name="ident">Set the ident size of display.</param>
             <returns>A string representation of the node's token values.</returns>
+        </member>
+        <member name="T:Proton.Parser.ParserResult">
+            <summary>
+            Represents the result of parser analysis, including tokens, errors, and macro sections.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.ParserResult.#ctor(System.Collections.Generic.List{Proton.ErrorHandler.BaseException},System.Collections.Generic.List{Proton.ErrorHandler.BaseException},System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Parser.Statements.Statement}},System.Boolean)">
+            <summary>
+            Represents the result of parser analysis, including tokens, errors, and macro sections.
+            </summary>
+        </member>
+        <member name="T:Proton.Parser.Service.ParserService">
+            <summary>
+            Provides a high-level orchestration service for syntax analysis,
+            including parsing tokenized input and validating its structure.
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Service.ParserService"/> class with the specified syntax analyzer.
+            </remarks>
+            <param name="analyzer">An instance of <see cref="T:Proton.Parser.Interfaces.ISyntaxAnalyzer"/> responsible for analyzing the tokenized sections.</param>
+        </member>
+        <member name="M:Proton.Parser.Service.ParserService.#ctor(Proton.Parser.Interfaces.ISyntaxAnalyzer)">
+            <summary>
+            Provides a high-level orchestration service for syntax analysis,
+            including parsing tokenized input and validating its structure.
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Service.ParserService"/> class with the specified syntax analyzer.
+            </remarks>
+            <param name="analyzer">An instance of <see cref="T:Proton.Parser.Interfaces.ISyntaxAnalyzer"/> responsible for analyzing the tokenized sections.</param>
+        </member>
+        <member name="M:Proton.Parser.Service.ParserService.Complie(System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Lexer.Token}})">
+            <summary>
+            Performs the complete syntax analysis process on the provided tokenized sections.
+            Analyzes the input sections for proper syntax, structural errors, and overall validity.
+            </summary>
+            <param name="sections">A dictionary containing tokenized input grouped by sections.</param>
+            <returns>A <see cref="T:Proton.Parser.ParserResult"/> containing the result of the analysis, including any errors or warnings detected during parsing.</returns>
+        </member>
+        <member name="T:Proton.Parser.Statements.Statement">
+            <summary>
+            Represents the base class for all statement nodes in the parse tree.
+            A statement typically performs an action and does not return a value.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Statements.Statement.#ctor(Proton.Parser.Expressions.Expression)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Statements.Statement"/> class using a parsed expression.
+            </summary>
+            <param name="expression">The expression containing the parse symbol for this statement.</param>
+        </member>
+        <member name="M:Proton.Parser.Statements.Statement.ToCode">
+            <summary>
+            Converts the statement to its string representation for code generation.
+            </summary>
+            <returns>A string representation of the statement prefixed with "State:".</returns>
+        </member>
+        <member name="T:Proton.Parser.SyntaxAnalyzer">
+            <summary>
+            Represents the main parser class responsible for analyzing tokens from each macro section,
+            generating syntax trees, and reporting errors and warnings.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.SyntaxAnalyzer.CurrentToken">
+            <summary>
+            Gets the current token at the parsing position, or EndOfInput if out of bounds.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.SyntaxAnalyzer.Reset">
+            <summary>
+            Before starting a new syntax analysis, reset everything.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.SyntaxAnalyzer.StatePlaceParser">
+            <summary>
+            Parses the StateSpace macro section, handling variable declarations.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.SyntaxAnalyzer.InputParser">
+            <summary>
+            Parses the Input macro section, handling variable initialize.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.SyntaxAnalyzer.PreconditionParser">
+            <summary>
+            Parses the Precondition macro section, handling variable initialize.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.SyntaxAnalyzer.PostconditionParser">
+            <summary>
+            Parses the Postcondition macro section, handling variable initialize.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.SyntaxAnalyzer.Analyze(System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Lexer.Token}})">
+            <summary>
+            Analyzes the provided tokenized sections, validating their syntactical structure and identifying
+            any syntax errors or warnings. It processes the input and returns the result of the syntax analysis,
+            indicating whether the code conforms to the expected grammatical rules.
+            </summary>
+            <param name="sections">A dictionary containing tokenized input grouped by sections. Each section represents
+            a logical unit of code, such as a function, loop, or declaration, with the tokens for that section
+            organized in a list.</param>
+            <returns>
+            A <see cref="T:Proton.Parser.ParserResult"/> containing:
+            <list type="bullet">
+              <item><description><see cref="P:Proton.Parser.ParserResult.errors"/> – A list of syntax errors encountered during analysis.</description></item>
+              <item><description><see cref="P:Proton.Parser.ParserResult.warnings"/> – A list of non-critical syntax warnings that may need attention.</description></item>
+              <item><description><see cref="P:Proton.Parser.ParserResult.sections"/> – A dictionary mapping macro section names to their associated parsed statements.</description></item>
+              <item><description><see cref="P:Proton.Parser.ParserResult.isSuccessful"/> – A boolean indicating whether the analysis passed successfully without critical errors.</description></item>
+            </list>
+            </returns>
+        </member>
+        <member name="M:Proton.Parser.SyntaxAnalyzer.SplitTokensByNewline(System.Collections.Generic.List{Proton.Lexer.Token})">
+            <summary>
+            Splits a flat list of tokens into rows of tokens separated by newlines,
+            removing whitespace and comment tokens.
+            </summary>
+            <param name="tokens">The input token list.</param>
+            <returns>A list of token rows (line-based).</returns>
+        </member>
+        <member name="M:Proton.Parser.SyntaxAnalyzer.Eat(Proton.Lexer.Token,System.String)">
+            <summary>
+            Consumes the current token and advances the token position.
+            If the next token is null or marks the end of input unexpectedly, a warning is added.
+            </summary>
+            <param name="token">The current token to be consumed.</param>
+            <param name="expressiontype">The expected expression type following the current token.</param>
+        </member>
+        <member name="M:Proton.Parser.SyntaxAnalyzer.PeekToken(System.Int32)">
+            <summary>
+            Peeks ahead at a future token in the stream without advancing the current position.
+            </summary>
+            <param name="offset">The number of tokens to look ahead.</param>
+            <returns>The peeked token.</returns>
         </member>
     </members>
 </doc>

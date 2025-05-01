@@ -17,7 +17,7 @@ namespace Proton.Parser
     /// </summary>
     public class SyntaxAnalyzer : ISyntaxAnalyzer
     {
-        // Stores tokens grouped by macro sections
+        // Stores statements grouped by macro sections
         private static readonly Dictionary<string, List<Statement>> Sections = new ();
 
         // List to store errors and warnings

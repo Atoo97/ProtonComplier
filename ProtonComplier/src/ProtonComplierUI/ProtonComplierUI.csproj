@@ -22,6 +22,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProtonComplier.Lexer\ProtonComplier.Lexer.csproj" />
+    <ProjectReference Include="..\ProtonComplier.Parser\ProtonComplier.Parser.csproj" />
+    <ProjectReference Include="..\ProtonComplier.Semantic\ProtonComplier.Semantic.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -26,7 +26,7 @@ namespace Proton.Lexer.Services
         /// </summary>
         /// <param name="code">The source code to be tokenized and analyzed.</param>
         /// <returns>A <see cref="LexicalResult"/> containing tokens grouped by macro sections, along with any detected errors, warnings, and overall success status.</returns>
-        public LexicalResult Compile(string code)
+        public LexicalResult Complie(string code)
         {
             var tokens = this.tokenizer.Tokenize(code);
             return this.analyzer.Analyze(tokens);

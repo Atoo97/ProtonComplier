@@ -1,0 +1,225 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ProtonComplier.Semantic</name>
+    </assembly>
+    <members>
+        <member name="T:Proton.Semantic.Interfaces.ISemanticAnalyzer">
+            <summary>
+            Defines the contract for a semantic analyzer responsible for validating parsed statement sections,
+            ensuring logical correctness, symbol resolution, and proper usage of declared entities.
+            </summary>
+            <remarks>
+            This interface is typically used after syntax analysis. It performs deeper validation of the program's meaning,
+            such as type checking, symbol table verification, and semantic rule enforcement.
+            </remarks>
+        </member>
+        <member name="M:Proton.Semantic.Interfaces.ISemanticAnalyzer.Analyze(System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Parser.Statements.Statement}})">
+            <summary>
+            Analyzes the provided parsed sections for semantic correctness, ensuring consistent use of variables,
+            types, and other logical constructs in accordance with language rules.
+            </summary>
+            <param name="sections">A dictionary containing parsed statements grouped by macro sections.</param>
+            <returns>
+            A <see cref="T:Proton.Semantic.SemanticResult"/> containing:
+            <list type="bullet">
+              <item><description>Semantic errors and warnings detected during analysis</description></item>
+              <item><description>Overall status indicating whether the analyzed code is semantically valid</description></item>
+            </list>
+            </returns>
+        </member>
+        <member name="T:Proton.Semantic.SemanticAnalyzer">
+            <summary>
+            Represents the main sematical class responsible for analyzing tokens from each macro section,
+            generating symbol table, and reporting errors and warnings.
+            </summary>
+        </member>
+        <member name="M:Proton.Semantic.SemanticAnalyzer.Reset">
+            <summary>
+            Before starting a new semantic analysis, reset everything.
+            </summary>
+        </member>
+        <member name="M:Proton.Semantic.SemanticAnalyzer.Analyze(System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Parser.Statements.Statement}})">
+            <summary>
+            Analyzes the provided parsed statement sections, performing semantic validation such as
+            type checking, symbol resolution, and logical rule enforcement. It ensures that the program's logic
+            adheres to the defined language semantics.
+            </summary>
+            <param name="sections">
+            A dictionary containing parsed statements grouped by macro sections. Each section represents
+            a logical block of code (e.g., StateSpace, Input, Precondition), with its corresponding list of statements.
+            </param>
+            <returns>
+            A <see cref="T:Proton.Semantic.SemanticResult"/> containing:
+            <list type="bullet">
+              <item><description><see cref="P:Proton.Semantic.SemanticResult.errors"/> – A list of semantic errors found during analysis, such as undeclared variables or type mismatches.</description></item>
+              <item><description><see cref="P:Proton.Semantic.SemanticResult.warnings"/> – A list of semantic warnings for non-critical issues, like unused variables or unreachable logic.</description></item>
+              <item><description><see cref="P:Proton.Semantic.SemanticResult.sections"/> – A dictionary mapping macro section names to their associated parsed statements.</description></item>
+              <item><description><see cref="P:Proton.Semantic.SemanticResult.table"/> – A symbol table mapping identifiers to their semantic information (e.g., type, scope, and location).</description></item>
+              <item><description><see cref="P:Proton.Semantic.SemanticResult.isSuccessful"/> – A boolean indicating whether the semantic analysis completed without any critical errors.</description></item>
+            </list>
+            </returns>
+        </member>
+        <member name="T:Proton.Semantic.SemanticResult">
+            <summary>
+            Represents the result of semantic analysis.
+            </summary>
+        </member>
+        <member name="M:Proton.Semantic.SemanticResult.#ctor(System.Collections.Generic.List{Proton.ErrorHandler.BaseException},System.Collections.Generic.List{Proton.ErrorHandler.BaseException},System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Parser.Statements.Statement}},Proton.Semantic.SymbolTable,System.Boolean)">
+            <summary>
+            Represents the result of semantic analysis.
+            </summary>
+        </member>
+        <member name="T:Proton.Semantic.Services.SemanticService">
+            <summary>
+            Provides a high-level orchestration service for semantic analysis,
+            including validating parsed statements for logical consistency, symbol usage, and type correctness.
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.Semantic.Services.SemanticService"/> class with the specified semantic analyzer.
+            </remarks>
+            <param name="semanticAnalyzer">An instance of <see cref="T:Proton.Semantic.Interfaces.ISemanticAnalyzer"/> responsible for analyzing parsed statement sections.</param>
+        </member>
+        <member name="M:Proton.Semantic.Services.SemanticService.#ctor(Proton.Semantic.Interfaces.ISemanticAnalyzer)">
+            <summary>
+            Provides a high-level orchestration service for semantic analysis,
+            including validating parsed statements for logical consistency, symbol usage, and type correctness.
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.Semantic.Services.SemanticService"/> class with the specified semantic analyzer.
+            </remarks>
+            <param name="semanticAnalyzer">An instance of <see cref="T:Proton.Semantic.Interfaces.ISemanticAnalyzer"/> responsible for analyzing parsed statement sections.</param>
+        </member>
+        <member name="M:Proton.Semantic.Services.SemanticService.Complie(System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Parser.Statements.Statement}})">
+            <summary>
+            Performs the complete semantic analysis process on the provided parsed statement sections.
+            Validates the semantic correctness of the code, including symbol resolution and rule enforcement.
+            </summary>
+            <param name="sections">A dictionary containing parsed statements grouped by macro sections.</param>
+            <returns>A <see cref="T:Proton.Semantic.SemanticResult"/> representing the outcome of the semantic analysis, including any errors or warnings found.</returns>
+        </member>
+        <member name="T:Proton.Semantic.Symbol">
+            <summary>
+            Represents a symbol (such as a variable) in the semantic model.
+            Stores its name, type, value(s), and initialization status.
+            </summary>
+        </member>
+        <member name="P:Proton.Semantic.Symbol.Name">
+            <summary>
+            Gets or sets the token name representing the name of the symbol (e.g., variable identifier).
+            </summary>
+        </member>
+        <member name="P:Proton.Semantic.Symbol.Type">
+            <summary>
+            Gets or sets the token type representing the data type of the symbol (e.g., Int, Uint, Double).
+            </summary>
+        </member>
+        <member name="P:Proton.Semantic.Symbol.Category">
+            <summary>
+            Gets or sets the token type representing the data category of the symbol (e.g., Int, Uint, Double).
+            </summary>
+        </member>
+        <member name="P:Proton.Semantic.Symbol.Value">
+            <summary>
+            Gets or sets the list of tokens representing the value(s) assigned to the symbol.
+            For array or list-like assignments, multiple tokens may be present.
+            </summary>
+        </member>
+        <member name="P:Proton.Semantic.Symbol.SymbolLine">
+            <summary>
+            Gets or Sets the line number where the symbol was found in the source code.
+            </summary>
+        </member>
+        <member name="P:Proton.Semantic.Symbol.SymbolColumn">
+            <summary>
+            Gets or Sets the column number where the symbol was found in the source code.
+            </summary>
+        </member>
+        <member name="P:Proton.Semantic.Symbol.IsList">
+            <summary>
+            Gets or sets a value indicating whether the symbol is list.
+            </summary>
+        </member>
+        <member name="P:Proton.Semantic.Symbol.IsInitialized">
+            <summary>
+            Gets or sets a value indicating whether the symbol has been initialized.
+            </summary>
+        </member>
+        <member name="M:Proton.Semantic.Symbol.MarkAsInitialized">
+            <summary>
+            Marks the symbol as initialized.
+            Useful for tracking usage during semantic analysis.
+            </summary>
+        </member>
+        <member name="M:Proton.Semantic.Symbol.ToString">
+            <summary>
+            Returns a string representation of the symbol, showing its name and type.
+            Useful for debugging and diagnostics.
+            </summary>
+            <returns>A string representing the symbol's name and type.</returns>
+        </member>
+        <member name="T:Proton.Semantic.SymbolTable">
+            <summary>
+            Represents a symbol table used in semantic analysis.
+            Stores and manages declared symbols (e.g., variables) in the current scope.
+            </summary>
+        </member>
+        <member name="M:Proton.Semantic.SymbolTable.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Semantic.SymbolTable"/> class.
+            </summary>
+        </member>
+        <member name="P:Proton.Semantic.SymbolTable.Symbols">
+            <summary>
+            Gets an enumerable collection of all symbols currently stored in the symbol table.
+            This provides read-only access to the internal symbol definitions.
+            </summary>
+        </member>
+        <member name="M:Proton.Semantic.SymbolTable.AddSymbol(Proton.Semantic.Symbol)">
+            <summary>
+            Adds a symbol to the symbol table.
+            </summary>
+            <param name="symbol">The symbol to add.</param>
+        </member>
+        <member name="M:Proton.Semantic.SymbolTable.FindSymbol(Proton.Lexer.Token)">
+            <summary>
+            Finds and returns a symbol by its name.
+            </summary>
+            <param name="symbol">The token of the symbol to find.</param>
+            <returns>The found <see cref="T:Proton.Semantic.Symbol"/> instance, or null if not found.</returns>
+        </member>
+        <member name="M:Proton.Semantic.SymbolTable.UpdateSymbol(Proton.Semantic.Symbol)">
+            <summary>
+            Updates an existing symbol in the symbol table.
+            Throws an error if the symbol does not exist.
+            </summary>
+            <param name="symbol">The updated symbol instance.</param>
+        </member>
+        <member name="M:Proton.Semantic.SymbolTable.MarkSymbolAsUsed(Proton.Semantic.Symbol)">
+            <summary>
+            Marks a symbol as initialized or used by its name.
+            Useful for tracking variable initialization during semantic analysis.
+            </summary>
+            <param name="symbol">The updated symbol instance.</param>
+            <returns>True if the symbol already initialized; otherwise, false.</returns>
+        </member>
+        <member name="M:Proton.Semantic.SymbolTable.Clear">
+            <summary>
+            Clears all symbols from the symbol table.
+            </summary>
+        </member>
+        <member name="M:Proton.Semantic.SymbolTable.DisplaySymbols">
+            <summary>
+            Displays all symbols currently stored in the symbol table.
+            Prints each symbol's string representation to the console.
+            </summary>
+        </member>
+        <member name="M:Proton.Semantic.SymbolTable.SymbolExists(System.String)">
+            <summary>
+            Checks if a symbol with the given name exists in the symbol table.
+            </summary>
+            <param name="name">The name of the symbol to check for.</param>
+            <returns>True if the symbol exists; otherwise, false.</returns>
+        </member>
+    </members>
+</doc>

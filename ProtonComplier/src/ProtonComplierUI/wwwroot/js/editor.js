@@ -363,6 +363,7 @@ connection.on("ConsoleOutput", function (message) {
 });
 
 connection.on("EditorOutput", function (message) {
+    window.outputText = "";
     window.outputText += message + "\n";
 
     if (typeof rightEditor !== 'undefined') {
@@ -431,6 +432,8 @@ document.getElementById("compileAndRunButton").addEventListener("click", async f
     const editorContent = editor.getValue();
     const fileName = document.getElementById("fileNameInputDesktop").value;
     const lexicalEnabled = document.getElementById("toggleLexicalAnalyzer").checked;
+    const syntaxEnabled = document.getElementById("toggleSyntaxAnalyzer").checked;
+    const semanticEnabled = document.getElementById("toggleSemanticalAnalyzer").checked;
 
     // Sync editor content to hidden input if needed
     document.getElementById("InputText").value = editorContent;
@@ -452,6 +455,8 @@ document.getElementById("compileAndRunButton").addEventListener("click", async f
     formData.append("ConnectionId", connectionId);
     formData.append("FileName", fileName);
     formData.append("Lexical", lexicalEnabled);
+    formData.append("Syntax", syntaxEnabled);
+    formData.append("Semantical", semanticEnabled);
 
     // Post to backend
     const response = await fetch("/Editor/CompileAndRun", {
