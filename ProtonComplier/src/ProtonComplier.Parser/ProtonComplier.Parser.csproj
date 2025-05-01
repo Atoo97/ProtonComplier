@@ -20,9 +20,4 @@
     <ProjectReference Include="..\ProtonComplier.Lexer\ProtonComplier.Lexer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Expressions\" />
-    <Folder Include="Statements\" />
-  </ItemGroup>
-
 </Project>
