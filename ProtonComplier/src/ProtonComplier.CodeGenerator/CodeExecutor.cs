@@ -48,7 +48,7 @@ namespace Proton.CodeGenerator
                     errors.Add(errorMessage);
                 }
 
-                return new GeneratorResult(code, string.Empty, errors);
+                return new GeneratorResult(code, string.Empty, errors, false);
             }
             else
             {
@@ -62,7 +62,7 @@ namespace Proton.CodeGenerator
                         if (!compileResult.Success)
                         {
                             errors.Add("Compilation failed.");
-                            return new GeneratorResult(code, string.Empty, errors);
+                            return new GeneratorResult(code, string.Empty, errors, false);
                         }
 
                         compiledAssembly = Assembly.Load(stream.GetBuffer());
@@ -75,18 +75,18 @@ namespace Proton.CodeGenerator
                     if (evaluate != null)
                     {
                         var result = evaluate.Invoke(null, null);
-                        return new GeneratorResult(code, (string)result!, errors);
+                        return new GeneratorResult(code, (string)result!, errors, true);
                     }
                     else
                     {
                         errors.Add("Error: No entry method found in compiled code.");
-                        return new GeneratorResult(code, string.Empty, errors);
+                        return new GeneratorResult(code, string.Empty, errors, false);
                     }
                 }
                 catch (Exception ex)
                 {
                     errors.Add($"Runtime Error: {ex.Message}");
-                    return new GeneratorResult(code, string.Empty, errors);
+                    return new GeneratorResult(code, string.Empty, errors, false);
                 }
             }
         }

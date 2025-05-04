@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 using Proton.Semantic.Services;
 using Proton.CodeGenerator.Services;
 using Proton.CodeGenerator;
+using Proton.Parser;
 
 namespace ProtonComplierUI.Controllers;
 
@@ -35,7 +36,7 @@ public class EditorController : Controller
         this.semanticService = semanticService;
         this.codeGeneratorService = codeGeneratorService;
         path = Path.Combine(Directory.GetCurrentDirectory(), "App_Data", "ProtonTemplate.txt");
-        _sbLock = new ();
+        _sbLock = new();
     }
 
     public async Task<IActionResult> Index(EditorViewModel model)
@@ -56,215 +57,181 @@ public class EditorController : Controller
     [HttpPost]
     public async Task<IActionResult> Compile([FromForm] CompileRequest request)
     {
-        var sb = new StringBuilder();
-        var stopwatch = new Stopwatch();
-
-        // Insted of: Clients.All.. this now support multiple users simultaneously:
-        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: Compiling ({request.FileName}.ptrn)");
         await Task.Delay(1000);
-        stopwatch.Start();
-
-        // ===== LEXICAL ANALYSIS =====
-        var result = lexicalService.Complie(request.Code);
-        var elapsedTime = stopwatch.Elapsed;
-        var timeMessage = $"🕒 Total Lexical Analysis time: {elapsedTime.TotalSeconds:F8} seconds";
-
-        if (result.isSuccessful)
-        {
-            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", "[ProtonComplier]: LexicalAnalyzing (Main.prtn) complete | Status: SuccessFull");
-            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
-            AppendErrorMessage(sb, result.warnings, false);
-
-            if (request.Lexical)
-            {
-                sb.AppendLine($"|===== LEXICAL ANALYSIS =====|");  // Append sections for each expected macro
-                MacroType.ExpectedMacros
-                    .Where(macro => result.sections.ContainsKey(macro.Value))
-                    .ToList()
-                    .ForEach(macro => AppendMacroSection(sb, macro.Value, result.sections[macro.Value]));
-            }
-
-            // ===== SYNTAX ANALYSIS (Add your logic if syntax == true) =====
-            // ===== SEMANTICAL ANALYSIS (Add your logic if semantical == true) =====
-
-            await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", sb.ToString());
-        }
-        else
-        {
-            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", "[ProtonComplier]: LexicalAnalyzing (Main.prtn) complete | Status: Denied");
-            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
-            AppendErrorMessage(sb, result.errors, true);
-            AppendErrorMessage(sb, result.warnings, false);
-            await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", sb.ToString());
-        }
-
-        stopwatch.Stop();
         return Ok();
     }
 
     [HttpPost]
     public async Task<IActionResult> CompileAndRun([FromForm] CompileRequest request)
     {
-        var sb = new StringBuilder();
+        var output = new StringBuilder();
+        var errors = new StringBuilder();
         var stopwatch = new Stopwatch();
+        var analyzetype = "Lexical";
 
         // Insted of: Clients.All.. this now support multiple users simultaneously:
-        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: Compiling ({request.FileName}.ptrn) started...");
+        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: Compiling ({request.FileName}.prtn)");
         await Task.Delay(2000);
-        stopwatch.Start();
 
         // ===== LEXICAL ANALYSIS =====
+        stopwatch.Start();
         var lexicalresult = lexicalService.Complie(request.Code);
         stopwatch.Stop();
-        var elapsedTimeLexical = stopwatch.Elapsed;
-        var timeMessage = $"[ProtonComplier]: Total Lexical Analysis time: {elapsedTimeLexical.TotalSeconds:F8} seconds";
+        var lexicalelapsedTime = stopwatch.Elapsed;
+        var timeMessage = $"[ProtonComplier]: Total {analyzetype} Analysis time: {lexicalelapsedTime.TotalSeconds:F8} seconds";
 
+        string statusMessage = lexicalresult.isSuccessful
+        ? $"[ProtonComplier]: {analyzetype} Analyzing ({request.FileName}.prtn) complete | Status: Succesfull"
+        : $"[ProtonComplier]: {analyzetype} Analyzing ({request.FileName}.prtn) complete | Status: Denied";
+
+        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", statusMessage);
+        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
+        AppendErrorMessage(errors, lexicalresult.errors);
+        AppendErrorMessage(errors, lexicalresult.warnings);
+        await Task.Delay(500);
         if (lexicalresult.isSuccessful)
         {
-            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: LexicalAnalyzing ({request.FileName}.ptrn) complete | Status: SuccessFull");
-            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
-            AppendErrorMessage(sb, lexicalresult.warnings, false);
-
-            if (request.Lexical) 
+            if (request.Lexical)
             {
                 lock (_sbLock)
                 {
-                    sb.AppendLine($"|===== LEXICAL ANALYSIS =====|");  // Append sections for each expected macro
+                    output.AppendLine($"|===== LEXICAL ANALYSIS RESULTS =====|");
                 }
                 MacroType.ExpectedMacros
                     .Where(macro => lexicalresult.sections.ContainsKey(macro.Value))
                     .ToList()
-                    .ForEach(macro => AppendMacroSection(sb, macro.Value, lexicalresult.sections[macro.Value]));
+                    .ForEach(macro => AppendMacroSection(output, macro.Value, lexicalresult.sections[macro.Value]));
 
-                await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", sb.ToString());
+                await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", output.ToString());
             }
 
-            // ===== SYNTAX ANALYSIS =====
-            await Task.Delay(1000);
-            stopwatch.Start();
-            var parserresult = parserService.Complie(lexicalresult.sections);
-            stopwatch.Stop();
-            var elapsedTimeParser = stopwatch.Elapsed;
-            elapsedTimeParser -= elapsedTimeLexical;
-            timeMessage = $"[ProtonComplier]: Total Syntax Analysis time: {elapsedTimeParser.TotalSeconds:F8} seconds";
-
-            if (parserresult.isSuccessful)
-            {
-                await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: SyntaxAnalyzing ({request.FileName}.ptrn) complete | Status: SuccessFull");
-                await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
-                AppendErrorMessage(sb, parserresult.warnings, false);
-
-                if (request.Syntax)
-                {
-                    lock (_sbLock)
-                    {
-                        sb.AppendLine($"|===== SYNTAX ANALYSIS =====|"); // Append sections for each expected macro
-                    }
-                    MacroType.ExpectedMacros
-                        .Where(macro => parserresult.sections.ContainsKey(macro.Value))
-                        .ToList()
-                        .ForEach(macro => AppendMacroSection(sb, macro.Value, parserresult.sections[macro.Value]));
-
-                    await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", sb.ToString());
-                }
-
-                // ===== SEMANTICAL ANALYSIS =====
-                await Task.Delay(1000);
-                stopwatch.Start();
-                var semanticalresult = semanticService.Complie(parserresult.sections);
-                stopwatch.Stop();
-                var elapsedTimeSemantic = stopwatch.Elapsed;
-                elapsedTimeSemantic -= (elapsedTimeLexical+elapsedTimeParser);
-                timeMessage = $"[ProtonComplier]: Total Semantical Analysis time: {elapsedTimeSemantic.TotalSeconds:F8} seconds";
-
-                if (semanticalresult.isSuccessful)
-                {
-                    await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: SemanticAnalyzing ({request.FileName}.ptrn) complete | Status: SuccessFull");
-                    await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
-                    AppendErrorMessage(sb, semanticalresult.warnings, false);
-
-                    if (request.Semantical)
-                    {
-                        lock (_sbLock)
-                        {
-                            sb.AppendLine($"|===== SEMANTIC ANALYSIS =====|");
-                        }
-                        MacroType.ExpectedMacros
-                            .Where(macro => semanticalresult.sections.ContainsKey(macro.Value))
-                            .ToList()
-                            .ForEach(macro => AppendMacroSection(sb, macro.Value, semanticalresult.sections[macro.Value]));     //TODO: to midfy display logic here
-
-                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", sb.ToString());
-                    }
-
-                    // ===== CODE GENERATOR =====
-                    await Task.Delay(1000);
-                    stopwatch.Start();
-                    var codegeneratorresult = await codeGeneratorService.GenerateAndExecute(semanticalresult.table);
-                    stopwatch.Stop();
-                    var elapsedTimeCodeGen = stopwatch.Elapsed;
-                    elapsedTimeCodeGen -= (elapsedTimeLexical + elapsedTimeParser + elapsedTimeSemantic);
-                    timeMessage = $"[ProtonComplier]: Total Code Generation time: {elapsedTimeCodeGen.TotalSeconds:F8} seconds";
-
-                    if (codegeneratorresult.errors.Count == 0)
-                    {
-                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: CodeGeneeation ({request.FileName}.ptrn) complete | Status: SuccessFull");
-                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
-
-                        lock (_sbLock)
-                        {
-                            sb.AppendLine($"|===== GENERATED C# CODE =====|");
-                            sb.AppendLine(codegeneratorresult.code);
-                        }
-                        
-                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", sb.ToString());
-                        var text = $"[ProtonComplier]: Executed code result: {codegeneratorresult.result}";
-                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", text);
-                    }
-                    else
-                    {
-                        await Task.Delay(500);
-                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: CodeGeneration ({request.FileName}.ptrn) complete | Status: Denied");
-                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
-                        lock (_sbLock)
-                        {
-                            sb.AppendLine($"|===== GENERATED C# CODE =====|");
-                            sb.AppendLine(codegeneratorresult.code);
-                        }
-
-                        var text = $"[ProtonComplier]: Executed code errors:\n{string.Join("\n", codegeneratorresult.errors)}";
-                        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput",text);
-                    }
-                }
-                else
-                {
-                    await Task.Delay(500);
-                    await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: SemanticAnalyzing ({request.FileName}.ptrn) complete | Status: Denied");
-                    await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", elapsedTimeSemantic);
-                    AppendErrorMessage(sb, semanticalresult.errors, true);
-                    AppendErrorMessage(sb, semanticalresult.warnings, false);
-                }
-            }
-            else
-            {
-                await Task.Delay(500);
-                await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: SyntaxAnalyzing ({request.FileName}.ptrn) complete | Status: Denied");
-                await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", elapsedTimeParser);
-                AppendErrorMessage(sb, parserresult.errors, true);
-                AppendErrorMessage(sb, parserresult.warnings, false);
-            }
+            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ErrorsAndWarningsOutput", errors.ToString());
         }
         else
         {
-            await Task.Delay(500);
-            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: LexicalAnalyzing ({request.FileName}.ptrn) complete | Status: Denied");
-            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", elapsedTimeLexical);
-            AppendErrorMessage(sb, lexicalresult.errors, true);
-            AppendErrorMessage(sb, lexicalresult.warnings, false);
+            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ErrorsAndWarningsOutput", errors.ToString());
+            return BadRequest();
         }
 
-        await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", sb.ToString());
+        // ===== SYNTAX ANALYSIS =====
+        analyzetype = "Syntax";
+        stopwatch.Start();
+        var parserresult = parserService.Complie(lexicalresult.sections);
         stopwatch.Stop();
+        var parserelapsedTime = stopwatch.Elapsed;
+        parserelapsedTime -= lexicalelapsedTime;
+        timeMessage = $"[ProtonComplier]: Total {analyzetype} Analysis time: {parserelapsedTime.TotalSeconds:F8} seconds";
+
+        statusMessage = parserresult.isSuccessful
+           ? $"[ProtonComplier]: {analyzetype} Analyzing ({request.FileName}.prtn) complete | Status: Succesfull"
+           : $"[ProtonComplier]: {analyzetype} Analyzing ({request.FileName}.prtn) complete | Status: Denied";
+
+        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", statusMessage);
+        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
+        AppendErrorMessage(errors, parserresult.errors);
+        AppendErrorMessage(errors, parserresult.warnings);
+        await Task.Delay(500);
+        if (parserresult.isSuccessful)
+        {
+            if (request.Syntax)
+            {
+                lock (_sbLock)
+                {
+                    output.AppendLine($"|===== SYNTAX ANALYSIS RESULTS =====|");
+                }
+                MacroType.ExpectedMacros
+                    .Where(macro => parserresult.sections.ContainsKey(macro.Value))
+                    .ToList()
+                    .ForEach(macro => AppendMacroSection(output, macro.Value, parserresult.sections[macro.Value]));
+
+                await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", output.ToString());
+            }
+
+            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ErrorsAndWarningsOutput", errors.ToString());
+        }
+        else
+        {
+            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ErrorsAndWarningsOutput", errors.ToString());
+            return BadRequest();
+        }
+
+        // ===== SEMANTIC ANALYSIS =====
+        analyzetype = "Semantic";
+        stopwatch.Start();
+        var semanticresult = semanticService.Complie(parserresult.sections);
+        stopwatch.Stop();
+        var semanticelapsedTime = stopwatch.Elapsed;
+        semanticelapsedTime -= (lexicalelapsedTime + parserelapsedTime);
+        timeMessage = $"[ProtonComplier]: Total {analyzetype} Analysis time: {semanticelapsedTime.TotalSeconds:F8} seconds";
+
+        statusMessage = semanticresult.isSuccessful
+           ? $"[ProtonComplier]: {analyzetype} Analyzing ({request.FileName}.prtn) complete | Status: Succesfull"
+           : $"[ProtonComplier]: {analyzetype} Analyzing ({request.FileName}.prtn) complete | Status: Denied";
+
+        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", statusMessage);
+        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
+        AppendErrorMessage(errors, semanticresult.errors);
+        AppendErrorMessage(errors, semanticresult.warnings);
+        await Task.Delay(500);
+        if (semanticresult.isSuccessful)
+        {
+            if (request.Semantical)
+            {
+                lock (_sbLock)
+                {
+                    output.AppendLine($"|===== SEMANTIC ANALYSIS RESULTS =====|");
+                    output.AppendLine(semanticresult.table.DisplaySymbols());
+                }
+
+                await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", output.ToString());
+            }
+
+            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ErrorsAndWarningsOutput", errors.ToString());
+        }
+        else
+        {
+            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ErrorsAndWarningsOutput", errors.ToString());
+            return BadRequest();
+        }
+
+        // ===== CODE GENERATION =====
+        analyzetype = "Code Generation";
+        stopwatch.Start();
+        var codegenresult = await codeGeneratorService.GenerateAndExecute(semanticresult.table);
+        stopwatch.Stop();
+        var codegenelapsedTime = stopwatch.Elapsed;
+        codegenelapsedTime -= (lexicalelapsedTime + parserelapsedTime + semanticelapsedTime);
+        timeMessage = $"[ProtonComplier]: Total {analyzetype} Analysis time: {codegenelapsedTime.TotalSeconds:F8} seconds";
+
+        statusMessage = codegenresult.isSuccessful
+           ? $"[ProtonComplier]: {analyzetype} Analyzing ({request.FileName}.prtn) complete | Status: Succesfull"
+           : $"[ProtonComplier]: {analyzetype} Analyzing ({request.FileName}.prtn) complete | Status: Denied";
+
+        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", statusMessage);
+        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", timeMessage);
+        await Task.Delay(500);
+        lock (_sbLock)
+        {
+            output.AppendLine($"|===== CODE GENERATION RESULTS =====|");
+            output.AppendLine(codegenresult.code);
+        }
+        await hubContext.Clients.Client(request.ConnectionId).SendAsync("EditorOutput", output.ToString());
+
+        if (codegenresult.isSuccessful)
+        {
+            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: Code Running result: {codegenresult.result}");
+        }
+        else
+        {
+            var text = string.Join(Environment.NewLine, codegenresult.errors.Select(e => $"⚠️ {e}"));
+            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: Code Running errors: {text}");
+            return BadRequest();
+        }
+
+        if (errors.Length > 1)
+        {
+            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ErrorsAndWarningsOutput", errors.ToString());
+        }
         return Ok();
     }
 
@@ -334,15 +301,27 @@ public class EditorController : Controller
     }
 
 
-    void AppendErrorMessage(StringBuilder sb, IEnumerable<BaseException> messageOutput, bool isError)
+    void AppendErrorMessage(StringBuilder sb, IEnumerable<BaseException> messageOutput)
     {
-        if (!messageOutput.Any()) return;
-
         lock (_sbLock)
         {
-            sb.AppendLine(isError ? "|===== ERRORS =====|" : "|===== WARNINGS =====|");
+            if (sb.Length == 0)
+            {
+                sb.AppendLine("|===== ERRORS & WARNINGS =====|");
+            }
             messageOutput.ToList().ForEach(msg => sb.AppendLine($"\u26A0 {msg}"));
-            sb.AppendLine();
+        }
+    }
+
+    void AppendErrorMessage(StringBuilder sb, IEnumerable<string> messageOutput)
+    {
+        lock (_sbLock)
+        {
+            if (sb.Length == 0)
+            {
+                sb.AppendLine("|===== ERRORS & WARNINGS =====|");
+            }
+            messageOutput.ToList().ForEach(msg => sb.AppendLine($"\u26A0 {msg}"));
         }
     }
 
@@ -350,7 +329,7 @@ public class EditorController : Controller
     {
         lock (_sbLock)
         {
-            sb.AppendLine($"~~~~~ MACRO SECTION: {macroName}");
+            sb.AppendLine($"MACRO SECTION: {macroName}");
 
             tokens
                 .Where(token => token.TokenType is not TokenType.Whitespace and not TokenType.Newline)
@@ -365,7 +344,7 @@ public class EditorController : Controller
     {
         lock (_sbLock)
         {
-            sb.AppendLine($"~~~~~ MACRO SECTION: {macroName}");
+            sb.Append($"MACRO SECTION: {macroName}");
 
             statements
                 .ToList()

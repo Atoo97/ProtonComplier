@@ -288,9 +288,18 @@
 
 /*Console Error links*/
 .linked-error {
-    color: #4ea1ff !important;
     text-decoration: underline;
     cursor: pointer;
+    background-color: white;
+    border-radius: 3px;
+    color: blue !important;
+    font-weight: bold !important;
+    padding: 1px 2px;
+}
+
+/* Optional: add a pointer cursor if needed elsewhere */
+.monaco-editor .cursor-pointer {
+    cursor: pointer !important;
 }
 
 /* Responsive styles */

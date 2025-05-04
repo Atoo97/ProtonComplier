@@ -15,3 +15,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0028:Simplify collection initialization", Justification = "<Pending>", Scope = "member", Target = "~M:Proton.Lexer.LexicalAnalyzer.Analyze(System.Collections.Generic.List{Proton.Lexer.Token})~Proton.Lexer.LexicalResult")]
 [assembly: SuppressMessage("Style", "IDE0300:Simplify collection initialization", Justification = "<Pending>", Scope = "member", Target = "~F:Proton.Lexer.Tokenizer.Separator")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "type", Target = "~T:Proton.Lexer.LexicalResult")]
+[assembly: SuppressMessage("Style", "IDE0028:Simplify collection initialization", Justification = "<Pending>", Scope = "member", Target = "~M:Proton.Lexer.Tokenizer.Tokenize(System.String)~System.Collections.Generic.List{Proton.Lexer.Token}")]

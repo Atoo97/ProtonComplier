@@ -3,9 +3,11 @@
 // </copyright>
 namespace Proton.Semantic
 {
+    using System.Text;
     using Proton.ErrorHandler;
     using Proton.Lexer;
     using Proton.Parser.Statements;
+    using ProtonComplier.Semantic;
 
     /// <summary>
     /// Represents a symbol table used in semantic analysis.
@@ -116,15 +118,39 @@ namespace Proton.Semantic
         }
 
         /// <summary>
-        /// Displays all symbols currently stored in the symbol table.
-        /// Prints each symbol's string representation to the console.
+        /// Returns a formatted table of all symbols currently stored in the symbol table.
+        /// Each symbol is displayed with its name, type, category, position, list status, initialization state, and value.
+        /// If no symbols are found, a default message is returned.
         /// </summary>
-        public void DisplaySymbols()
+        /// <returns>A string representing the formatted symbol table or a message indicating no symbols were found.</returns>
+        public string DisplaySymbols()
         {
-            foreach (var symbol in this.symbols.Values)
+            if (this.symbols.Count == 0)
             {
-                Console.WriteLine(symbol.ToString());
+                return "No symbols were found in the semantic table.";
             }
+
+            var sb = new StringBuilder();
+            sb.AppendLine(string.Format(
+                $"| {{0,-{SymbolTableFormat.NameWidth}}} | {{1,-{SymbolTableFormat.TypeWidth}}} | " +
+                $"{{2,-{SymbolTableFormat.CategoryWidth}}} | {{3,-{SymbolTableFormat.LineWidth}}} | " +
+                $"{{4,-{SymbolTableFormat.ColWidth}}} | {{5,-{SymbolTableFormat.ListWidth}}} | " +
+                $"{{6,-{SymbolTableFormat.InitializedWidth}}} | {{7,-{SymbolTableFormat.ValueWidth}}} |",
+                "Name", "Type", "Category", "Line", "Col", "List", "Initialized", "Value"));
+
+            int totalWidth = SymbolTableFormat.NameWidth + SymbolTableFormat.TypeWidth +
+                             SymbolTableFormat.CategoryWidth + SymbolTableFormat.LineWidth +
+                             SymbolTableFormat.ColWidth + SymbolTableFormat.ListWidth +
+                             SymbolTableFormat.InitializedWidth + SymbolTableFormat.ValueWidth + 25;
+
+            sb.AppendLine(new string('-', totalWidth));
+
+            foreach (var symbol in this.symbols)
+            {
+                sb.AppendLine(symbol.ToString());
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>

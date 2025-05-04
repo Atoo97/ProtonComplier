@@ -33,15 +33,15 @@ namespace Proton.CodeGenerator
             var match = MyRegex().Match(expressionShell);
             string indent = match.Success ? match.Groups[1].Value : string.Empty;
 
-            var statePlaceCode = string.Empty; // GenerateStateOrInput(symbolTable, indent, isInput: false);
+            var statePlaceCode = GenerateStateOrInput(symbolTable, indent, isInput: false);
             var inputCode = string.Empty; // GenerateStateOrInput(symbolTable, indent, isInput: true);
 
-            return new GeneratorResult(expressionShell.Replace("$", statePlaceCode + "\n" + inputCode), null!, null!);
+            return new GeneratorResult(expressionShell.Replace("$", statePlaceCode + "\n" + inputCode), null!, null!, true);
         }
 
         private static string GenerateStateOrInput(SymbolTable symbolTable, string indent, bool isInput)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new ();
             sb.AppendLine($"//{(isInput ? "Inputs" : "StatePlace")}:\n");
 
             var groupedByLine = symbolTable.Symbols
@@ -77,8 +77,7 @@ namespace Proton.CodeGenerator
                     {
                         var symbolValueMap = group.ToDictionary(
                             s => s,
-                            s => s.Value.FirstOrDefault()?.TokenValue ?? "0"
-                        );
+                            s => s.Value.FirstOrDefault()?.TokenValue ?? "0");
 
                         var groupedByValue = symbolValueMap
                             .GroupBy(kvp => kvp.Value)

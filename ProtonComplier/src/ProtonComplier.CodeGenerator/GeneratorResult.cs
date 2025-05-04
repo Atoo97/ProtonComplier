@@ -9,5 +9,6 @@ namespace Proton.CodeGenerator
     public readonly record struct GeneratorResult(
         string code,
         string result,
-        List<string> errors);
+        List<string> errors,
+        bool isSuccessful);
 }

@@ -63,7 +63,7 @@
             Represents the result of code generator.
             </summary>
         </member>
-        <member name="M:Proton.CodeGenerator.GeneratorResult.#ctor(System.String,System.String,System.Collections.Generic.List{System.String})">
+        <member name="M:Proton.CodeGenerator.GeneratorResult.#ctor(System.String,System.String,System.Collections.Generic.List{System.String},System.Boolean)">
             <summary>
             Represents the result of code generator.
             </summary>

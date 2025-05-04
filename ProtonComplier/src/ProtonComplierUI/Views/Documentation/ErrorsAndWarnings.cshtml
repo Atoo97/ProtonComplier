@@ -26,21 +26,23 @@
                     <ul class="nav flex-column">
                         <!-- Lexical Errors Section -->
                         <li class="nav-item">
-                            <a class="nav-link-item" href="#P001" onclick="showMessage('P001'); return false;">Unexpected Character (001)</a>
+                            <a class="nav-link-item" href="#P001" onclick="showMessage('P001'); return false;">Internal Complie Error (001)</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link-item" href="#P002" onclick="showMessage('P002'); return false;">Deprecated Token Usage (002)</a>
+                            <a class="nav-link-item" href="#P004" onclick="showMessage('P004'); return false;">Invalid Macro Type Error (004)</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link-item" href="#P004" onclick="showMessage('P004'); return false;">Invalid Macro Definition (004)</a>
+                            <a class="nav-link-item" href="#P005" onclick="showMessage('P005'); return false;">Missing Macro Section Error (005)</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link-item" href="#P007" onclick="showMessage('P007'); return false;">Unknown Error (007)</a>
+                            <a class="nav-link-item" href="#P006" onclick="showMessage('P006'); return false;">Multiple Macro Definition Warning (006)</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link-item" href="#P006" onclick="showMessage('P006'); return false;">Multiple Macro Definition (006)</a>
+                            <a class="nav-link-item" href="#P008" onclick="showMessage('P008'); return false;">Invalid Value Placement Error (008)</a>
                         </li>
-                        <!-- Add more lexical errors here -->
+                        <li class="nav-item">
+                            <a class="nav-link-item" href="#P011" onclick="showMessage('P011'); return false;">Unknown Token Definition Error (011)</a>
+                        </li>
                         <!-- Parser Errors Section -->
                         <li class="nav-item mt-4">
                             <h6 class="text-uppercase text-muted">Parser Errors (101-200)</h6>
@@ -84,14 +86,13 @@
 
             <!-- Right Main Content -->
             <main class="col-md-9">
-                <div class="content" id="content">
-                    <h1>Proton Error Documentation</h1>
-                    <p>Select an error code from the left to view its details.</p>
+                <div class="content" id="content"></div>
+                <div id="editor-container" class="box" style="height: 200px; display: none;">
+                    <div id="editor-inner"></div>
                 </div>
+                <div class="content2" id="content2"></div>
             </main>
 
         </div>
     </section>
 </section>
-
-

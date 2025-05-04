@@ -49,6 +49,153 @@ namespace Proton.Parser
         /// </summary>
         public static void StatePlaceParser()
         {
+            // Split tokens by new lines (each row is a list of tokens)
+            List<List<Token>> splitedTokens = SplitTokensByNewline(Tokens);
+
+            // Create a list to store variable declarations for this macro section
+            List<Statement> variableDeclarations = new ();
+
+            for (int i = 0; i < splitedTokens.Count; i++)
+            {
+                Tokens.Clear();
+                Tokens.AddRange(splitedTokens[i]);  // it makes work the Eat/Peak() methods
+
+                if (Tokens.Count == 0)
+                {
+                    break;
+                }
+
+                try
+                {
+                    position = 0; // Reset token position for each row
+                    List<IdentifierExpression> variables = new ();
+
+                    do
+                    {
+                        // 1) Step: Create identifier expression + check next expression exist
+                        variables.Add(new IdentifierExpression(CurrentToken));
+                        Eat(CurrentToken, "Separator");
+
+                        bool warned = false;       // Track if we've already warned about consecutive commas
+                        bool lastWasComma = false; // Tracks if the last token was a comma
+
+                        // 2) Step: Check multiple identifier declaration order
+                        while (CurrentToken.TokenType != TokenType.EndOfInput)
+                        {
+                            if (CurrentToken.TokenType == TokenType.Identifier)
+                            {
+                                variables.Add(new IdentifierExpression(CurrentToken));
+                                Eat(CurrentToken, "Separator");
+
+                                warned = false;         // Reset warning since we found a valid variable
+                                lastWasComma = false;   // Reset comma tracker
+                            }
+                            else if (CurrentToken.TokenType == TokenType.Comma)
+                            {
+                                if (lastWasComma) // Detect multiple consecutive commas (var1,,,var2)
+                                {
+                                    if (!warned)
+                                    {
+                                        Warnings.Add(new AnalyzerWarning(
+                                            "107",
+                                            string.Format(MessageRegistry.GetMessage(107).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
+
+                                        warned = true; // Prevent duplicate warnings
+                                    }
+                                }
+
+                                Eat(CurrentToken, "Identifier");
+                                lastWasComma = true; // Mark last token as comma
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+                        // If the last token before ':' was a comma (e.g., var2,:N), issue a warning
+                        if (lastWasComma)
+                        {
+                            Warnings.Add(new AnalyzerWarning(
+                                "107", // Unique ID for trailing comma
+                                string.Format(MessageRegistry.GetMessage(107).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
+                        }
+
+                        // 3) Step: Create separator expression
+                        SeparatorExpression separator = new (CurrentToken);
+                        Eat(CurrentToken, "Keyword");
+
+                        // 4) Step: Collect Specifier type expression until not find new semmicolon.
+                        var typeTokens = Tokens.Skip(position)
+                        .TakeWhile(t => t.TokenType != TokenType.Semicolon && t.TokenType != TokenType.EndOfInput)
+                        .ToList();
+
+                        position += typeTokens.Count + 1;
+
+                        // Add remaining tokens to the end of the row. Support multiple declaration in one line.
+                        if (CurrentToken.TokenType != TokenType.EndOfInput && typeTokens.Count > 0)
+                        {
+                            // Handle multiple separator warning:
+                            // Skip over all leading ',' or ';' and add warnings
+                            while (position < Tokens.Count &&
+                                  (Tokens[position].TokenType == TokenType.Comma || Tokens[position].TokenType == TokenType.Semicolon))
+                            {
+                                var warningToken = Tokens[position];
+
+                                Warnings.Add(new AnalyzerWarning(
+                                        "108",
+                                        string.Format(MessageRegistry.GetMessage(107).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
+
+                                position++; // Skip this token
+                            }
+
+                            var tokens = Tokens.Skip(position).ToList();
+                            splitedTokens.Insert(i + 1, tokens);
+                        }
+                        else if (typeTokens.Count == 0)
+                        {
+                            // Error if separator not followed TypeSpecifierExpression
+                            // Generate error message
+                            throw new AnalyzerError(
+                                "101",
+                                string.Format(MessageRegistry.GetMessage(101).Text, Tokens[position - 1].TokenLine, Tokens[position - 1].TokenColumn, "TypeSpecifier ('[]' or ',' or ';')"));
+                        }
+
+                        // 5) Step: Create Typesepcification expression
+                        TypeSpecifierExpression typeSpecifier = new (typeTokens);
+
+                        // 6) Step: Create VariableDeclaration for each variable
+                        foreach (var varExpr in variables)
+                        {
+                            VariableDeclaration variableDeclaration = new (varExpr, separator, typeSpecifier);
+
+                            variableDeclarations.Add(variableDeclaration); // Add to the list of variable declarations
+                        }
+
+                        break;
+                    }
+                    while (false);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is AnalyzerWarning warning)
+                    {
+                        Warnings.Add(warning);
+                    }
+                    else if (ex is AnalyzerError error)
+                    {
+                        Errors.Add(error);
+                    }
+                    else
+                    {
+                        // Fallback: Add generic errors to both lists if the type is unknown
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+
+            // Store the parsed variable declarations in the Sections dictionary, grouped by the "StateSpace" macro
+            Sections["StateSpace"] = variableDeclarations;
         }
 
         /// <summary>
@@ -117,14 +264,6 @@ namespace Proton.Parser
                     default:
                         throw new Exception();
                 }
-
-                // Just until first iteration (Delet lateer!!!)
-                /*
-                if (macroString == "Precondition")
-                {
-                    break;
-                }
-                */
             }
 
             // Return results

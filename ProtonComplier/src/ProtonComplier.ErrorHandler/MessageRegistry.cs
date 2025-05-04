@@ -21,18 +21,18 @@ namespace Proton.ErrorHandler
             },
             {
                 004, new Message(
-                "invalid-macro",
-                "LexerInvalid macro: '{0}' at line {1}, column {2}. Expected one of: {3}.")
+                "invalid-macro-type",
+                "LexerError: Invalid macro: '{0}' at line {1}, column {2}. Expected one of: {3}.")
             },
             {
                 005, new Message(
-                "missing-section",
-                "LexerMissing section: '{0}'. This section is required for the document to be valid.")
+                "missing-macro-section",
+                "LexerError: Missing macro section: '{0}'. This section is required for the document to be valid.")
             },
             {
                 006, new Message(
-                "multiple-macro",
-                "LexerMultiple '{0}' macros detected at line {1}, column {2}. The definitions are being added as extra lines.")
+                "multiple-macro-definition",
+                "LexerWarning: Multiple '{0}' macros detected at line {1}, column {2}. The definitions are being added as extra lines.")
             },
             {
                 008, new Message(
@@ -43,6 +43,40 @@ namespace Proton.ErrorHandler
                 011, new Message(
                 "unknown-token-definition",
                 "LexerError: The unknown token '{0}' detected at line {1}, column {2} is not exist in the current context.")
+            },
+
+            // Parser errors & warnings (101-200):
+            {
+                101, new Message(
+                "invalid-expression",
+                "ParserError: Invalid expression at line {0}, column {1}. Expected expression type: '{2}'.")
+            },
+            {
+                104, new Message(
+                "unexpected-token",
+                "ParserError: Unexpected token: '{0}' at line {1}, column {2}. Expected token: '{3}'.")
+            },
+            {
+                107, new Message(
+                "multiple-commas",
+                "ParserWarning: Multiple consecutive commas detected at line {0}, column {1}.")
+            },
+            {
+                108, new Message(
+                "multiple-delimeter",
+                "ParserWarning: Multiple consecutive delimeter detected at line {0}, column {1}.")
+            },
+            {
+                112, new Message(
+                "multiple-listspecifier",
+                "ParserError: Multiple list specifier detected at line {0}, column {1}.")
+            },
+
+            // Semantic errors & warnings (201-300):
+            {
+                204, new Message(
+                "invalid-variable-identifier",
+                "SemanticalError: Invalid variable name declaration '{0}' at line {1}, column {2}.")
             },
         };
 

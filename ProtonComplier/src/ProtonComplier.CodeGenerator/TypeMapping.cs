@@ -13,6 +13,9 @@ namespace Proton.CodeGenerator
             { "Natural", "uint" },      // Natural number
             { "Integer", "int" },       // Integer number
             { "Real", "double" },       // Real number
+            { "Character", "char" },
+            { "Text", "string" },
+            { "Boolean", "bool" },
         };
 
         /// <summary>

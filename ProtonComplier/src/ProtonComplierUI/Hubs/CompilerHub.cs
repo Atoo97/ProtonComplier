@@ -16,6 +16,8 @@
 
             await Clients.All.SendAsync("ConsoleOutput", message);
 
+            await Clients.All.SendAsync("ErrorsAndWarningsOutput", message);
+
             await Clients.All.SendAsync("ResetEditor", message);
         }
     }

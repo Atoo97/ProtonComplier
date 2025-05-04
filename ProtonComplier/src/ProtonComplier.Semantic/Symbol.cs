@@ -5,6 +5,7 @@ namespace Proton.Semantic
 {
     using Proton.Lexer;
     using Proton.Lexer.Enums;
+    using ProtonComplier.Semantic;
 
     /// <summary>
     /// Represents a symbol (such as a variable) in the semantic model.
@@ -63,18 +64,28 @@ namespace Proton.Semantic
         }
 
         /// <summary>
-        /// Returns a string representation of the symbol, showing its name and type.
-        /// Useful for debugging and diagnostics.
+        /// Returns a detailed string representation of the symbol for symbol table display.
         /// </summary>
-        /// <returns>A string representing the symbol's name and type.</returns>
+        /// <returns>A formatted string showing the symbol's properties as a table row.</returns>
         public override string ToString()
         {
-            return $"{this.Name} : {this.Type}";
-        }
+            string valueStr = this.Value != null && this.Value.Count > 0
+                ? string.Join(", ", this.Value.Select(v => v.TokenValue))
+                : "N/A";
 
-        // Additional properties can be added as necessary, such as:
-        // - Value (for constants or literals)
-        // - Line Number (where it is declared)
-        // - IsParameter (if it's a function parameter)
+            return string.Format(
+                $"| {{0,-{SymbolTableFormat.NameWidth}}} | {{1,-{SymbolTableFormat.TypeWidth}}} | " +
+                $"{{2,-{SymbolTableFormat.CategoryWidth}}} | {{3,-{SymbolTableFormat.LineWidth}}} | " +
+                $"{{4,-{SymbolTableFormat.ColWidth}}} | {{5,-{SymbolTableFormat.ListWidth}}} | " +
+                $"{{6,-{SymbolTableFormat.InitializedWidth}}} | {{7,-{SymbolTableFormat.ValueWidth}}} |",
+                this.Name,
+                this.Type,
+                this.Category,
+                this.SymbolLine,
+                this.SymbolColumn,
+                this.IsList ? "Yes" : "No",
+                this.IsInitialized ? "Yes" : "No",
+                valueStr);
+        }
     }
 }

@@ -27,18 +27,23 @@ namespace Proton.Lexer
         /// <returns>A list of <see cref="Token"/> objects representing the lexical structure of the input.</returns>
         public List<Token> Tokenize(string input)
         {
-            // Split input into lines
-            var lines = input.Split('\n');
-            var tokens = new List<Token>();
-
-            foreach (var line in lines)
+            if (input != null)
             {
-                var lineTokens = this.TokenizeLine(line);
-                tokens.AddRange(lineTokens);
-                this.line++;
+                // Split input into lines
+                var lines = input.Split('\n');
+                var tokens = new List<Token>();
+
+                foreach (var line in lines)
+                {
+                    var lineTokens = this.TokenizeLine(line);
+                    tokens.AddRange(lineTokens);
+                    this.line++;
+                }
+
+                return tokens;
             }
 
-            return tokens;
+            return new ();
         }
 
         /// <summary>

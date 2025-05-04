@@ -26,7 +26,6 @@ namespace Proton.Parser.Expressions
         /// <returns>A string representation of the expression prefixed with "Exp:".</returns>
         public override string ToCode(int ident)
         {
-            string indentLine = new string(' ', ident * 4);
             return $"Expression: {base.ToCode(ident)}";
         }
     }

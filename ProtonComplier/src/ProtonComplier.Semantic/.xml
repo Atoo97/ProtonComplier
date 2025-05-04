@@ -39,6 +39,13 @@
             Before starting a new semantic analysis, reset everything.
             </summary>
         </member>
+        <member name="M:Proton.Semantic.SemanticAnalyzer.StatePlaceSemantical">
+            <summary>
+            Semantically analyzes the StateSpace macro section, handling variable declarations.
+            This includes verifying identifiers, checking for duplicates, validating type specifiers,
+            and populating the symbol table.
+            </summary>
+        </member>
         <member name="M:Proton.Semantic.SemanticAnalyzer.Analyze(System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Parser.Statements.Statement}})">
             <summary>
             Analyzes the provided parsed statement sections, performing semantic validation such as
@@ -59,6 +66,29 @@
               <item><description><see cref="P:Proton.Semantic.SemanticResult.isSuccessful"/> – A boolean indicating whether the semantic analysis completed without any critical errors.</description></item>
             </list>
             </returns>
+        </member>
+        <member name="M:Proton.Semantic.SemanticAnalyzer.TypeMatch(Proton.Semantic.Symbol,Proton.Lexer.Token)">
+            <summary>
+            Compares the declared type of a symbol with the type specified in an expression.
+            </summary>
+            <param name="symbol">The declared symbol containing the semantic type (e.g., "Natural", "Real").</param>
+            <param name="token">The expression containing the actual value type (e.g., "uint", "double").</param>
+            <returns>True if types semantically match; otherwise, false.</returns>
+        </member>
+        <member name="M:Proton.Semantic.SemanticAnalyzer.IdentifierRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>\\G([a-z_][\\p{L}0-9_]{0,510})</code><br/>
+            Options:<br/>
+            <code>RegexOptions.Compiled</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the start position.<br/>
+            ○ 1st capture group.<br/>
+                ○ Match a character in the set [_a-z].<br/>
+                ○ Match a character in the set [0-9_\p{L}] atomically at most 510 times.<br/>
+            </code>
+            </remarks>
         </member>
         <member name="T:Proton.Semantic.SemanticResult">
             <summary>
@@ -153,10 +183,9 @@
         </member>
         <member name="M:Proton.Semantic.Symbol.ToString">
             <summary>
-            Returns a string representation of the symbol, showing its name and type.
-            Useful for debugging and diagnostics.
+            Returns a detailed string representation of the symbol for symbol table display.
             </summary>
-            <returns>A string representing the symbol's name and type.</returns>
+            <returns>A formatted string showing the symbol's properties as a table row.</returns>
         </member>
         <member name="T:Proton.Semantic.SymbolTable">
             <summary>
@@ -210,9 +239,11 @@
         </member>
         <member name="M:Proton.Semantic.SymbolTable.DisplaySymbols">
             <summary>
-            Displays all symbols currently stored in the symbol table.
-            Prints each symbol's string representation to the console.
+            Returns a formatted table of all symbols currently stored in the symbol table.
+            Each symbol is displayed with its name, type, category, position, list status, initialization state, and value.
+            If no symbols are found, a default message is returned.
             </summary>
+            <returns>A string representing the formatted symbol table or a message indicating no symbols were found.</returns>
         </member>
         <member name="M:Proton.Semantic.SymbolTable.SymbolExists(System.String)">
             <summary>
@@ -220,6 +251,94 @@
             </summary>
             <param name="name">The name of the symbol to check for.</param>
             <returns>True if the symbol exists; otherwise, false.</returns>
+        </member>
+        <member name="T:ProtonComplier.Semantic.SymbolTableFormat">
+            <summary>
+            Defines constant column widths for formatting the symbol table display in a consistent and aligned manner.
+            Each constant corresponds to the character width of a specific column, such as Name, Type, Line, etc.
+            Used primarily when generating textual representations of the semantic symbol table.
+            </summary>
+        </member>
+        <member name="F:ProtonComplier.Semantic.SymbolTableFormat.NameWidth">
+            <summary>
+            The column width allocated for the symbol name.
+            </summary>
+        </member>
+        <member name="F:ProtonComplier.Semantic.SymbolTableFormat.TypeWidth">
+            <summary>
+            The column width allocated for the symbol's data type (e.g., Int, Double).
+            </summary>
+        </member>
+        <member name="F:ProtonComplier.Semantic.SymbolTableFormat.CategoryWidth">
+            <summary>
+            The column width allocated for the symbol's category (e.g., Numeric, Identifier).
+            </summary>
+        </member>
+        <member name="F:ProtonComplier.Semantic.SymbolTableFormat.LineWidth">
+            <summary>
+            The column width allocated for the symbol's source code line number.
+            </summary>
+        </member>
+        <member name="F:ProtonComplier.Semantic.SymbolTableFormat.ColWidth">
+            <summary>
+            The column width allocated for the symbol's source code column number.
+            </summary>
+        </member>
+        <member name="F:ProtonComplier.Semantic.SymbolTableFormat.ListWidth">
+            <summary>
+            The column width allocated to display whether the symbol represents a list.
+            </summary>
+        </member>
+        <member name="F:ProtonComplier.Semantic.SymbolTableFormat.InitializedWidth">
+            <summary>
+            The column width allocated for the symbol's initialization status (e.g., Yes/No).
+            </summary>
+        </member>
+        <member name="F:ProtonComplier.Semantic.SymbolTableFormat.ValueWidth">
+            <summary>
+            The column width allocated for displaying the symbol's value(s).
+            </summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.IdentifierRegex_0">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the IdentifierRegex method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.IdentifierRegex_0.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.IdentifierRegex_0.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.IdentifierRegex_0.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.IdentifierRegex_0.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.IdentifierRegex_0.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.IdentifierRegex_0.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.IdentifierRegex_0.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.IdentifierRegex_0.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.Utilities">
+            <summary>Helper methods used by generated <see cref="T:System.Text.RegularExpressions.Regex"/>-derived implementations.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout">
+            <summary>Default timeout value set in <see cref="T:System.AppContext"/>, or <see cref="F:System.Text.RegularExpressions.Regex.InfiniteMatchTimeout"/> if none was set.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_hasTimeout">
+            <summary>Whether <see cref="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout"/> is non-infinite.</summary>
         </member>
     </members>
 </doc>

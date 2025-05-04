@@ -29,5 +29,4 @@ namespace Proton.Semantic.Services
             return this.semanticAnalyzer.Analyze(sections);
         }
     }
-
 }

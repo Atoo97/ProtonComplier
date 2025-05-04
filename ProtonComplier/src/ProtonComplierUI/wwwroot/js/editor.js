@@ -330,6 +330,11 @@ require(['vs/editor/editor.main'], function () {
         automaticLayout: true
     });
 
+    // Attach model content change listener
+    rightEditor.onDidChangeModelContent(() => {
+        highlightThreeDigitGroups(rightEditor);
+    });
+
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle.checked) {
         monaco.editor.setTheme('proton-dark');
@@ -338,6 +343,63 @@ require(['vs/editor/editor.main'], function () {
     }
 });
 
+// Function to set the value of the Monaco editor dynamically from documentation
+function setEditorValue(newValue) {
+    editor.setValue(newValue);
+    // Make the editor read-only
+    editor.updateOptions({ readOnly: true });
+}
+
+// Error&Warning highligt
+function highlightThreeDigitGroups(editor) {
+    const regex = /\((\d{3})\)/g; // Match (123)
+    const model = editor.getModel();
+    const fullText = model.getValue();
+
+    const matches = [];
+    const decorationsMeta = []; // Maps each decoration to its code
+    let match;
+
+    while ((match = regex.exec(fullText)) !== null) {
+        const start = model.getPositionAt(match.index);
+        const end = model.getPositionAt(match.index + match[0].length);
+        const code = match[1]; // "123"
+
+        matches.push({
+            range: new monaco.Range(start.lineNumber, start.column, end.lineNumber, end.column),
+            options: {
+                inlineClassName: 'linked-error',
+                hoverMessage: {
+                    value: `Click to view docs for [#P${code}](../Documentation/ErrorsAndWarnings#P${code})`
+                }
+            }
+        });
+
+        decorationsMeta.push({ start, end, code });
+    }
+
+    const decorationIds = editor.deltaDecorations([], matches);
+
+    editor.onMouseDown(function (e) {
+        if (e.target.type === monaco.editor.MouseTargetType.CONTENT_TEXT) {
+            const position = e.target.position;
+
+            for (let i = 0; i < decorationIds.length; i++) {
+                const range = editor.getModel().getDecorationRange(decorationIds[i]);
+                if (
+                    position.lineNumber === range.startLineNumber &&
+                    position.column >= range.startColumn &&
+                    position.column <= range.endColumn
+                ) {
+                    const code = decorationsMeta[i].code;
+                    const url = `../Documentation/ErrorsAndWarnings#P${code}`;
+                    window.open(url, '_blank'); // Open in new tab
+                    break;
+                }
+            }
+        }
+    });
+}
 
 /*ADDITIONAL COMPLIE LOGIC*/
 let outputString = "";
@@ -365,6 +427,18 @@ connection.on("ConsoleOutput", function (message) {
 connection.on("EditorOutput", function (message) {
     window.outputText = "";
     window.outputText += message + "\n";
+
+    if (typeof rightEditor !== 'undefined') {
+        rightEditor.setValue(window.outputText);
+    }
+});
+
+connection.on("ErrorsAndWarningsOutput", function (message) {
+    if (typeof window.outputText === 'undefined') {
+        window.outputText = "";
+    }
+
+    window.outputText = message + "\n" + window.outputText;
 
     if (typeof rightEditor !== 'undefined') {
         rightEditor.setValue(window.outputText);

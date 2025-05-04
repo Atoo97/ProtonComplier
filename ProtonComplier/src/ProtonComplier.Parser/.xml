@@ -4,6 +4,27 @@
         <name>ProtonComplier.Parser</name>
     </assembly>
     <members>
+        <member name="T:Proton.Parser.Expressions.AssignExpression">
+            <summary>
+            Represents an assignment expression, such as the "=" operator used to assign values.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.AssignExpression.#ctor(Proton.Lexer.Token)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.AssignExpression"/> class.
+            Validates that the provided token is of type "Assign".
+            </summary>
+            <param name="variable">The token representing the assignment operator ("="). </param>
+            <exception cref="T:System.Exception">Thrown if the token is not of type "Assign".</exception>
+        </member>
+        <member name="M:Proton.Parser.Expressions.AssignExpression.ToCode(System.Int32)">
+            <summary>
+            Generates the string representation of the assignment expression for code generation,
+            including the assignment operator and proper indentation.
+            </summary>
+            <param name="ident">The indentation level (each level equals 4 spaces).</param>
+            <returns>A formatted string representing the assignment expression.</returns>
+        </member>
         <member name="T:Proton.Parser.Expressions.Expression">
             <summary>
             Represents the base class for all expression nodes in the parse tree.
@@ -21,6 +42,126 @@
             </summary>
             <param name="ident">Set the ident size of display.</param>
             <returns>A string representation of the expression prefixed with "Exp:".</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.IdentifierExpression">
+            <summary>
+            Represents an identifier expression in the parse tree (e.g., variable names like "_varX").
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.IdentifierExpression.#ctor(Proton.Lexer.Token)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.IdentifierExpression"/> class.
+            </summary>
+            <param name="variable">The token representing the identifier.</param>
+            <exception cref="T:System.Exception">Thrown if the token type is not <see cref="F:Proton.Lexer.Enums.TokenType.Identifier"/>.</exception>
+        </member>
+        <member name="M:Proton.Parser.Expressions.IdentifierExpression.ToCode(System.Int32)">
+            <summary>
+            Generates the string representation of the identifier expression for code generation,
+            including indentation and formatting.
+            </summary>
+            <param name="ident">The indentation level (each level equals 4 spaces).</param>
+            <returns>A formatted string representing the identifier.</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.LiteralExpression">
+            <summary>
+            Represents an literal expression in the parse tree (e.g., "abc", True/False, -2.34, 'c').
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.LiteralExpression.#ctor(Proton.Lexer.Token)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.LiteralExpression"/> class.
+            This constructor checks that the token is of a valid literal type (UInt, Integer, Double, Char, Boolean or String).
+            </summary>
+            <param name="literalToken">The token representing the literal (UInt, Int, Double, Char, Bool or String).</param>
+            <exception cref="T:System.Exception">Thrown when the token type is not a valid literal type.</exception>
+        </member>
+        <member name="M:Proton.Parser.Expressions.LiteralExpression.ToCode(System.Int32)">
+            <summary>
+            Generates the string representation of the literal expression for code generation,
+            including indentation and formatting.
+            </summary>
+            <param name="ident">The indentation level (each level equals 4 spaces).</param>
+            <returns>A formatted string representing the literal expression with indentation.</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.SeparatorExpression">
+            <summary>
+            Represents a separator expression, such as the colon ":" used in various syntax constructs.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.SeparatorExpression.#ctor(Proton.Lexer.Token)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.SeparatorExpression"/> class.
+            Validates that the provided token is of type "Colon".
+            </summary>
+            <param name="variable">The token representing the separator (e.g., ":").</param>
+            <exception cref="T:System.Exception">Thrown if the token is not of type "Colon".</exception>
+        </member>
+        <member name="M:Proton.Parser.Expressions.SeparatorExpression.ToCode(System.Int32)">
+            <summary>
+            Generates the string representation of the separator expression for code generation,
+            applying the specified indentation.
+            </summary>
+            <param name="ident">The indentation level (each level equals 4 spaces).</param>
+            <returns>A formatted string representing the separator expression with indentation.</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.TypeExpression">
+            <summary>
+            Represents a type expression in the syntax tree, such as "N", "R",
+            with support for detecting if it represents a list (e.g., "N[]").
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.TypeExpression.#ctor(Proton.Lexer.Token,System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.TypeExpression"/> class.
+            Validates that the provided token is a valid type token.
+            </summary>
+            <param name="type">The type token (e.g., "N", "R").</param>
+            <param name="isList">Indicates whether the type is a list type (e.g., "N[]").</param>
+            <exception cref="T:System.Exception">Thrown if the token is not a recognized type token.</exception>
+        </member>
+        <member name="P:Proton.Parser.Expressions.TypeExpression.IsList">
+            <summary>
+            Gets a value indicating whether the type represents a list (e.g., "N[]").
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.TypeExpression.ToCode(System.Int32)">
+            <summary>
+            Generates the string representation of the type expression for code generation,
+            including a "[]" suffix if the type represents a list. Indentation is applied based on the specified level.
+            </summary>
+            <param name="ident">The indentation level (each level equals 4 spaces).</param>
+            <returns>A formatted string representing the type expression.</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.TypeSpecifierExpression">
+            <summary>
+            Represents a type specifier expression in the parse tree.
+            A type specifier can be something like "N[]", "R", or "Z[]..".
+            This class handles parsing and storing the list specifier and delimiters, as well as the type expression.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.TypeSpecifierExpression.#ctor(System.Collections.Generic.List{Proton.Lexer.Token})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.TypeSpecifierExpression"/> class.
+            Parses the given tokens to extract type specifiers, list indicators, and delimiters.
+            </summary>
+            <param name="tokens">The list of tokens to parse for the type specifier expression.</param>
+            <exception cref="T:System.Exception">Thrown when a critical parsing error occurs due to malformed or unexpected tokens.</exception>
+        </member>
+        <member name="P:Proton.Parser.Expressions.TypeSpecifierExpression.ListSpecifier">
+            <summary>
+            Gets the list specifier for the type (e.g., "[]").
+            This token represents the square brackets used for array or list type specifications.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.TypeSpecifierExpression.ToCode(System.Int32)">
+            <summary>
+            Generates the string representation of the <see cref="T:Proton.Parser.Expressions.TypeSpecifierExpression"/> for code generation.
+            Delegates to the base implementation to include the full structure of the type, including lists and delimiters,
+            with appropriate indentation based on the provided level.
+            </summary>
+            <param name="ident">The indentation level.</param>
+            <returns>A formatted string representing the type specifier expression.</returns>
         </member>
         <member name="T:Proton.Parser.Interfaces.ISyntaxAnalyzer">
             <summary>
@@ -51,11 +192,19 @@
             Represents a node in the parse tree used during syntax analysis.
             Each node may contain a single token or a list of tokens, and optional left and right child nodes.
             </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.Parser.ParseNode"/> class with a single token.
+            </remarks>
+            <param name="symbol">The token this node represents.</param>
         </member>
         <member name="M:Proton.Parser.ParseNode.#ctor(Proton.Lexer.Token)">
             <summary>
-            Initializes a new instance of the <see cref="T:Proton.Parser.ParseNode"/> class with a single token.
+            Represents a node in the parse tree used during syntax analysis.
+            Each node may contain a single token or a list of tokens, and optional left and right child nodes.
             </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.Parser.ParseNode"/> class with a single token.
+            </remarks>
             <param name="symbol">The token this node represents.</param>
         </member>
         <member name="P:Proton.Parser.ParseNode.ParseSymbol">
@@ -147,6 +296,35 @@
             Converts the statement to its string representation for code generation.
             </summary>
             <returns>A string representation of the statement prefixed with "State:".</returns>
+        </member>
+        <member name="T:Proton.Parser.Statements.VariableDeclaration">
+            <summary>
+            Represents a variable declaration statement in the parse tree.
+            This includes a variable identifier, separator (like ":"), and type specifier (like "N[];").
+            (e.g., "_var1,_var2:N[]; or _var1:N or _var1:Z[];;").
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Statements.VariableDeclaration.#ctor(Proton.Parser.Expressions.IdentifierExpression,Proton.Parser.Expressions.SeparatorExpression,Proton.Parser.Expressions.TypeSpecifierExpression)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Statements.VariableDeclaration"/> class.
+            This constructor processes the identifier, separator, and type specifier for the variable declaration.
+            </summary>
+            <param name="identifier">The identifier expression for the variable.</param>
+            <param name="separator">The separator expression (e.g., ":").</param>
+            <param name="typeSpecifier">The type specifier expression (e.g., "N[];").</param>
+            <exception cref="T:System.Exception">Thrown if there is an error in creating the variable declaration components.</exception>
+        </member>
+        <member name="P:Proton.Parser.Statements.VariableDeclaration.IsList">
+            <summary>
+            Gets a value indicating whether the statement represents a list (e.g., "N[]").
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Statements.VariableDeclaration.ToCode">
+            <summary>
+            Converts the variable declaration statement to its string representation for code generation.
+            This method formats the statement into a structured string, including the identifier, separator, and type.
+            </summary>
+            <returns>A string representation of the variable declaration statement.</returns>
         </member>
         <member name="T:Proton.Parser.SyntaxAnalyzer">
             <summary>

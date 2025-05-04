@@ -16,7 +16,7 @@ nav {
 }
 
 .docs-header {
-    background-color: #f5f4fa;
+    background-color: #e7e7e7;
     padding-left: 1rem;
     padding-right: 1rem;
     position: sticky;
@@ -115,7 +115,7 @@ nav {
     margin: 4px 0;
     text-decoration: none;
     color: #333;
-    background: #e0e0e0;
+    background: #0d6efd38;
     border-radius: 4px;
 }
 
@@ -133,7 +133,7 @@ nav {
 .link-box {
     display: flex;
     align-items: center;
-    background-color: #f5f4fa;
+    background-color: #e5e5e5;
     padding: 1rem;
     border-radius: 8px;
     text-decoration: none;
@@ -183,7 +183,7 @@ nav {
     height: 75vh;
     position: sticky;
     top: 3.5rem;
-    background-color: lightgrey;
+    background-color: #e7e7e7;
 }
 
 /* Dark Mode */
@@ -215,19 +215,22 @@ pre.syntax code {
     text-decoration: underline; /* Optional: adds underline on hover */
 }
 
-table {
+#errortable {
     border-collapse: collapse;
     width: 100%;
+    border: solid 1px black;
 }
 
-th, td {
-    border: 1px solid #ddd;
+#errortable th, #errortable td {
     padding: 8px;
+    border: solid 1px black;
+    text-align: left;
+    border-width: 1px;
 }
 
-th {
+#errortable th {
     background-color: #f2f2f2;
-    text-align: left;
+    width: 2rem;
 }
 
 /* Responsive tweaks */
@@ -253,11 +256,6 @@ th {
 
     .link-list {
         gap: 0.5rem;
-    }
-
-    .link-box {
-        flex-direction: column;
-        align-items: flex-start;
     }
 
     .link-icon {

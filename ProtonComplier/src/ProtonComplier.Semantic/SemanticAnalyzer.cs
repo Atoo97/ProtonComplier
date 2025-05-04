@@ -3,6 +3,7 @@
 // </copyright>
 namespace Proton.Semantic
 {
+    using System.Text.RegularExpressions;
     using Proton.ErrorHandler;
     using Proton.Lexer;
     using Proton.Lexer.Enums;
@@ -14,7 +15,7 @@ namespace Proton.Semantic
     /// Represents the main sematical class responsible for analyzing tokens from each macro section,
     /// generating symbol table, and reporting errors and warnings.
     /// </summary>
-    public class SemanticAnalyzer : ISemanticAnalyzer
+    public partial class SemanticAnalyzer : ISemanticAnalyzer
     {
         // Stores statement grouped by macro sections
         private static readonly Dictionary<string, List<Statement>> Sections = new ();
@@ -35,6 +36,68 @@ namespace Proton.Semantic
             SymbolTable.Clear();
             Errors.Clear();
             Warnings.Clear();
+        }
+
+        /// <summary>
+        /// Semantically analyzes the StateSpace macro section, handling variable declarations.
+        /// This includes verifying identifiers, checking for duplicates, validating type specifiers,
+        /// and populating the symbol table.
+        /// </summary>
+        public static void StatePlaceSemantical()
+        {
+            foreach (var statement in Statements)
+            {
+                try
+                {
+                    if (statement is VariableDeclaration variableDeclaration)
+                    {
+                        // Check if the identifier matches the valid naming rule
+                        var match = IdentifierRegex().Match(statement.LeftNode!.ParseSymbol!.TokenValue);
+                        if (!match.Success)
+                        {
+                            // Generate error message
+                            throw new AnalyzerError(
+                                "204",
+                                string.Format(MessageRegistry.GetMessage(204).Text, statement.LeftNode!.ParseSymbol!.TokenValue, statement.LeftNode!.ParseSymbol!.TokenLine, statement.LeftNode!.ParseSymbol!.TokenColumn));
+                        }
+
+                        // Create new Symbol
+                        var symbol = new Symbol
+                        {
+                            Name = statement.LeftNode.ParseSymbol!.TokenValue,
+                            Type = statement.RightNode!.ParseSymbol!.TokenType,
+                            Category = statement.LeftNode.ParseSymbol!.TokenCategory,
+                            Value = new (),
+                            SymbolLine = statement.LeftNode.ParseSymbol!.TokenLine,
+                            SymbolColumn = statement.LeftNode.ParseSymbol!.TokenColumn,
+                            IsList = variableDeclaration.IsList,
+                        };
+
+                        // Add symbol to symbol table if possible
+                        SymbolTable.AddSymbol(symbol);
+                    }
+                    else
+                    {
+                        // Add error if not statement..
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (ex is AnalyzerWarning warning)
+                    {
+                        Warnings.Add(warning);
+                    }
+                    else if (ex is AnalyzerError error)
+                    {
+                        Errors.Add(error);
+                    }
+                    else
+                    {
+                        // Fallback: Add generic errors to both lists if the type is unknown
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -64,13 +127,20 @@ namespace Proton.Semantic
             {
                 var macroString = macro.Value; // Get the string value of the macro
                 Statements.Clear();
-                // Statements.AddRange(sections[macroString].ToList()); now its null!
+                if (sections.TryGetValue(macroString, out var statementList) && statementList is not null)
+                {
+                    Statements.AddRange(statementList.ToList());
+                }
+                else
+                {
+                    continue;
+                }
 
                 // Call the correct parsing function based on macroKey
                 switch (macroString)
                 {
                     case "StateSpace":
-                        // StatePlaceParser();
+                        StatePlaceSemantical();
                         break;
                     case "Input":
                         // InputParser();
@@ -84,14 +154,6 @@ namespace Proton.Semantic
                     default:
                         throw new Exception();
                 }
-
-                // Just until first iteration (Delet lateer!!!)
-                /*
-                if (macroString == "Precondition")
-                {
-                    break;
-                }
-                */
             }
 
             // Return results
@@ -99,5 +161,29 @@ namespace Proton.Semantic
             return new SemanticResult(Errors, Warnings, Sections, SymbolTable, isSuccessful);
         }
 
+        /// <summary>
+        /// Compares the declared type of a symbol with the type specified in an expression.
+        /// </summary>
+        /// <param name="symbol">The declared symbol containing the semantic type (e.g., "Natural", "Real").</param>
+        /// <param name="token">The expression containing the actual value type (e.g., "uint", "double").</param>
+        /// <returns>True if types semantically match; otherwise, false.</returns>
+        private static bool TypeMatch(Symbol symbol, Token token)
+        {
+            // Normalize expected and actual types
+            var expectedType = symbol.Type;
+            var actualType = token.TokenType;
+
+            // Semantic mapping
+            return (expectedType == TokenType.Natural && actualType == TokenType.Uint) ||
+                   (expectedType == TokenType.Integer && actualType == TokenType.Int) ||
+                   (expectedType == TokenType.Real && actualType == TokenType.Double) ||
+                   (expectedType == TokenType.Boolean && actualType == TokenType.Bool) ||
+                   (expectedType == TokenType.Character && actualType == TokenType.Char) ||
+                   (expectedType == TokenType.Text && actualType == TokenType.String);
+        }
+
+        // Basic (stricter) concept of variable name regex, Cant be longer than 511 character
+        [GeneratedRegex(@"\G([a-z_][\p{L}0-9_]{0,510})", RegexOptions.Compiled)]
+        private static partial Regex IdentifierRegex();
     }
 }
