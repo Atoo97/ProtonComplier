@@ -136,6 +136,9 @@ function showMessage(code) {
             <p>Welcome to the Proton Error Documentation section. <br />
                 Here, you can explore detailed information on various errors and warnings that may occur during compilation and execution. <br />
                 Each entry includes an explanation of the error or warning, along with common causes and practical examples of how to resolve them. Use the navigation on the left to select an error or warning code and view its full details.</p>
+                <button class="btn btn-primary" onclick="showMessage('P001')">
+                    Next Up: “P001” →
+                </button>
         `;
         content2.innerHTML = "";
         editorContainer.style.display = 'none';

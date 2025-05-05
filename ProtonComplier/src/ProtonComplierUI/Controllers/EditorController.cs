@@ -15,6 +15,7 @@ using Proton.Semantic.Services;
 using Proton.CodeGenerator.Services;
 using Proton.CodeGenerator;
 using Proton.Parser;
+using System.Reflection;
 
 namespace ProtonComplierUI.Controllers;
 
@@ -252,25 +253,37 @@ public class EditorController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Upload(EditorViewModel model)
+    public async Task<IActionResult> Upload([FromForm] CompileRequest request)
     {
-        await Task.Delay(1000);
-        return View("Index", model);
+        if (request.File != null && request.File.Length > 0)
+        {
+            using var reader = new StreamReader(request.File.OpenReadStream());
+            string fileContent = await reader.ReadToEndAsync();
+
+            // Set the file content to the model so it shows up in the editor
+            await hubContext.Clients.Client(request.ConnectionId).SendAsync("ResetEditor", fileContent, "// Output C# code display here\n");
+
+            return Ok();
+        }
+
+        return BadRequest();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Download(EditorViewModel model)
+    public async Task<IActionResult> Download([FromForm] CompileRequest request)
     {
-        await Task.Delay(1000);
-        return View("Index", model);
+        await Task.Delay(500);
+        if (string.IsNullOrWhiteSpace(request.Code))
+        {
+            return BadRequest("No input text provided.");
+        }
+
+        var fileBytes = System.Text.Encoding.UTF8.GetBytes(request.Code);
+        var fileName = "ProtonFile.prtn";
+
+        return File(fileBytes, "application/octet-stream", fileName);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Copy(EditorViewModel model)
-    {
-        await Task.Delay(1000);
-        return View("Index", model);
-    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
@@ -284,18 +297,11 @@ public class EditorController : Controller
     {
         var model = new EditorViewModel();
 
-        if (TempData["LexicalViewModel"] is not null)
-        {
-            model.InputText = TempData["LexicalViewModel"]!.ToString();
-        }
-        else
-        {
-            if (!System.IO.File.Exists(path))
-                throw new FileNotFoundException("Default template file not found.", path);
+        if (!System.IO.File.Exists(path))
+            throw new FileNotFoundException("Default template file not found.", path);
 
-            model.InputText = await System.IO.File.ReadAllTextAsync(path);
-            model.OutputText = "// Output C# code display here";
-        }
+        model.InputText = await System.IO.File.ReadAllTextAsync(path);
+        model.OutputText = "// Output C# code display here";
 
         return model;
     }

@@ -256,7 +256,7 @@ require(['vs/editor/editor.main'], function () {
         ],
         colors: {
             'editor.foreground': '#000000',
-            'editor.background': '#FFFFFF',
+            'editor.background': '#f7f7f7',
             'editor.lineHighlightBackground': '#F3F3F3',
             'editorCursor.foreground': '#333333',
             'editorLineNumber.foreground': '#237893',
@@ -322,6 +322,9 @@ require(['vs/editor/editor.main'], function () {
         automaticLayout: true
     });
 
+    // Hook persistence
+    window.initializeEditor(editor, "left");
+
     rightEditor = monaco.editor.create(rightContainer, {
         value: window.outputText,
         language: 'proton',
@@ -329,6 +332,9 @@ require(['vs/editor/editor.main'], function () {
         readOnly: true,
         automaticLayout: true
     });
+
+    // Hook persistence
+    window.initializeEditor(rightEditor, "right");
 
     // Attach model content change listener
     rightEditor.onDidChangeModelContent(() => {
@@ -342,6 +348,43 @@ require(['vs/editor/editor.main'], function () {
         monaco.editor.setTheme('proton-light'); // Switch Monaco to light theme
     }
 });
+
+// Save editor content to localStorage on change
+function setupEditorPersistence(editor, editorType) {
+    const storageKey = 'protonEditorContent';     // left editor
+    const storageKey2 = 'protonEditorContent2';   // right editor
+
+    if (editorType === "left") {
+        // Load from localStorage on page load
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+            editor.setValue(saved);
+        }
+
+        // Save changes to localStorage
+        editor.onDidChangeModelContent(() => {
+            localStorage.setItem(storageKey, editor.getValue());
+        });
+
+    } else {
+        // Load from localStorage on page load
+        const saved = localStorage.getItem(storageKey2);
+        if (saved) {
+            editor.setValue(saved);
+        }
+
+        // Save changes to localStorage
+        editor.onDidChangeModelContent(() => {
+            localStorage.setItem(storageKey2, editor.getValue());
+        });
+    }
+}
+
+// Wait for Monaco editor to initialize
+window.initializeEditor = function (editorInstance, editorType) {
+    setupEditorPersistence(editorInstance, editorType);
+    highlightThreeDigitGroups(editorInstance);
+};
 
 // Function to set the value of the Monaco editor dynamically from documentation
 function setEditorValue(newValue) {
@@ -401,7 +444,7 @@ function highlightThreeDigitGroups(editor) {
     });
 }
 
-/*ADDITIONAL COMPLIE LOGIC*/
+/*ADDITIONAL COMPILE LOGIC*/
 let outputString = "";
 
 const connection = new signalR.HubConnectionBuilder()
@@ -549,4 +592,88 @@ document.getElementById("clearButton").addEventListener("click", function () {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ connectionId: connectionId })
     });
+});
+
+document.getElementById('copyButton').addEventListener('click', () => {
+    const text = rightEditor.getValue();
+    navigator.clipboard.writeText(text).then(() => {
+        // Create the message element if it doesn't exist
+        let message = document.getElementById('copyMessage');
+        if (!message) {
+            message = document.createElement('div');
+            message.id = 'copyMessage';
+            message.style.position = 'fixed';
+            message.style.top = '10px';
+            message.style.left = '50%';
+            message.style.transform = 'translateX(-50%)';
+            message.style.padding = '10px 20px';
+            message.style.backgroundColor = 'lightgrey';
+            message.style.color = 'black';
+            message.style.borderRadius = '5px';
+            message.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+            message.style.zIndex = '10000';
+            message.style.fontFamily = 'Segoe UI, sans-serif';
+            document.body.appendChild(message);
+        }
+
+        // Show the message
+        message.textContent = 'Text copied to clipboard!';
+        message.style.display = 'block';
+
+        // Hide after 2 seconds
+        setTimeout(() => {
+            message.style.display = 'none';
+        }, 2000);
+    });
+});
+
+document.getElementById("uploadButton").addEventListener("click", function (e) {
+    e.preventDefault(); // Prevent any default action
+    document.getElementById("fileInput").click(); // Open file dialog
+});
+
+document.getElementById("fileInput").addEventListener("change", async function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("ConnectionId", connectionId);
+    formData.append("File", file);
+
+    // Post to backend
+    const response = await fetch("/Editor/Upload", {
+        method: "POST",
+        body: formData, // do NOT set Content-Type manually
+    });
+});
+
+document.getElementById("downloadButton").addEventListener("click", async function (e) {
+    e.preventDefault();
+
+    // Assuming you have the editor text stored in a JS variable
+    const inputText = editor.getValue(); // Replace with your actual editor reference
+
+    const formData = new FormData();
+    formData.append("ConnectionId", connectionId);
+    formData.append("Code", inputText);
+
+    const response = await fetch("/Editor/Download", {
+        method: "POST",
+        body: formData
+    });
+
+    if (!response.ok) {
+        console.error("Download failed");
+        return;
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ProtonFile.prtn";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
 });

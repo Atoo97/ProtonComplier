@@ -1,6 +1,5 @@
 html {
     font-size: 14px;
-    font-family: 'AvenirNextRoundedPro-Med', sans-serif;
     letter-spacing: -0.04em;
     font-weight: 500;
     position: relative;
@@ -230,12 +229,12 @@ input:checked + .slider .slider-icon.right {
     color: black;
 }
 
+
 /* Dark Mode */
 .features-section.dark-mode {
     background-color: #1d1e23;
     color: white;
 }
-
 
 
 /*Mobibel view layout:*/

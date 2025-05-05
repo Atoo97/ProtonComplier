@@ -46,28 +46,28 @@
             
             <div class="d-none d-md-flex align-items-center">
                 <!-- Upload Form (Desktop Only) -->
-                <form id="upLoadFormDesktop" asp-controller="Editor" asp-action="Upload"
-                      method="post" class="d-flex align-items-center">
-                    <button id="uploadButton" type="submit" style="margin-left: 20px;"
+                <div id="upLoadFormDesktop" class="d-flex align-items-center">
+                    <input type="file" id="fileInput" name="file" class="form-control d-none" accept=".prtn">
+                    <button id="uploadButton"
+                            style="margin-left: 20px;"
                             class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
                             data-bs-toggle="tooltip"
                             data-bs-placement="bottom"
                             title="Upload Proton source file">
                         <img src="@Url.Content("~/images/UploadDocument.svg")" alt="Upload">
                     </button>
-                </form>
+                </div>
 
                 <!-- Download Form (Desktop Only) -->
-                <form id="downloadFormDesktop" asp-controller="Editor" asp-action="Download"
-                      method="post" class="d-flex align-items-center">
-                    <button id="downloadButton" type="submit"
+                <div id="downloadFormDesktop" class="d-flex align-items-center">
+                    <button id="downloadButton"
                             class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
                             data-bs-toggle="tooltip"
                             data-bs-placement="bottom"
                             title="Download Proton source file">
                         <img src="@Url.Content("~/images/DownloadDocument.svg")" alt="Download">
                     </button>
-                </form>
+                </div>
 
                 <!-- Analyzer Toggles (Desktop Only) -->
                 <div id="TogglesDesktop" class="analyzer-container" style="display: flex">
@@ -87,8 +87,7 @@
                 </div>
 
                 <!-- Copy Form (Desktop Only) -->
-                <form id="copydFormDesktop" asp-controller="Editor" asp-action="Copy"
-                      method="post" class="d-flex align-items-center">
+                <div id="copydFormDesktop" class="d-flex align-items-center">
                     <button id="copyButton" type="submit"
                             class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
                             data-bs-toggle="tooltip"
@@ -96,7 +95,7 @@
                             title="Copy code">
                         <img src="@Url.Content("~/images/Copy.svg")" alt="Copy">
                     </button>
-                </form>
+                </div>
             </div>
             </div>
         </div>
@@ -148,16 +147,15 @@
                         </form>
 
                         <!-- Copy Form (Desktop Only) -->
-                        <form id="copydFormMobile" asp-controller="Editor" asp-action="Copy"
-                              method="post" class="d-flex align-items-center">
+                        <div id="copydFormMobile" class="d-flex align-items-center">
                             <button id="copyButton" type="submit"
-                                    class="btn btn-primary d-flex justify-content-center align-items-center"
+                                    class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="bottom"
                                     title="Copy code">
                                 <img src="@Url.Content("~/images/Copy.svg")" alt="Copy">
                             </button>
-                        </form>
+                        </div>
                     </div>
                 </li>
 
@@ -183,3 +181,4 @@
         </div>
     </div>
 </nav>
+

@@ -174,7 +174,7 @@
 }
 
 .wrapper {
-    background: linear-gradient(135deg, #3a0ca3, #5f0f40);
+    background-color: transparent;
     color: #ffffff;
     /* Use flexbox */
     display: flex;
@@ -192,7 +192,7 @@
 
 /* Container with margin and default height */
 #editor-container {
-    border: 1px solid #328f81;
+    border: 1px solid #727272;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     position: relative;
     overflow: hidden; /* Ensure the editor content respects the border-radius */
@@ -217,7 +217,6 @@
     content: '';
     display: block;
     height: 100%;
-    background: #3c3f47;
     margin: 0 auto;
 }
 
@@ -233,7 +232,7 @@
 /* Right-side editor styling */
 #right-editor-container {
     height: 400px;
-    border: 1px solid #328f81;
+    border: 1px solid #727272;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     position: relative;
     overflow: hidden;
@@ -254,12 +253,12 @@
     height: 150px;
     overflow-y: auto;
     margin-bottom: 0px;
-    border: 1px solid #328f81;
+    border: 1px solid #727272;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    background-color: #48226d;
+    background-color: black;
     font-family: Consolas, monospace; /* Choose a monospaced font for console output */
     font-size: 16px;
-    color: white;
+    color: #00ff89b3;
 }
 
 /* Light theme modifier */
@@ -268,7 +267,7 @@
 }
 
 #blinkingArrow {
-    color: #328f81; /* Adjust color of the blinking '>>' */
+    color: #00ff89b3; /* Adjust color of the blinking '>>' */
     animation: blinkAnimation 1s steps(1, start) infinite; /* Blink every second */
 }
 
