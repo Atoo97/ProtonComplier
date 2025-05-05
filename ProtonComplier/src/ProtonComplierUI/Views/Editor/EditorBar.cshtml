@@ -7,7 +7,7 @@
             <!-- Compile Form -->
             <div id="compileForm" class="d-flex align-items-center">
                 <button id="compileButton" type="submit"
-                        class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
+                        class="btn btn-primary me-1 d-flex justify-content-center align-items-center xbutton"
                         data-bs-toggle="tooltip"
                         data-bs-placement="bottom"
                         title="Compile">
@@ -18,7 +18,7 @@
             <!-- Compile & Run Form -->
             <div id="compileAndRunForm" class="d-flex align-items-center">
                 <button id="compileAndRunButton" type="button"
-                        class="btn btn-success me-1 d-flex justify-content-center align-items-center"
+                        class="btn btn-success me-1 d-flex justify-content-center align-items-center xbutton"
                         data-bs-toggle="tooltip"
                         data-bs-placement="bottom"
                         title="Compile & Run">
@@ -29,7 +29,7 @@
             <!-- Clear Editor Form -->
             <div id="clearForm" class="d-flex align-items-center">
                 <button id="clearButton" type="submit"
-                        class="btn btn-danger me-1 d-flex justify-content-center align-items-center"
+                        class="btn btn-danger me-1 d-flex justify-content-center align-items-center xbutton"
                         data-bs-toggle="tooltip"
                         data-bs-placement="bottom"
                         title="Clear editor">
@@ -40,8 +40,6 @@
             <!-- File Name TextBox (Desktop Only) -->
             <input type="text" id="fileNameInputDesktop" name="fileNameInputDesktop"
                    class="form-control ms-2 d-none d-md-block"
-                   placeholder="Enter file name..."
-                   value="@ViewBag.DefaultFileName"
                    style="max-width: 200px; background-color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.3);" />
             
             <div class="d-none d-md-flex align-items-center">
@@ -50,7 +48,7 @@
                     <input type="file" id="fileInput" name="file" class="form-control d-none" accept=".prtn">
                     <button id="uploadButton"
                             style="margin-left: 20px;"
-                            class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
+                            class="btn btn-primary me-1 d-flex justify-content-center align-items-center uploadButtons xbutton"
                             data-bs-toggle="tooltip"
                             data-bs-placement="bottom"
                             title="Upload Proton source file">
@@ -61,7 +59,7 @@
                 <!-- Download Form (Desktop Only) -->
                 <div id="downloadFormDesktop" class="d-flex align-items-center">
                     <button id="downloadButton"
-                            class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
+                            class="btn btn-primary me-1 d-flex justify-content-center align-items-center downloadButtons xbutton"
                             data-bs-toggle="tooltip"
                             data-bs-placement="bottom"
                             title="Download Proton source file">
@@ -89,7 +87,7 @@
                 <!-- Copy Form (Desktop Only) -->
                 <div id="copydFormDesktop" class="d-flex align-items-center">
                     <button id="copyButton" type="submit"
-                            class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
+                            class="btn btn-primary me-1 d-flex justify-content-center align-items-center copyButtons xbutton"
                             data-bs-toggle="tooltip"
                             data-bs-placement="bottom"
                             title="Copy code">
@@ -113,7 +111,6 @@
                 <li class="nav-item d-block d-md-none mt-2">
                     <input type="text" id="fileNameInputMobile" name="fileNameInputMobile"
                            class="form-control"
-                           placeholder="Enter file name..."
                            style="background-color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(255, 255, 255, 0.3);">
                 </li>
 
@@ -123,33 +120,33 @@
                     <div class="d-flex flex-wrap align-items-center">
 
                         <!-- Upload Form -->
-                        <form id="upLoadFormMobile" asp-controller="Editor" asp-action="Upload"
-                              method="post" class="d-flex align-items-center">
-                            <button id="uploadButton" type="submit"
-                                    class="btn btn-primary d-flex justify-content-center align-items-center"
+                        <div id="upLoadFormMobile" class="d-flex align-items-center">
+                            <input type="file" id="fileInput" name="file" class="form-control d-none" accept=".prtn">
+                            <button id="uploadButton"
+                                    style="margin-left: 20px;"
+                                    class="btn btn-primary me-1 d-flex justify-content-center align-items-center uploadButtons xbutton"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="bottom"
                                     title="Upload Proton source file">
                                 <img src="@Url.Content("~/images/UploadDocument.svg")" alt="Upload">
                             </button>
-                        </form>
+                        </div>
 
                         <!-- Download Form -->
-                        <form id="downloadFormMobile" asp-controller="Editor" asp-action="Download"
-                              method="post" class="d-flex align-items-center">
-                            <button id="downloadButton" type="submit"
-                                    class="btn btn-primary d-flex justify-content-center align-items-center"
+                        <div id="downloadFormMobile" class="d-flex align-items-center">
+                            <button id="downloadButton"
+                                    class="btn btn-primary d-flex justify-content-center align-items-center downloadButtons xbutton"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="bottom"
                                     title="Download Proton source file">
                                 <img src="@Url.Content("~/images/DownloadDocument.svg")" alt="Download">
                             </button>
-                        </form>
+                        </div>
 
                         <!-- Copy Form (Desktop Only) -->
                         <div id="copydFormMobile" class="d-flex align-items-center">
                             <button id="copyButton" type="submit"
-                                    class="btn btn-primary me-1 d-flex justify-content-center align-items-center"
+                                    class="btn btn-primary me-1 d-flex justify-content-center align-items-center copyButtons xbutton"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="bottom"
                                     title="Copy code">
@@ -181,4 +178,3 @@
         </div>
     </div>
 </nav>
-

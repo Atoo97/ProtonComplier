@@ -341,6 +341,12 @@ require(['vs/editor/editor.main'], function () {
         highlightThreeDigitGroups(rightEditor);
     });
 
+    // Set fileName
+    const fileNameInputDesk = document.getElementById("fileNameInputDesktop");
+    const fileNameInputMob = document.getElementById("fileNameInputMobile");
+    fileNameInputDesk.value = window.filenameText;
+    fileNameInputMob.value = window.filenameText;
+
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle.checked) {
         monaco.editor.setTheme('proton-dark');
@@ -351,33 +357,39 @@ require(['vs/editor/editor.main'], function () {
 
 // Save editor content to localStorage on change
 function setupEditorPersistence(editor, editorType) {
-    const storageKey = 'protonEditorContent';     // left editor
-    const storageKey2 = 'protonEditorContent2';   // right editor
+    const storageKey = 'protonEditorContent';     // Left editor
+    const storageKey2 = 'protonEditorContent2';   // Right editor
+    const fileNameKey = 'protonFilename';         // New key for filename
 
-    if (editorType === "left") {
-        // Load from localStorage on page load
-        const saved = localStorage.getItem(storageKey);
-        if (saved) {
-            editor.setValue(saved);
-        }
+    // Load and set filename from localStorage if available
+    const fileNameInputDesk = document.getElementById("fileNameInputDesktop");
+    const fileNameInputMob = document.getElementById("fileNameInputMobile");
+    const savedFilename = localStorage.getItem(fileNameKey);
 
-        // Save changes to localStorage
-        editor.onDidChangeModelContent(() => {
-            localStorage.setItem(storageKey, editor.getValue());
-        });
-
-    } else {
-        // Load from localStorage on page load
-        const saved = localStorage.getItem(storageKey2);
-        if (saved) {
-            editor.setValue(saved);
-        }
-
-        // Save changes to localStorage
-        editor.onDidChangeModelContent(() => {
-            localStorage.setItem(storageKey2, editor.getValue());
-        });
+    if (savedFilename) {
+        fileNameInputDesk.value = savedFilename;
+        fileNameInputMob.value = savedFilename;
+        window.filenameText = savedFilename;
     }
+
+    // Listen for filename changes and update localStorage
+    [fileNameInputDesk, fileNameInputMob].forEach(input => {
+        input.addEventListener("input", () => {
+            localStorage.setItem(fileNameKey, input.value);
+            window.filenameText = input.value;
+        });
+    });
+
+    // Editor logic
+    const storageKeyToUse = editorType === "left" ? storageKey : storageKey2;
+    const saved = localStorage.getItem(storageKeyToUse);
+    if (saved) {
+        editor.setValue(saved);
+    }
+
+    editor.onDidChangeModelContent(() => {
+        localStorage.setItem(storageKeyToUse, editor.getValue());
+    });
 }
 
 // Wait for Monaco editor to initialize
@@ -467,8 +479,7 @@ connection.on("ConsoleOutput", function (message) {
     }
 });
 
-connection.on("EditorOutput", function (message) {
-    window.outputText = "";
+connection.on("RightEditorOutput", function (message) {
     window.outputText += message + "\n";
 
     if (typeof rightEditor !== 'undefined') {
@@ -488,7 +499,7 @@ connection.on("ErrorsAndWarningsOutput", function (message) {
     }
 });
 
-connection.on("ResetEditor", function (defaultCode, defaultOutput) {
+connection.on("ResetEditor", function (defaultCode, defaultOutput, filename) {
     if (typeof editor !== 'undefined') {
         editor.setValue(defaultCode);
     }
@@ -496,6 +507,14 @@ connection.on("ResetEditor", function (defaultCode, defaultOutput) {
     if (typeof rightEditor !== 'undefined') {
         rightEditor.setValue(defaultOutput);
     }
+
+    // Reset filename inputs to "Main"
+    const fileNameInputDesk = document.getElementById("fileNameInputDesktop");
+    const fileNameInputMob = document.getElementById("fileNameInputMobile");
+    if (fileNameInputDesk) fileNameInputDesk.value = filename;
+    if (fileNameInputMob) fileNameInputMob.value = filename;
+    window.filenameText = filename;
+    localStorage.setItem("protonFilename", filename);
 
     // Also clear the console visually
     const output = document.getElementById("compilerOutput");
@@ -510,42 +529,15 @@ connection.start()
     .then(() => connection.invoke("GetConnectionId"))
     .then(id => {
         connectionId = id;
-        console.log("Connected with ID:", connectionId);
     })
     .catch(err => console.error(err.toString()));
 
-
-document.getElementById("compileButton").addEventListener("click", function () {
-    const editorContent = editor.getValue();
-    document.getElementById("InputText").value = editorContent;
-
-    const lexicalEnabled = document.getElementById("toggleLexicalAnalyzer").checked;
-
-    // Reset outputText and right editor
-    window.outputText = "";
-    if (typeof rightEditor !== 'undefined') {
-        rightEditor.setValue("");
-    }
-
-    // Reset HTML console output
-    const output = document.getElementById("compilerOutput");
-    if (output) {
-        output.innerHTML = '<span id="blinkingArrow">ProtonCompiler &gt;&gt; </span>';
-    }
-
-    // Trigger backend compile action
-    fetch("/Editor/Compile", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-            code: editorContent,
-            connectionId: connectionId,
-            lexical: lexicalEnabled
-        })
-    });
-});
-
 document.getElementById("compileAndRunButton").addEventListener("click", async function () {
+    // Disable all buttons with the class 'xbutton'
+    document.querySelectorAll("button.xbutton").forEach(btn => {
+        btn.disabled = true;
+    });
+
     const editorContent = editor.getValue();
     const fileName = document.getElementById("fileNameInputDesktop").value;
     const lexicalEnabled = document.getElementById("toggleLexicalAnalyzer").checked;
@@ -554,6 +546,7 @@ document.getElementById("compileAndRunButton").addEventListener("click", async f
 
     // Sync editor content to hidden input if needed
     document.getElementById("InputText").value = editorContent;
+    window.outputText = "";
 
     // Clear right editor
     if (typeof rightEditor !== 'undefined') {
@@ -568,8 +561,8 @@ document.getElementById("compileAndRunButton").addEventListener("click", async f
 
     // Prepare form data
     const formData = new FormData();
-    formData.append("Code", editorContent);
     formData.append("ConnectionId", connectionId);
+    formData.append("Code", editorContent);
     formData.append("FileName", fileName);
     formData.append("Lexical", lexicalEnabled);
     formData.append("Syntax", syntaxEnabled);
@@ -580,56 +573,107 @@ document.getElementById("compileAndRunButton").addEventListener("click", async f
         method: "POST",
         body: formData, // do NOT set Content-Type manually
     });
+
+    // Enable all buttons with the class 'xbutton'
+    document.querySelectorAll("button.xbutton").forEach(btn => {
+        btn.disabled = false;
+    });
 });
 
-document.getElementById("clearButton").addEventListener("click", function () {
-        const confirmed = confirm("Are you sure you want to clear both the editor and console output?");
+document.getElementById("clearButton").addEventListener("click", async function (e) {
+    e.preventDefault();
+
+    const confirmed = confirm("Are you sure you want to clear both editor and console output?");
     if (!confirmed) return;
 
-    // Trigger backend clear action
-    fetch("/Editor/Clear", {
+    const formData = new FormData();
+    formData.append("ConnectionId", connectionId);
+
+    const response = await fetch("/Editor/Clear", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ connectionId: connectionId })
+        body: formData
+    });
+
+    if (!response.ok) {
+        console.error("Clear failed");
+        return;
+    }
+
+    // Create the message element if it doesn't exist
+    let message = document.getElementById('clearMessage');
+    if (!message) {
+        message = document.createElement('div');
+        message.id = 'clearMessage';
+        message.style.position = 'fixed';
+        message.style.top = '10px';
+        message.style.left = '50%';
+        message.style.transform = 'translateX(-50%)';
+        message.style.maxWidth = '90%';
+        message.style.padding = '10px 20px';
+        message.style.backgroundColor = 'lightgrey';
+        message.style.color = 'black';
+        message.style.borderRadius = '5px';
+        message.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+        message.style.zIndex = '10000';
+        message.style.fontFamily = 'Segoe UI, sans-serif';
+        message.style.fontSize = '1rem';
+        message.style.textAlign = 'center';
+        message.style.zIndex = '10000';
+        document.body.appendChild(message);
+    }
+
+    message.textContent = 'Editor reset to default!';
+    message.style.display = 'block';
+
+    setTimeout(() => {
+        message.style.display = 'none';
+    }, 4000);
+});
+
+document.querySelectorAll('.copyButtons').forEach(button => {
+    button.addEventListener('click', () => {
+        const text = rightEditor.getValue();
+
+        navigator.clipboard.writeText(text).then(() => {
+            let message = document.getElementById('copyMessage');
+            if (!message) {
+                message = document.createElement('div');
+                message.id = 'copyMessage';
+                message.style.position = 'fixed';
+                message.style.top = '10px';
+                message.style.left = '50%';
+                message.style.transform = 'translateX(-50%)';
+                message.style.maxWidth = '90%';
+                message.style.padding = '10px 20px';
+                message.style.backgroundColor = 'lightgrey';
+                message.style.color = 'black';
+                message.style.borderRadius = '5px';
+                message.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+                message.style.zIndex = '10000';
+                message.style.fontFamily = 'Segoe UI, sans-serif';
+                message.style.fontSize = '1rem';
+                message.style.textAlign = 'center';
+                message.style.zIndex = '10000';
+                document.body.appendChild(message);
+            }
+
+            // Show the message
+            message.textContent = 'Text copied to clipboard!';
+            message.style.display = 'block';
+
+            // Hide after 4 seconds
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 4000);
+        });
     });
 });
 
-document.getElementById('copyButton').addEventListener('click', () => {
-    const text = rightEditor.getValue();
-    navigator.clipboard.writeText(text).then(() => {
-        // Create the message element if it doesn't exist
-        let message = document.getElementById('copyMessage');
-        if (!message) {
-            message = document.createElement('div');
-            message.id = 'copyMessage';
-            message.style.position = 'fixed';
-            message.style.top = '10px';
-            message.style.left = '50%';
-            message.style.transform = 'translateX(-50%)';
-            message.style.padding = '10px 20px';
-            message.style.backgroundColor = 'lightgrey';
-            message.style.color = 'black';
-            message.style.borderRadius = '5px';
-            message.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-            message.style.zIndex = '10000';
-            message.style.fontFamily = 'Segoe UI, sans-serif';
-            document.body.appendChild(message);
-        }
-
-        // Show the message
-        message.textContent = 'Text copied to clipboard!';
-        message.style.display = 'block';
-
-        // Hide after 2 seconds
-        setTimeout(() => {
-            message.style.display = 'none';
-        }, 2000);
+document.querySelectorAll(".uploadButtons").forEach(button => {
+    button.addEventListener("click", function (e) {
+        e.preventDefault();
+        document.getElementById("fileInput").click();
     });
-});
-
-document.getElementById("uploadButton").addEventListener("click", function (e) {
-    e.preventDefault(); // Prevent any default action
-    document.getElementById("fileInput").click(); // Open file dialog
 });
 
 document.getElementById("fileInput").addEventListener("change", async function () {
@@ -637,43 +681,80 @@ document.getElementById("fileInput").addEventListener("change", async function (
     if (!file) return;
 
     const formData = new FormData();
-    formData.append("ConnectionId", connectionId);
+    formData.append("ConnectionId", connectionId); // Ensure connectionId is defined in scope
     formData.append("File", file);
+    formData.append("FileName", file.name);
 
-    // Post to backend
     const response = await fetch("/Editor/Upload", {
-        method: "POST",
-        body: formData, // do NOT set Content-Type manually
-    });
-});
-
-document.getElementById("downloadButton").addEventListener("click", async function (e) {
-    e.preventDefault();
-
-    // Assuming you have the editor text stored in a JS variable
-    const inputText = editor.getValue(); // Replace with your actual editor reference
-
-    const formData = new FormData();
-    formData.append("ConnectionId", connectionId);
-    formData.append("Code", inputText);
-
-    const response = await fetch("/Editor/Download", {
         method: "POST",
         body: formData
     });
 
     if (!response.ok) {
-        console.error("Download failed");
+        console.error("Upload failed");
         return;
     }
 
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "ProtonFile.prtn";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
+    // Create the message element if it doesn't exist
+    let message = document.getElementById('uploadMessage');
+    if (!message) {
+        message = document.createElement('div');
+        message.id = 'uploadMessage';
+        message.style.position = 'fixed';
+        message.style.top = '10px';
+        message.style.left = '50%';
+        message.style.transform = 'translateX(-50%)';
+        message.style.maxWidth = '90%';
+        message.style.padding = '10px 20px';
+        message.style.backgroundColor = 'lightgrey';
+        message.style.color = 'black';
+        message.style.borderRadius = '5px';
+        message.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+        message.style.zIndex = '10000';
+        message.style.fontFamily = 'Segoe UI, sans-serif';
+        message.style.fontSize = '1rem';
+        message.style.textAlign = 'center';
+        message.style.zIndex = '10000';
+        document.body.appendChild(message);
+    }
+
+    message.textContent = `File: ${file.name} uploaded successfully!`;
+    message.style.display = 'block';
+
+    setTimeout(() => {
+        message.style.display = 'none';
+    }, 4000);
+});
+
+document.querySelectorAll(".downloadButtons").forEach(button => {
+    button.addEventListener("click", async function (e) {
+        e.preventDefault();
+
+        const inputText = editor.getValue(); // Replace with actual editor reference if different
+        const filename = document.getElementById("fileNameInputDesktop").value; //Nam of the file
+
+        const formData = new FormData();
+        formData.append("ConnectionId", connectionId);
+        formData.append("Code", inputText);
+
+        const response = await fetch("/Editor/Download", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            console.error("Download failed");
+            return;
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename + ".prtn";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    });
 });
