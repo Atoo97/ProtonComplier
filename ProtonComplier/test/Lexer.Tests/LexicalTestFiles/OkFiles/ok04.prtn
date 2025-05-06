@@ -1,0 +1,18 @@
+﻿// One Line comment!..
+
+#StateSpace
+s:R, 
+t:R, 
+v:R;
+
+#Input
+s = 2, 
+	t = 2
+
+#Precondition
+s ≥ 0 ∧ v ≥ 0
+
+//@ unknown token type!
+
+#Postcondition
+v = s/t 

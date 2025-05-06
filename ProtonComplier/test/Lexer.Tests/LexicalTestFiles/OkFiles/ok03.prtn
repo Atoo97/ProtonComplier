@@ -1,0 +1,12 @@
+﻿// Test for non structure macro definiton and extra tabs/spaces..
+
+#Precondition
+		
+
+#StateSpace		
+//#Precondition 
+#Postcondition	
+
+
+
+#Input 

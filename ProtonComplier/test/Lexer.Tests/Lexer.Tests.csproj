@@ -10,11 +10,55 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="TestFiles\LexicalTestFiles\ok.prtn" />
+    <None Remove="LexicalTestFiles\ErrorFiles\error01.prtn" />
+    <None Remove="LexicalTestFiles\ErrorFiles\error02.prtn" />
+    <None Remove="LexicalTestFiles\ErrorFiles\error03.prtn" />
+    <None Remove="LexicalTestFiles\ErrorFiles\error04.prtn" />
+    <None Remove="LexicalTestFiles\ErrorFiles\error05.prtn" />
+    <None Remove="LexicalTestFiles\ErrorFiles\error06.prtn" />
+    <None Remove="LexicalTestFiles\OkFiles\ok01.prtn" />
+    <None Remove="LexicalTestFiles\OkFiles\ok02.prtn" />
+    <None Remove="LexicalTestFiles\OkFiles\ok03.prtn" />
+    <None Remove="LexicalTestFiles\OkFiles\ok04.prtn" />
+    <None Remove="LexicalTestFiles\OkFiles\ok05.prtn" />
+    <None Remove="LexicalTestFiles\OkFiles\ok06.prtn" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="TestFiles\LexicalTestFiles\ok.prtn">
+    <Content Include="LexicalTestFiles\ErrorFiles\error01.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexicalTestFiles\ErrorFiles\error02.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexicalTestFiles\ErrorFiles\error03.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexicalTestFiles\ErrorFiles\error04.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexicalTestFiles\ErrorFiles\error05.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexicalTestFiles\ErrorFiles\error06.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexicalTestFiles\OkFiles\ok01.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexicalTestFiles\OkFiles\ok06.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexicalTestFiles\OkFiles\ok05.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexicalTestFiles\OkFiles\ok04.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexicalTestFiles\OkFiles\ok03.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LexicalTestFiles\OkFiles\ok02.prtn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -28,10 +72,6 @@
 		<PackageReference Include="coverlet.collector" Version="6.0.0" />
 		<PackageReference Include="xunit" Version="2.9.3" />
 	</ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="TestFiles\TokenizeTestFiles\" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ProtonComplier.ErrorHandler\ProtonComplier.ErrorHandler.csproj" />

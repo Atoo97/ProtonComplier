@@ -1,0 +1,17 @@
+﻿// One Line comment!..
+
+#StateSpace
+osztó,osztandó:Z,eredmény:$,eredmény2:B;
+
+#Input
+	osztó = 3
+	osztandó = 100
+
+#Precondition
+osztó ≠ 0
+
+//@ unknown token type!
+
+#Postcondition
+(osztandó%osztó=0) -> eredmény="osztója" ∧
+(osztandó%osztó≠0) -> eredmény2=false 

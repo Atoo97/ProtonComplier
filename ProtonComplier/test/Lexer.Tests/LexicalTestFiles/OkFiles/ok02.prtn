@@ -1,0 +1,7 @@
+﻿// Test for non structure macro definiton..
+
+#Precondition
+#StateSpace
+//#Precondition
+#Postcondition		
+#Input 
