@@ -144,7 +144,7 @@ namespace Proton.Parser
 
                                 Warnings.Add(new AnalyzerWarning(
                                         "108",
-                                        string.Format(MessageRegistry.GetMessage(107).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
+                                        string.Format(MessageRegistry.GetMessage(108).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
 
                                 position++; // Skip this token
                             }

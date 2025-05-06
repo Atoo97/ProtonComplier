@@ -48,7 +48,7 @@ namespace Proton.ErrorHandler
             // Parser errors & warnings (101-200):
             {
                 101, new Message(
-                "invalid-expression",
+                "invalid-expression-definition",
                 "ParserError: Invalid expression at line {0}, column {1}. Expected expression type: '{2}'.")
             },
             {

@@ -113,7 +113,54 @@ const messages = {
             '<ul><li><b>#StateSpace</b></li><li><b>#Input</b></li><li><b>#Precondition</b></li><li><b>#Postcondition</b></li> </ul >\n' +
             '<h2><b>Example</b></h2><p>The following example generates P011:</p>',
         editorcode: '// @ProtonComplier\n\n#StateSpace\n\n@:N[];\n\n#Input\n\n#Precondition\n\n#Postcondition\n\n#StateSpace',
-    }
+    },
+    P101: {
+        code: 'P101',
+        severity: 'Error',
+        text: 'ParserError: Invalid expression at line {0}, column {1}. Expected expression type: {2}.',
+        example: 'The error occurs when the file contains lines of invalid expressions.You can fix this error if you define a fully valid expression.' +
+                 '<h2><b>Example</b></h2><p>The following example generates P101:</p>',
+        editorcode: '// @ProtonComplier\n\n#StateSpace\n\nn:$[]f:N[];\n\n#Input\n\n#Precondition\n\n#Postcondition',
+    },
+    P104: {
+        code: 'P104',
+        severity: 'Error',
+        text: 'ParserError: Unexpected token: {0} at line {1}, column {2}. Expected token: {3}.',
+        example: 'The error occurs when the file contains lines of invalid tokens in the expressions.You can fix this error if you define a proper token for the expression.' +
+            '<h2><b>Example</b></h2><p>The following example generates P104:</p>',
+        editorcode: '// @ProtonComplier\n\n#StateSpace\n\n#Input\n\nn=1+2(3)\n\n#Precondition\n\n#Postcondition',
+    },
+    P107: {
+        code: 'P107',
+        severity: 'Warning',
+        text: 'ParserWarning: Multiple consecutive commas detected at line {0}, column {1}.',
+        example: 'The warning occurs when the file contains lines where multiple consecutive comma follow each other as separator. You can fix this warning if you define only one separator.' +
+            '<h2><b>Example</b></h2><p>The following example generates P107:</p>',
+        editorcode: '// @ProtonComplier\n\n#StateSpace\n\nvar1,,var2:N;\n\n#Input\n\n#Precondition\n\n#Postcondition',
+    },
+    P108: {
+        code: 'P108',
+        severity: 'Warning',
+        text: 'ParserWarning: Multiple consecutive delimeter detected at line {0}, column {1}.',
+        example: 'The warning occurs when the file contains lines where multiple consecutive delimeter follow each other as separator. You can fix this warning if you define only one delimeter as separator.' +
+                 '<h2><b>Example</b></h2><p>The following example generates P108:</p>',
+        editorcode: '// @ProtonComplier\n\n#StateSpace\n\nvar1:N;;var2:N;\n\n#Input\n\n#Precondition\n\n#Postcondition',
+    },
+    P112: {
+        code: 'P112',
+        severity: 'Error',
+        text: 'ParserError: Multiple list specifier detected at line {0}, column {1}.',
+        example: 'The warning occurs when the file contains lines where identifier has multiple consecutive list specifier follow each other. You can fix this error if you define only one list specifier.' +
+            '<h2><b>Example</b></h2><p>The following example generates P112:</p>',
+        editorcode: '// @ProtonComplier\n\n#StateSpace\n\nvar1:N[][];\n\n#Input\n\n#Precondition\n\n#Postcondition',
+    },
+    P204: {
+        code: 'P204',
+        severity: 'Error',
+        text: 'SemanticalError: Invalid variable name declaration {0} at line {1}, column {2}.',
+        example: 'The warning occurs when the file contains lines where variable name definition is invalid. You can fix this error if you define variable name which cant be longer than 511 character and start with and followed by: underscore or the mixture of the following characters: numbers: [0-9]; characters: [a-z;A-Z] or underscore.',
+        editorcode: '?',
+    },
 };
 
 // Get an ordered list of error codes
