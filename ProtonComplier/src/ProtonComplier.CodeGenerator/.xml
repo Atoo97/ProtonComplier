@@ -41,6 +41,11 @@
             injected into the template.
             </returns>
         </member>
+        <member name="M:Proton.CodeGenerator.GenerateCode.IsBooleanOp(Proton.Lexer.Enums.TokenType)">
+            <summary>
+            Determines whether the given TokenType is a valid boolean operator.
+            </summary>
+        </member>
         <member name="M:Proton.CodeGenerator.GenerateCode.MyRegex">
             <remarks>
             Pattern:<br/>

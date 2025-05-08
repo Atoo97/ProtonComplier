@@ -100,7 +100,7 @@ namespace Proton.Lexer
                         }
 
                         // Handle Character literal: Remove surrounding single quotes
-                        if (def.TokenName == TokenType.Character)
+                        if (def.TokenName == TokenType.Char)
                         {
                             value = value.Trim('\'').Trim('\r', '\n');
                             matchLength = value.Length + 2; // Account for removed single quotes

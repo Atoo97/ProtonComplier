@@ -8,8 +8,11 @@ namespace Proton.Semantic
     using Proton.Lexer;
     using Proton.Lexer.Enums;
     using Proton.Parser;
+    using Proton.Parser.Expressions;
     using Proton.Parser.Statements;
     using Proton.Semantic.Interfaces;
+    using ProtonComplier.Parser.Expressions;
+    using ProtonComplier.Parser.Statements;
 
     /// <summary>
     /// Represents the main sematical class responsible for analyzing tokens from each macro section,
@@ -101,6 +104,105 @@ namespace Proton.Semantic
         }
 
         /// <summary>
+        /// Semantically analyzes the Input macro section, initialize all declared input variables.
+        /// This includes checking identifier naming rules, ensuring type correctness,
+        /// preventing duplicates, and inserting valid symbols into the symbol table.
+        /// All semantic errors or warnings encountered during the analysis are recorded.
+        /// </summary>
+        public static void InputSemantical()
+        {
+            foreach (var statement in Statements)
+            {
+                try
+                {
+                    // 1) Chehck if varibale is exist in symboltable
+                    Symbol symbol = SymbolTable.FindSymbol(statement.LeftNode!.ParseSymbol) !;
+
+                    if (statement is VariableInitialization variableInitialization)
+                    {
+                        // 2) Chehck if defined as list or not
+                        if (symbol.IsList != variableInitialization.IsList)
+                        {
+                            var token = variableInitialization.LeftNode!.ParseSymbol;
+                            string declaredAs = symbol.IsList ? "a list" : "not a list";
+
+                            throw new AnalyzerError(
+                                "212",
+                                string.Format(MessageRegistry.GetMessage(212).Text, symbol.Name, declaredAs, token.TokenLine, token.TokenColumn));
+                        }
+
+                        // 3) Add values to the Symbol, plus chehck typecorrectness
+                        if (variableInitialization.IsList)
+                        {
+                            symbol.Value.Clear();
+                            var listexpr = variableInitialization.RightNode as ListExpression;
+
+                            if (listexpr!.ParseSymbol.TokenType == TokenType.ValueSpecifier) // Empty list
+                            {
+                                // Add ?? as indicate empty list:
+                                symbol.Value.Add(new Token
+                                {
+                                    TokenType = TokenType.QuestionMarks,
+                                    TokenCategory = TokenCategory.Special,
+                                    TokenValue = "??",
+                                    TokenLine = 0,
+                                    TokenColumn = 0,
+                                });
+
+                                symbol.IsInitialized = true;
+                                continue;
+                            }
+
+                            foreach (var item in listexpr!.Elements)
+                            {
+                                ValidateAndCollectTokens(item, symbol);
+
+                                // Add semicolon as list separator:
+                                symbol.Value.Add(new Token
+                                {
+                                    TokenType = TokenType.Semicolon,
+                                    TokenCategory = TokenCategory.Punctuator,
+                                    TokenValue = ";",
+                                    TokenLine = 0,
+                                    TokenColumn = 0,
+                                });
+                            }
+
+                            symbol.IsInitialized = true;
+                        }
+                        else
+                        {
+                            var rightnode = variableInitialization.RightNode as Expression;
+                            symbol.Value.Clear();
+                            ValidateAndCollectTokens(rightnode!, symbol);
+                            symbol.IsInitialized = true;
+                        }
+                    }
+                    else
+                    {
+                        // Add error if not statement..
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (ex is AnalyzerWarning warning)
+                    {
+                        Warnings.Add(warning);
+                    }
+                    else if (ex is AnalyzerError error)
+                    {
+                        Errors.Add(error);
+                    }
+                    else
+                    {
+                        // Fallback: Add generic errors to both lists if the type is unknown
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Analyzes the provided parsed statement sections, performing semantic validation such as
         /// type checking, symbol resolution, and logical rule enforcement. It ensures that the program's logic
         /// adheres to the defined language semantics.
@@ -143,7 +245,7 @@ namespace Proton.Semantic
                         StatePlaceSemantical();
                         break;
                     case "Input":
-                        // InputParser();
+                        InputSemantical();
                         break;
                     case "Precondition":
                         // PreconditionParser();
@@ -161,25 +263,211 @@ namespace Proton.Semantic
             return new SemanticResult(Errors, Warnings, Sections, SymbolTable, isSuccessful);
         }
 
-        /// <summary>
-        /// Compares the declared type of a symbol with the type specified in an expression.
-        /// </summary>
-        /// <param name="symbol">The declared symbol containing the semantic type (e.g., "Natural", "Real").</param>
-        /// <param name="token">The expression containing the actual value type (e.g., "uint", "double").</param>
-        /// <returns>True if types semantically match; otherwise, false.</returns>
-        private static bool TypeMatch(Symbol symbol, Token token)
+        private static void ValidateAndCollectTokens(Expression expr, Symbol symbol)
         {
-            // Normalize expected and actual types
-            var expectedType = symbol.Type;
-            var actualType = token.TokenType;
+            switch (expr)
+            {
+                case OperandExpression operand:
+                    Token token = operand.ParseSymbol!;
+                    var type = GetSemanticType(operand.ParseSymbol);
 
-            // Semantic mapping
-            return (expectedType == TokenType.Natural && actualType == TokenType.Uint) ||
-                   (expectedType == TokenType.Integer && actualType == TokenType.Int) ||
-                   (expectedType == TokenType.Real && actualType == TokenType.Double) ||
-                   (expectedType == TokenType.Boolean && actualType == TokenType.Bool) ||
-                   (expectedType == TokenType.Character && actualType == TokenType.Char) ||
-                   (expectedType == TokenType.Text && actualType == TokenType.String);
+                    // Typecheck
+                    if (type == TokenType.Identifier)
+                    {
+                        // Get the varibale values and recall the validation:
+                        Symbol antohersymbol = SymbolTable.FindSymbol(token) !;
+
+                        if (!antohersymbol.IsInitialized)
+                        {
+                            throw new AnalyzerError(
+                                 "227",
+                                 string.Format(MessageRegistry.GetMessage(227).Text, token.TokenValue, token.TokenLine, token.TokenColumn));
+                        }
+                        else if (symbol.Type != antohersymbol.Type && symbol.Type != TokenType.Boolean)
+                        {
+                            throw new AnalyzerError(
+                                 "232",
+                                 string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, antohersymbol.Type, token.TokenLine, token.TokenColumn));
+                        }
+                        /*
+                        else if (symbol.Type == TokenType.Boolean && (antohersymbol.Type == TokenType.Character || antohersymbol.Type == TokenType.Text)) // Boolean type only handles numbers os bool
+                        {
+                            throw new AnalyzerError(
+                                 "232",
+                                 string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, antohersymbol.Type, token.TokenLine, token.TokenColumn));
+                        }
+                        */
+                        else
+                        {
+                            foreach (var item in antohersymbol.Value)
+                            {
+                                symbol.Value.Add(item);
+                            }
+
+                            break;
+                        }
+                    }
+                    else if (symbol.Type == TokenType.Real)
+                    {
+                    }
+                    else if (symbol.Type == TokenType.Integer)
+                    {
+                        if (type == TokenType.Real)
+                        {
+                            throw new AnalyzerError(
+                                "232",
+                                string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, token.TokenType, token.TokenLine, token.TokenColumn));
+                        }
+                    }
+                    else if (symbol.Type == TokenType.Natural)
+                    {
+                        if (type == TokenType.Real || type == TokenType.Integer)
+                        {
+                            throw new AnalyzerError(
+                                 "232",
+                                 string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, token.TokenType, token.TokenLine, token.TokenColumn));
+                        }
+                    }
+                    else if (symbol.Type == TokenType.Boolean)
+                    {
+                        // Nothing should happen here
+                    }
+                    else if (symbol.Type != type)
+                    {
+                        throw new AnalyzerError(
+                            "232",
+                            string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, token.TokenType, token.TokenLine, token.TokenColumn));
+                    }
+
+                    symbol.Value.Add(token);
+                    break;
+
+                case OperatorExpression opExpr:
+                    Token token2 = opExpr.ParseSymbol!;
+
+                    // Chehck valid operator:
+                    if (symbol.Type == TokenType.Boolean)
+                    {
+                        if (!IsBooleanOperator(token2.TokenType))
+                        {
+                            throw new AnalyzerError(
+                               "234",
+                               string.Format(MessageRegistry.GetMessage(234).Text, token2.TokenType, symbol.Type, token2.TokenLine, token2.TokenColumn));
+                        }
+                    }
+                    else if (symbol.Type == TokenType.Character) // Cannot be applied operator for char
+                    {
+                        throw new AnalyzerError(
+                              "234",
+                              string.Format(MessageRegistry.GetMessage(234).Text, token2.TokenType, symbol.Type, token2.TokenLine, token2.TokenColumn));
+                    }
+                    else if (symbol.Type == TokenType.Text)
+                    {
+                        if (!IsStringOperator(token2.TokenType))
+                        {
+                            throw new AnalyzerError(
+                               "234",
+                               string.Format(MessageRegistry.GetMessage(234).Text, token2.TokenType, symbol.Type, token2.TokenLine, token2.TokenColumn));
+                        }
+                    }
+                    else
+                    {
+                        if (!IsMathOperator(token2.TokenType))
+                        {
+                            throw new AnalyzerError(
+                               "234",
+                               string.Format(MessageRegistry.GetMessage(234).Text, token2.TokenType, symbol.Type, token2.TokenLine, token2.TokenColumn));
+                        }
+                    }
+
+                    symbol.Value.Add(token2);
+                    break;
+
+                case BinaryExpression binExpr:
+                    ValidateAndCollectTokens(binExpr.Left, symbol);
+                    ValidateAndCollectTokens(binExpr.Operator, symbol);
+                    ValidateAndCollectTokens(binExpr.Right, symbol);
+                    break;
+                case ParenthesisExpression parenExpr:
+                    // Add parenthesises:
+                    symbol.Value.Add(new Token
+                    {
+                        TokenType = TokenType.OpenParen,
+                        TokenCategory = TokenCategory.Punctuator,
+                        TokenValue = "(",
+                        TokenLine = parenExpr.ParseSymbol.TokenLine,
+                        TokenColumn = parenExpr.ParseSymbol.TokenColumn - 1,
+                    });
+
+                    ValidateAndCollectTokens(parenExpr.InnerExpression, symbol);
+
+                    symbol.Value.Add(new Token
+                    {
+                        TokenType = TokenType.CloseParen,
+                        TokenCategory = TokenCategory.Punctuator,
+                        TokenValue = ")",
+                        TokenLine = parenExpr.ParseSymbol.TokenLine,
+                        TokenColumn = parenExpr.LastToken.TokenColumn + 1,
+                    });
+
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Infers the declared semantic type from a token's actual value type.
+        /// </summary>
+        /// <param name="token">The token containing the actual data type.</param>
+        /// <returns>The corresponding declared semantic type.</returns>
+        private static TokenType GetSemanticType(Token token)
+        {
+            return token.TokenType switch
+            {
+                TokenType.Uint => TokenType.Natural,
+                TokenType.Int => TokenType.Integer,
+                TokenType.Double => TokenType.Real,
+                TokenType.Bool => TokenType.Boolean,
+                TokenType.Char => TokenType.Character,
+                TokenType.String => TokenType.Text,
+                TokenType.Identifier => TokenType.Identifier,
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        /// <summary>
+        /// Determines whether the given TokenType is a valid math operator.
+        /// </summary>
+        private static bool IsMathOperator(TokenType type)
+        {
+            return type == TokenType.Addition ||
+                   type == TokenType.Subtraction ||
+                   type == TokenType.Multiplication ||
+                   type == TokenType.Division ||
+                   type == TokenType.Modulus;
+        }
+
+        /// <summary>
+        /// Determines whether the given TokenType is a valid boolean operator.
+        /// </summary>
+        private static bool IsBooleanOperator(TokenType type)
+        {
+            return type == TokenType.Equal ||
+                   type == TokenType.NotEqual ||
+                   type == TokenType.GreaterThan ||
+                   type == TokenType.LessThan ||
+                   type == TokenType.GreaterThanOrEqual ||
+                   type == TokenType.LessThanOrEqual ||
+                   type == TokenType.LogicalAnd ||
+                   type == TokenType.LogicalOr ||
+                   type == TokenType.LogicalNot;
+        }
+
+        /// <summary>
+        /// Determines whether the given TokenType is a valid string operator.
+        /// </summary>
+        private static bool IsStringOperator(TokenType type)
+        {
+            return type == TokenType.Addition; // for concatenation
         }
 
         // Basic (stricter) concept of variable name regex, Cant be longer than 511 character

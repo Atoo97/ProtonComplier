@@ -43,12 +43,12 @@ namespace Proton.Lexer
                 new (TokenType.Double, TokenCategory.Literal, DoubleRegex()),
                 new (TokenType.Uint, TokenCategory.Literal, UIntegerRegex()),
                 new (TokenType.Int, TokenCategory.Literal, IntegerRegex()),
+                new (TokenType.Bool, TokenCategory.Literal, BooleanRegex()),
 
                 new (TokenType.Identifier, TokenCategory.Identifier, IdentifierRegex()), // Identifier token
 
                 new (TokenType.Char, TokenCategory.Literal, CharacterRegex()),
                 new (TokenType.String, TokenCategory.Literal, StringRegex()),
-                new (TokenType.Bool, TokenCategory.Literal, BooleanRegex()),
 
                 // Operator Tokens
                 new (TokenType.Addition, TokenCategory.Operator, AdditionRegex()),
@@ -78,6 +78,7 @@ namespace Proton.Lexer
                 new (TokenType.Comma, TokenCategory.Punctuator, CommaRegex()),
                 new (TokenType.OpenParen, TokenCategory.Punctuator, OpenParenRegex()),
                 new (TokenType.CloseParen, TokenCategory.Punctuator, CloseParenRegex()),
+                new (TokenType.ValueSpecifier, TokenCategory.Punctuator, ValueSpecifierRegex()),
                 new (TokenType.OpenBrace, TokenCategory.Punctuator, OpenBraceRegex()),
                 new (TokenType.CloseBrace, TokenCategory.Punctuator, CloseBraceRegex()),
                 new (TokenType.ListSpecifier, TokenCategory.Punctuator, ListSpecifierRegex()),
@@ -134,7 +135,7 @@ namespace Proton.Lexer
         [GeneratedRegex("\\G(\".*?\")", RegexOptions.Compiled)]
         private static partial Regex StringRegex();
 
-        [GeneratedRegex("\\G(True|False)", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+        [GeneratedRegex("\\G(True|False)", RegexOptions.Compiled)]
         private static partial Regex BooleanRegex();
 
         // Keyword Regex:
@@ -226,6 +227,9 @@ namespace Proton.Lexer
 
         [GeneratedRegex("\\G(\\))", RegexOptions.Compiled)]
         private static partial Regex CloseParenRegex();
+
+        [GeneratedRegex("\\G(\\{})", RegexOptions.Compiled)]
+        private static partial Regex ValueSpecifierRegex();
 
         [GeneratedRegex("\\G(\\{)", RegexOptions.Compiled)]
         private static partial Regex OpenBraceRegex();

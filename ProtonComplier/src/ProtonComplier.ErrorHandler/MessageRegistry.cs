@@ -71,12 +71,67 @@ namespace Proton.ErrorHandler
                 "multiple-listspecifier",
                 "ParserError: Multiple list specifier detected at line {0}, column {1}.")
             },
+            {
+                121, new Message(
+                "missing-closing-paren",
+                "ParserError: Unclosed parenthesis detected at line {0}, column {1}.")
+            },
+            {
+                123, new Message(
+                "missing-closing-brace",
+                "ParserError: Missing close brace detected at line {0}, column {1}.")
+            },
+            {
+                124, new Message(
+                "missing-operand",
+                "ParserError: Missing operand at line {0}, column {1}.")
+            },
+            {
+                127, new Message(
+                "invalid-parenthesis-expression",
+                "ParserError: Invalid parenthesis expression. Empty parentheses are not allowed at line {0}, column {1}.")
+            },
+            {
+                131, new Message(
+                "missing-binary-expression",
+                "ParserError: Missing operand at line {0}, column {1}.")
+            },
 
             // Semantic errors & warnings (201-300):
             {
                 204, new Message(
                 "invalid-variable-identifier",
                 "SemanticalError: Invalid variable name declaration '{0}' at line {1}, column {2}.")
+            },
+            {
+                207, new Message(
+                "redefined-variable-identifier",
+                "SemanticalError: The variable '{0}' is already exist (line {1}, column {2}).")
+            },
+            {
+                209, new Message(
+                "undeclared-variable-identifier",
+                "SemanticalError: The variable '{0}' is used but never declared at line {1}, column {2}.")
+            },
+            {
+                212, new Message(
+                "missing-list-initializer",
+                "SemanticalError: The variable '{0}' is declared as '{1}' but is not initialized correctly at line {2}, column {3}.")
+            },
+            {
+                227, new Message(
+                "uninitialized-variable-reference",
+                "SemanticalError: The variable '{0}' is referenced at line {1}, column {2}, but it has not been initialized.")
+            },
+            {
+                232, new Message(
+                "unmatched-type",
+                "SemanticalError: Type mismatch — expected type '{0}', but found type '{1}' at line {2}, column {3}.")
+            },
+            {
+                234, new Message(
+                "invalid-operator-type",
+                "SemanticalError: Operator '{0}' cannot be applied to operands of type '{1}' at line {2}, column {3}.")
             },
         };
 

@@ -46,6 +46,14 @@
             and populating the symbol table.
             </summary>
         </member>
+        <member name="M:Proton.Semantic.SemanticAnalyzer.InputSemantical">
+            <summary>
+            Semantically analyzes the Input macro section, initialize all declared input variables.
+            This includes checking identifier naming rules, ensuring type correctness,
+            preventing duplicates, and inserting valid symbols into the symbol table.
+            All semantic errors or warnings encountered during the analysis are recorded.
+            </summary>
+        </member>
         <member name="M:Proton.Semantic.SemanticAnalyzer.Analyze(System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Parser.Statements.Statement}})">
             <summary>
             Analyzes the provided parsed statement sections, performing semantic validation such as
@@ -67,13 +75,27 @@
             </list>
             </returns>
         </member>
-        <member name="M:Proton.Semantic.SemanticAnalyzer.TypeMatch(Proton.Semantic.Symbol,Proton.Lexer.Token)">
+        <member name="M:Proton.Semantic.SemanticAnalyzer.GetSemanticType(Proton.Lexer.Token)">
             <summary>
-            Compares the declared type of a symbol with the type specified in an expression.
+            Infers the declared semantic type from a token's actual value type.
             </summary>
-            <param name="symbol">The declared symbol containing the semantic type (e.g., "Natural", "Real").</param>
-            <param name="token">The expression containing the actual value type (e.g., "uint", "double").</param>
-            <returns>True if types semantically match; otherwise, false.</returns>
+            <param name="token">The token containing the actual data type.</param>
+            <returns>The corresponding declared semantic type.</returns>
+        </member>
+        <member name="M:Proton.Semantic.SemanticAnalyzer.IsMathOperator(Proton.Lexer.Enums.TokenType)">
+            <summary>
+            Determines whether the given TokenType is a valid math operator.
+            </summary>
+        </member>
+        <member name="M:Proton.Semantic.SemanticAnalyzer.IsBooleanOperator(Proton.Lexer.Enums.TokenType)">
+            <summary>
+            Determines whether the given TokenType is a valid boolean operator.
+            </summary>
+        </member>
+        <member name="M:Proton.Semantic.SemanticAnalyzer.IsStringOperator(Proton.Lexer.Enums.TokenType)">
+            <summary>
+            Determines whether the given TokenType is a valid string operator.
+            </summary>
         </member>
         <member name="M:Proton.Semantic.SemanticAnalyzer.IdentifierRegex">
             <remarks>

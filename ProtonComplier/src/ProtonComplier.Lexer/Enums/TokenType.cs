@@ -239,6 +239,11 @@ namespace Proton.Lexer.Enums
         CloseParen,
 
         /// <summary>
+        /// {}
+        /// </summary>
+        ValueSpecifier,
+
+        /// <summary>
         /// {
         /// </summary>
         OpenBrace,

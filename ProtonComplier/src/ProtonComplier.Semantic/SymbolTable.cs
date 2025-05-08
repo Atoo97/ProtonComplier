@@ -6,7 +6,6 @@ namespace Proton.Semantic
     using System.Text;
     using Proton.ErrorHandler;
     using Proton.Lexer;
-    using Proton.Parser.Statements;
     using ProtonComplier.Semantic;
 
     /// <summary>

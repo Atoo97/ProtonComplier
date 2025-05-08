@@ -25,6 +25,56 @@
             <param name="ident">The indentation level (each level equals 4 spaces).</param>
             <returns>A formatted string representing the assignment expression.</returns>
         </member>
+        <member name="T:Proton.Parser.Expressions.BinaryExpression">
+            <summary>
+            Represents a binary expression in the parse tree, such as "x + 3" or "1 + 3 * (1 - 2)".
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.BinaryExpression.#ctor(Proton.Parser.Expressions.Expression,Proton.Parser.Expressions.OperatorExpression,System.Collections.Generic.List{Proton.Lexer.Token})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.BinaryExpression"/> class.
+            </summary>
+            <param name="left">The left expression.</param>
+            <param name="op">The operator token (e.g., '+', '-', '*').</param>
+            <param name="remainingTokens">The remaining tokens for the right-hand side of the expression.</param>
+            <exception cref="T:Proton.ErrorHandler.AnalyzerError">Thrown when the right-hand side is missing or improperly formed.</exception>
+        </member>
+        <member name="P:Proton.Parser.Expressions.BinaryExpression.Left">
+            <summary>
+            Gets the left-hand side expression of the binary expression.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.Expressions.BinaryExpression.Operator">
+            <summary>
+            Gets the operator in the binary expression (e.g., '+', '-', '*').
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.Expressions.BinaryExpression.Right">
+            <summary>
+            Gets the right-hand side expression of the binary expression.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.BinaryExpression.ToCode(System.Int32)">
+            <summary>
+            Generates a human-readable string representation of the binary expression, formatted with indentation.
+            </summary>
+            <param name="ident">The indentation level.</param>
+            <returns>A formatted string representation of the binary expression.</returns>
+        </member>
+        <member name="M:Proton.Parser.Expressions.BinaryExpression.SetRight(Proton.Parser.Expressions.Expression)">
+            <summary>
+            Sets the right-hand side expression explicitly.
+            </summary>
+            <param name="right">The right-hand side expression to assign.</param>
+        </member>
+        <member name="M:Proton.Parser.Expressions.BinaryExpression.ParseRightExpression(System.Collections.Generic.List{Proton.Lexer.Token})">
+            <summary>
+            Parses the right-hand side of the binary expression, handling parentheses and nested expressions.
+            </summary>
+            <param name="tokens">The tokens that represent the right-hand side expression.</param>
+            <returns>An <see cref="T:Proton.Parser.Expressions.Expression"/> object representing the parsed right-hand side.</returns>
+            <exception cref="T:Proton.ErrorHandler.AnalyzerError">Thrown if the parentheses are empty or malformed.</exception>
+        </member>
         <member name="T:Proton.Parser.Expressions.Expression">
             <summary>
             Represents the base class for all expression nodes in the parse tree.
@@ -42,6 +92,31 @@
             </summary>
             <param name="ident">Set the ident size of display.</param>
             <returns>A string representation of the expression prefixed with "Exp:".</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.ExpressionParserHelper">
+            <summary>
+            Provides helper methods for parsing expressions in the Proton parser.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.ExpressionParserHelper.ParseExpression(System.Collections.Generic.List{Proton.Lexer.Token})">
+            <summary>
+            Parses a list of tokens into an <see cref="T:Proton.Parser.Expressions.Expression"/> object.
+            Supports parenthesis grouping and binary expressions.
+            </summary>
+            <param name="tokens">The list of tokens to parse.</param>
+            <returns>An <see cref="T:Proton.Parser.Expressions.Expression"/> representing the parsed expression tree.</returns>
+            <exception cref="T:Proton.ErrorHandler.AnalyzerError">
+            Thrown when parentheses are empty or unmatched, or if tokens are invalid for an expression.
+            </exception>
+        </member>
+        <member name="M:Proton.Parser.Expressions.ExpressionParserHelper.FindMatchingParen(System.Collections.Generic.List{Proton.Lexer.Token},System.Int32)">
+            <summary>
+            Finds the index of the matching closing parenthesis for the opening parenthesis at the specified index.
+            </summary>
+            <param name="tokens">The list of tokens.</param>
+            <param name="startIndex">The index of the opening parenthesis.</param>
+            <returns>The index of the matching closing parenthesis.</returns>
+            <exception cref="T:Proton.ErrorHandler.AnalyzerError">Thrown when no matching closing parenthesis is found.</exception>
         </member>
         <member name="T:Proton.Parser.Expressions.IdentifierExpression">
             <summary>
@@ -83,6 +158,97 @@
             </summary>
             <param name="ident">The indentation level (each level equals 4 spaces).</param>
             <returns>A formatted string representing the literal expression with indentation.</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.OperandExpression">
+            <summary>
+            Represents a single operand in the parse tree, such as a literal or an identifier.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.OperandExpression.#ctor(Proton.Lexer.Token)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.OperandExpression"/> class.
+            Validates that the provided token is either a literal or an identifier.
+            </summary>
+            <param name="operandToken">The token representing the operand.</param>
+            <exception cref="T:Proton.ErrorHandler.AnalyzerError">
+            Thrown if the token is not a literal or identifier.
+            </exception>
+        </member>
+        <member name="M:Proton.Parser.Expressions.OperandExpression.ToCode(System.Int32)">
+            <summary>
+            Generates the string representation of this operand for code generation.
+            </summary>
+            <param name="ident">The indentation level (each level equals 4 spaces).</param>
+            <returns>A string representation of the operand expression.</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.OperatorExpression">
+            <summary>
+            Represents an operator expression in the parse tree (e.g., "+", "-", "*", "/", "%").
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.OperatorExpression.#ctor(Proton.Lexer.Token)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.OperatorExpression"/> class.
+            This constructor checks that the token is of a valid operator type (Addition, Subtraction, Multiplication, Division, or Modulus).
+            </summary>
+            <param name="operatorToken">The token representing the operator (Addition, Subtraction, Multiplication, Division, or Modulus).</param>
+            <exception cref="T:System.Exception">Thrown when the token type is not a valid operator type.</exception>
+        </member>
+        <member name="M:Proton.Parser.Expressions.OperatorExpression.ToCode(System.Int32)">
+            <summary>
+            Converts the operator expression to its string representation for code generation.
+            </summary>
+            <param name="ident">The indentation level (each level equals 4 spaces).</param>
+            <returns>A string representation of the operator expression.</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.ParenthesisExpression">
+            <summary>
+            Represents an expression enclosed in parentheses, such as (2 + 3).
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.ParenthesisExpression"/> class.
+            Parses the inner expression from the provided list of tokens.
+            </remarks>
+            <param name="tokens">The list of tokens within the parentheses.</param>
+        </member>
+        <member name="M:Proton.Parser.Expressions.ParenthesisExpression.#ctor(System.Collections.Generic.List{Proton.Lexer.Token})">
+            <summary>
+            Represents an expression enclosed in parentheses, such as (2 + 3).
+            </summary>
+            <remarks>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.ParenthesisExpression"/> class.
+            Parses the inner expression from the provided list of tokens.
+            </remarks>
+            <param name="tokens">The list of tokens within the parentheses.</param>
+        </member>
+        <member name="P:Proton.Parser.Expressions.ParenthesisExpression.InnerExpression">
+            <summary>
+            Gets the inner expression contained within the parentheses.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.Expressions.ParenthesisExpression.LastToken">
+            <summary>
+            Gets the last token of the inner expression inside the parentheses.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.ParenthesisExpression.ToCode(System.Int32)">
+            <summary>
+            Converts the expression to a formatted code string for debugging or output purposes.
+            </summary>
+            <param name="ident">The indentation level for formatting.</param>
+            <returns>A string representing the expression.</returns>
+        </member>
+        <member name="M:Proton.Parser.Expressions.ParenthesisExpression.GetLastToken(Proton.Parser.Expressions.Expression)">
+            <summary>
+            Recursively retrieves the last token of the provided expression.
+            This method traverses through different types of expressions to find the last token,
+            such as in operand expressions, operator expressions, and binary or parenthetical expressions.
+            </summary>
+            <param name="expr">The expression whose last token is to be retrieved.</param>
+            <returns>The last token of the provided expression.</returns>
+            <exception cref="T:System.InvalidOperationException">
+            Thrown if the expression type is unsupported or cannot have a last token.
+            </exception>
         </member>
         <member name="T:Proton.Parser.Expressions.SeparatorExpression">
             <summary>
@@ -403,6 +569,62 @@
             </summary>
             <param name="offset">The number of tokens to look ahead.</param>
             <returns>The peeked token.</returns>
+        </member>
+        <member name="T:ProtonComplier.Parser.Expressions.ListExpression">
+            <summary>
+            Represents a list expression node that parses and stores multiple comma-separated expressions
+            within braces (e.g., {expr1, expr2, ...}).
+            </summary>
+        </member>
+        <member name="M:ProtonComplier.Parser.Expressions.ListExpression.#ctor(System.Collections.Generic.List{Proton.Lexer.Token},System.Collections.Generic.List{Proton.ErrorHandler.BaseException})">
+            <summary>
+            Initializes a new instance of the <see cref="T:ProtonComplier.Parser.Expressions.ListExpression"/> class by parsing tokens enclosed in braces.
+            Supports nested expressions and warns on invalid comma usage.
+            </summary>
+            <param name="tokens">The token list including outer braces and inner expressions.</param>
+            <param name="warnings">A collection to which parser warnings are added.</param>
+            <exception cref="T:Proton.ErrorHandler.AnalyzerError">Thrown when closing brace is missing or when an empty element is encountered.</exception>
+        </member>
+        <member name="P:ProtonComplier.Parser.Expressions.ListExpression.Elements">
+            <summary>
+            Gets the list of parsed expression elements within the list expression.
+            </summary>
+        </member>
+        <member name="M:ProtonComplier.Parser.Expressions.ListExpression.ToCode(System.Int32)">
+            <summary>
+            Returns a formatted string representation of the list expression, showing each element.
+            </summary>
+            <param name="ident">Indentation level (for pretty-printing nested structures).</param>
+            <returns>A string representing the formatted structure of the list expression.</returns>
+        </member>
+        <member name="T:ProtonComplier.Parser.Statements.VariableInitialization">
+            <summary>
+            Represents a variable initialization statement in the parse tree.
+            This includes a variable identifier, assign (like "="), and type definier (like "{1,2,(2+5),4..}").
+            (e.g., "_var1,_var2=2+(4-6);).
+            </summary>
+        </member>
+        <member name="M:ProtonComplier.Parser.Statements.VariableInitialization.#ctor(Proton.Parser.Expressions.IdentifierExpression,Proton.Parser.Expressions.AssignExpression,Proton.Parser.Expressions.Expression)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ProtonComplier.Parser.Statements.VariableInitialization"/> class.
+            This constructor processes the identifier, separator, and type specifier for the variable declaration.
+            </summary>
+            <param name="identifier">The identifier expression for the variable.</param>
+            <param name="separator">The separator expression (e.g., ":=).</param>
+            <param name="valueSpecifier">The type specifier expression (e.g., "{1,2,3,4};").</param>
+            <exception cref="T:System.Exception">Thrown if there is an error in creating the variable declaration components.</exception>
+        </member>
+        <member name="P:ProtonComplier.Parser.Statements.VariableInitialization.IsList">
+            <summary>
+            Gets a value indicating whether the initialized identifier represents a list (e.g., "{....}").
+            </summary>
+        </member>
+        <member name="M:ProtonComplier.Parser.Statements.VariableInitialization.ToCode">
+            <summary>
+            Converts the variable initialization statement to its string representation for code generation.
+            This method formats the statement into a structured string, including the identifier, assignment, and type.
+            </summary>
+            <returns>A string representation of the variable initialization statement.</returns>
         </member>
     </members>
 </doc>
