@@ -133,6 +133,11 @@ namespace Proton.ErrorHandler
                 "invalid-operator-type",
                 "SemanticalError: Operator '{0}' cannot be applied to operands of type '{1}' at line {2}, column {3}.")
             },
+            {
+                239, new Message(
+                "invalid-boolean-expression",
+                "SemanticalError: Invalid boolean expression '{0}' at line {1}, column {2}.")
+            },
         };
 
         /// <summary>

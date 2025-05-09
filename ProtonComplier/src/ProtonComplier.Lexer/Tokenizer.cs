@@ -99,20 +99,6 @@ namespace Proton.Lexer
                             matchLength = value.Length + 1;
                         }
 
-                        // Handle Character literal: Remove surrounding single quotes
-                        if (def.TokenName == TokenType.Char)
-                        {
-                            value = value.Trim('\'').Trim('\r', '\n');
-                            matchLength = value.Length + 2; // Account for removed single quotes
-                        }
-
-                        // Handle Srting literal:  Remove surrounding double quotes
-                        if (def.TokenName == TokenType.String)
-                        {
-                            value = value.Trim('"').Trim('\r', '\n');
-                            matchLength = value.Length + 2;
-                        }
-
                         // Check if negative numbers comes after ")" token:
                         if ((def.TokenName == TokenType.Double || def.TokenName == TokenType.Int) && value.StartsWith('-'))
                         {

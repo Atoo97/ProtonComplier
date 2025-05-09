@@ -15,13 +15,7 @@ namespace Proton.CodeGenerator
             { "Real", "double" },       // Real number
             { "Character", "char" },
             { "Text", "string" },
-            { "Boolean", "bool" },       // Logical for boolean
-            { "NotEqual", "!=" },              // ≠
-            { "GreaterThanOrEqual", ">=" },    // ≥
-            { "LessThanOrEqual", "<=" },       // ≤
-            { "LogicalAnd", "&&" },            // ∧
-            { "LogicalOr", "||" },             // ∨
-            { "LogicalNot", "!" },             // ┐
+            { "Boolean", "bool" },
         };
 
         /// <summary>

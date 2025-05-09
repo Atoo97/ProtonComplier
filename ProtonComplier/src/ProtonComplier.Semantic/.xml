@@ -82,19 +82,22 @@
             <param name="token">The token containing the actual data type.</param>
             <returns>The corresponding declared semantic type.</returns>
         </member>
-        <member name="M:Proton.Semantic.SemanticAnalyzer.IsMathOperator(Proton.Lexer.Enums.TokenType)">
+        <member name="M:Proton.Semantic.SemanticAnalyzer.GetCSharpOperator(System.String)">
             <summary>
-            Determines whether the given TokenType is a valid math operator.
+            Converts a high-level token type name (e.g., "NotEqual", "LogicalAnd") into its corresponding C# operator string (e.g., "!=").
             </summary>
-        </member>
-        <member name="M:Proton.Semantic.SemanticAnalyzer.IsBooleanOperator(Proton.Lexer.Enums.TokenType)">
-            <summary>
-            Determines whether the given TokenType is a valid boolean operator.
-            </summary>
+            <param name="tokenTypeName">The name of the token type to convert (e.g., "GreaterThanOrEqual").</param>
+            <returns>The equivalent C# operator as a string (e.g., ">=").</returns>
+            <exception cref="T:System.ArgumentException">Thrown if the token type name is not recognized.</exception>
         </member>
         <member name="M:Proton.Semantic.SemanticAnalyzer.IsStringOperator(Proton.Lexer.Enums.TokenType)">
             <summary>
             Determines whether the given TokenType is a valid string operator.
+            </summary>
+        </member>
+        <member name="M:Proton.Semantic.SemanticAnalyzer.IsMathOperator(Proton.Lexer.Enums.TokenType)">
+            <summary>
+            Determines whether the given TokenType is a valid math operator.
             </summary>
         </member>
         <member name="M:Proton.Semantic.SemanticAnalyzer.IdentifierRegex">
@@ -174,6 +177,12 @@
         <member name="P:Proton.Semantic.Symbol.Value">
             <summary>
             Gets or sets the list of tokens representing the value(s) assigned to the symbol.
+            For array or list-like assignments, multiple tokens may be present.
+            </summary>
+        </member>
+        <member name="P:Proton.Semantic.Symbol.ValueTokens">
+            <summary>
+            Gets or sets the list of tokens representing the value(s) assigned to the symbol as string.
             For array or list-like assignments, multiple tokens may be present.
             </summary>
         </member>

@@ -7,7 +7,6 @@ namespace Proton.CodeGenerator
     using System.Text;
     using System.Text.RegularExpressions;
     using Proton.CodeGenerator.Interfaces;
-    using Proton.Lexer;
     using Proton.Lexer.Enums;
     using Proton.Semantic;
 
@@ -103,63 +102,9 @@ namespace Proton.CodeGenerator
                     {
                         value = string.Empty;
                     }
-                    else if (variableType == "Text")
-                    {
-                        value = string.Concat(firstSymbol.Value.Select(t =>
-                        {
-                            var value = t.TokenValue;
-
-                            // Check if the value is a declared variable in the symbol table
-                            bool isDeclaredVariable = t.TokenType == TokenType.Identifier;
-                            // Check if the token consists only of letters and spaces
-                            bool isStringOperator = t.TokenType == TokenType.String;
-
-                            // If it’s a known variable, keep it as-is; otherwise wrap it in quotes
-                            return isDeclaredVariable || !isStringOperator ? value : $"\"{value}\"";
-                        }));
-
-                        value = value.TrimEnd(';').Replace(";", ",");
-                    }
-                    else if (variableType == "Character")
-                    {
-                        var filtered = firstSymbol.Value
-                            .Where(t => t.TokenValue != ";") // Remove all semicolons
-                            .Select(t => $"'{t.TokenValue}'"); // Wrap each value in single quotes
-
-                        value = string.Join(", ", filtered); // Join with commas
-                    }
-                    else if (variableType == "Boolean")
-                    {
-                        // also typeMatch every operator
-                        var filtered = firstSymbol.Value
-                           .Where(t => t.TokenValue != ";")
-                           .Select(t =>
-                           {
-                               if (IsBooleanOp(t.TokenType))
-                               {
-                                   // Replace TokenValue with mapped C# operator
-                                   return TypeMapping.ToCSharpType(t.TokenType.ToString());
-                               }
-                               else if (t.TokenType == TokenType.Bool)
-                               {
-                                   // Lowercase the first letter of the value
-                                   return char.ToLower(t.TokenValue[0]) + t.TokenValue.Substring(1);
-                               }
-                               else if (t.TokenType == TokenType.String)
-                               {
-                                   // Lowercase the first letter of the value
-                                   return $"\"{t.TokenValue}\"";
-                               }
-
-                               return t.TokenValue;
-                           });
-
-                        value = string.Join(string.Empty, filtered);
-                    }
                     else
                     {
-                        value = string.Concat(firstSymbol.Value.Select(t => t.TokenValue));
-                        value = value.TrimEnd(';').Replace(";", ",");
+                        value = firstSymbol.ValueTokens.ToString().TrimEnd(',');
                     }
 
                     string declaration = isList
@@ -183,68 +128,14 @@ namespace Proton.CodeGenerator
                         {
                             value = string.Empty;
                         }
-                        else if (variableType == "Text")
-                        {
-                            value = string.Concat(firstSymbol.Value.Select(t =>
-                            {
-                                var value = t.TokenValue;
-
-                                // Check if the value is a declared variable in the symbol table
-                                bool isDeclaredVariable = t.TokenType == TokenType.Identifier;
-                                // Check if the token consists only of letters and spaces
-                                bool isStringOperator = t.TokenType == TokenType.String;
-
-                                // If it’s a known variable, keep it as-is; otherwise wrap it in quotes
-                                return isDeclaredVariable || !isStringOperator ? value : $"\"{value}\"";
-                            }));
-
-                            value = value.TrimEnd(';').Replace(";", ",");
-                        }
-                        else if (variableType == "Character")
-                        {
-                            var filtered = firstSymbol.Value
-                            .Where(t => t.TokenValue != ";") // Remove all semicolons
-                            .Select(t => $"'{t.TokenValue}'"); // Wrap each value in single quotes
-
-                            value = string.Join(", ", filtered); // Join with commas
-                        }
-                        else if (variableType == "Boolean")
-                        {
-                            // also typeMatch every operator
-                            var filtered = firstSymbol.Value
-                               .Where(t => t.TokenValue != ";")
-                               .Select(t =>
-                               {
-                                   if (IsBooleanOp(t.TokenType))
-                                   {
-                                       // Replace TokenValue with mapped C# operator
-                                       return TypeMapping.ToCSharpType(t.TokenType.ToString());
-                                   }
-                                   else if (t.TokenType == TokenType.Bool)
-                                   {
-                                       // Lowercase the first letter of the value
-                                       return char.ToLower(t.TokenValue[0]) + t.TokenValue.Substring(1);
-                                   }
-                                   else if (t.TokenType == TokenType.String)
-                                   {
-                                       // Lowercase the first letter of the value
-                                       return $"\"{t.TokenValue}\"";
-                                   }
-
-                                   return t.TokenValue;
-                               });
-
-                            value = string.Join(string.Empty, filtered);
-                        }
                         else
                         {
-                            value = string.Concat(firstSymbol.Value.Select(t => t.TokenValue));
-                            value = value.TrimEnd(';').Replace(";", ",");
+                            value = firstSymbol.ValueTokens.ToString().TrimEnd(',');
                         }
 
                         string declaration = isList
-                        ? $"{item.Name} = new {csharpType}[] {{{value}}};"
-                        : $"{item.Name} = {value};";
+                            ? $"{string.Join(" = ", group.Select(s => s.Name))} = new {csharpType}[] {{{value}}};"
+                            : $"{string.Join(" = ", group.Select(s => s.Name))} = {value};";
 
                         sb.AppendLine($"{indent}{declaration}");  // Add the declaration to the StringBuilder
                     }

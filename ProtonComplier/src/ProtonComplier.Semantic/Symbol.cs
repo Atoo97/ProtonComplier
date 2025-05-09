@@ -6,6 +6,7 @@ namespace Proton.Semantic
     using Proton.Lexer;
     using Proton.Lexer.Enums;
     using ProtonComplier.Semantic;
+    using System.Text;
 
     /// <summary>
     /// Represents a symbol (such as a variable) in the semantic model.
@@ -33,6 +34,12 @@ namespace Proton.Semantic
         /// For array or list-like assignments, multiple tokens may be present.
         /// </summary>
         required public List<Token> Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of tokens representing the value(s) assigned to the symbol as string.
+        /// For array or list-like assignments, multiple tokens may be present.
+        /// </summary>
+        public StringBuilder ValueTokens { get; set; } = new ();
 
         /// <summary>
         /// Gets or Sets the line number where the symbol was found in the source code.
@@ -73,11 +80,16 @@ namespace Proton.Semantic
                 ? string.Join(", ", this.Value.Select(v => v.TokenValue))
                 : "N/A";
 
+            string valueTokensStr = this.ValueTokens.Length > 0
+                ? this.ValueTokens.ToString()
+                : "N/A";
+
             return string.Format(
                 $"| {{0,-{SymbolTableFormat.NameWidth}}} | {{1,-{SymbolTableFormat.TypeWidth}}} | " +
                 $"{{2,-{SymbolTableFormat.CategoryWidth}}} | {{3,-{SymbolTableFormat.LineWidth}}} | " +
                 $"{{4,-{SymbolTableFormat.ColWidth}}} | {{5,-{SymbolTableFormat.ListWidth}}} | " +
-                $"{{6,-{SymbolTableFormat.InitializedWidth}}} | {{7,-{SymbolTableFormat.ValueWidth}}} |",
+                $"{{6,-{SymbolTableFormat.InitializedWidth}}} | {{7,-{SymbolTableFormat.ValueWidth}}} | " +
+                $"{{8,-{SymbolTableFormat.ValueWidth}}} |",
                 this.Name,
                 this.Type,
                 this.Category,
@@ -85,7 +97,8 @@ namespace Proton.Semantic
                 this.SymbolColumn,
                 this.IsList ? "Yes" : "No",
                 this.IsInitialized ? "Yes" : "No",
-                valueStr);
+                valueStr,
+                valueTokensStr);
         }
     }
 }

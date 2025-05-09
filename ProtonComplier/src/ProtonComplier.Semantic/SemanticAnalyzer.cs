@@ -4,10 +4,11 @@
 namespace Proton.Semantic
 {
     using System.Text.RegularExpressions;
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Proton.ErrorHandler;
     using Proton.Lexer;
     using Proton.Lexer.Enums;
-    using Proton.Parser;
     using Proton.Parser.Expressions;
     using Proton.Parser.Statements;
     using Proton.Semantic.Interfaces;
@@ -157,6 +158,26 @@ namespace Proton.Semantic
                             {
                                 ValidateAndCollectTokens(item, symbol);
 
+                                if (symbol.Type == TokenType.Boolean)
+                                {
+                                    string valueStr = symbol.ValueTokens.ToString();
+                                    int lastCommaIndex = valueStr.LastIndexOf(',');
+
+                                    string lastSegment = lastCommaIndex >= 0
+                                        ? valueStr.Substring(lastCommaIndex + 1).Trim()
+                                        : valueStr.Trim();
+
+                                    // Check if boolean type is valid
+                                    if (!IsValidExpression(lastSegment, "bool"))
+                                    {
+                                        throw new AnalyzerError(
+                                             "239",
+                                             string.Format(MessageRegistry.GetMessage(239).Text, lastSegment, symbol.SymbolLine, symbol.SymbolColumn));
+                                    }
+                                }
+
+                                symbol.ValueTokens.Append(',');
+
                                 // Add semicolon as list separator:
                                 symbol.Value.Add(new Token
                                 {
@@ -175,6 +196,25 @@ namespace Proton.Semantic
                             var rightnode = variableInitialization.RightNode as Expression;
                             symbol.Value.Clear();
                             ValidateAndCollectTokens(rightnode!, symbol);
+
+                            if (symbol.Type == TokenType.Boolean)
+                            {
+                                string valueStr = symbol.ValueTokens.ToString();
+                                int lastCommaIndex = valueStr.LastIndexOf(',');
+
+                                string lastSegment = lastCommaIndex >= 0
+                                    ? valueStr.Substring(lastCommaIndex + 1).Trim()
+                                    : valueStr.Trim();
+
+                                // Check if boolean type is valid
+                                if (!IsValidExpression(lastSegment, "bool"))
+                                {
+                                    throw new AnalyzerError(
+                                         "239",
+                                         string.Format(MessageRegistry.GetMessage(239).Text, lastSegment, symbol.SymbolLine, symbol.SymbolColumn));
+                                }
+                            }
+
                             symbol.IsInitialized = true;
                         }
                     }
@@ -265,132 +305,12 @@ namespace Proton.Semantic
 
         private static void ValidateAndCollectTokens(Expression expr, Symbol symbol)
         {
+            Token token;
+            TokenType symbolType;
             switch (expr)
             {
-                case OperandExpression operand:
-                    Token token = operand.ParseSymbol!;
-                    var type = GetSemanticType(operand.ParseSymbol);
-
-                    // Typecheck
-                    if (type == TokenType.Identifier)
-                    {
-                        // Get the varibale values and recall the validation:
-                        Symbol antohersymbol = SymbolTable.FindSymbol(token) !;
-
-                        if (!antohersymbol.IsInitialized)
-                        {
-                            throw new AnalyzerError(
-                                 "227",
-                                 string.Format(MessageRegistry.GetMessage(227).Text, token.TokenValue, token.TokenLine, token.TokenColumn));
-                        }
-                        else if (symbol.Type != antohersymbol.Type && symbol.Type != TokenType.Boolean)
-                        {
-                            throw new AnalyzerError(
-                                 "232",
-                                 string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, antohersymbol.Type, token.TokenLine, token.TokenColumn));
-                        }
-                        /*
-                        else if (symbol.Type == TokenType.Boolean && (antohersymbol.Type == TokenType.Character || antohersymbol.Type == TokenType.Text)) // Boolean type only handles numbers os bool
-                        {
-                            throw new AnalyzerError(
-                                 "232",
-                                 string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, antohersymbol.Type, token.TokenLine, token.TokenColumn));
-                        }
-                        */
-                        else
-                        {
-                            foreach (var item in antohersymbol.Value)
-                            {
-                                symbol.Value.Add(item);
-                            }
-
-                            break;
-                        }
-                    }
-                    else if (symbol.Type == TokenType.Real)
-                    {
-                    }
-                    else if (symbol.Type == TokenType.Integer)
-                    {
-                        if (type == TokenType.Real)
-                        {
-                            throw new AnalyzerError(
-                                "232",
-                                string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, token.TokenType, token.TokenLine, token.TokenColumn));
-                        }
-                    }
-                    else if (symbol.Type == TokenType.Natural)
-                    {
-                        if (type == TokenType.Real || type == TokenType.Integer)
-                        {
-                            throw new AnalyzerError(
-                                 "232",
-                                 string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, token.TokenType, token.TokenLine, token.TokenColumn));
-                        }
-                    }
-                    else if (symbol.Type == TokenType.Boolean)
-                    {
-                        // Nothing should happen here
-                    }
-                    else if (symbol.Type != type)
-                    {
-                        throw new AnalyzerError(
-                            "232",
-                            string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, token.TokenType, token.TokenLine, token.TokenColumn));
-                    }
-
-                    symbol.Value.Add(token);
-                    break;
-
-                case OperatorExpression opExpr:
-                    Token token2 = opExpr.ParseSymbol!;
-
-                    // Chehck valid operator:
-                    if (symbol.Type == TokenType.Boolean)
-                    {
-                        if (!IsBooleanOperator(token2.TokenType))
-                        {
-                            throw new AnalyzerError(
-                               "234",
-                               string.Format(MessageRegistry.GetMessage(234).Text, token2.TokenType, symbol.Type, token2.TokenLine, token2.TokenColumn));
-                        }
-                    }
-                    else if (symbol.Type == TokenType.Character) // Cannot be applied operator for char
-                    {
-                        throw new AnalyzerError(
-                              "234",
-                              string.Format(MessageRegistry.GetMessage(234).Text, token2.TokenType, symbol.Type, token2.TokenLine, token2.TokenColumn));
-                    }
-                    else if (symbol.Type == TokenType.Text)
-                    {
-                        if (!IsStringOperator(token2.TokenType))
-                        {
-                            throw new AnalyzerError(
-                               "234",
-                               string.Format(MessageRegistry.GetMessage(234).Text, token2.TokenType, symbol.Type, token2.TokenLine, token2.TokenColumn));
-                        }
-                    }
-                    else
-                    {
-                        if (!IsMathOperator(token2.TokenType))
-                        {
-                            throw new AnalyzerError(
-                               "234",
-                               string.Format(MessageRegistry.GetMessage(234).Text, token2.TokenType, symbol.Type, token2.TokenLine, token2.TokenColumn));
-                        }
-                    }
-
-                    symbol.Value.Add(token2);
-                    break;
-
-                case BinaryExpression binExpr:
-                    ValidateAndCollectTokens(binExpr.Left, symbol);
-                    ValidateAndCollectTokens(binExpr.Operator, symbol);
-                    ValidateAndCollectTokens(binExpr.Right, symbol);
-                    break;
                 case ParenthesisExpression parenExpr:
-                    // Add parenthesises:
-                    symbol.Value.Add(new Token
+                    symbol.Value.Add(new Token // Add parenthesis:
                     {
                         TokenType = TokenType.OpenParen,
                         TokenCategory = TokenCategory.Punctuator,
@@ -398,10 +318,11 @@ namespace Proton.Semantic
                         TokenLine = parenExpr.ParseSymbol.TokenLine,
                         TokenColumn = parenExpr.ParseSymbol.TokenColumn - 1,
                     });
+                    symbol.ValueTokens.Append('(');
 
                     ValidateAndCollectTokens(parenExpr.InnerExpression, symbol);
 
-                    symbol.Value.Add(new Token
+                    symbol.Value.Add(new Token // Add parenthesis:
                     {
                         TokenType = TokenType.CloseParen,
                         TokenCategory = TokenCategory.Punctuator,
@@ -409,8 +330,309 @@ namespace Proton.Semantic
                         TokenLine = parenExpr.ParseSymbol.TokenLine,
                         TokenColumn = parenExpr.LastToken.TokenColumn + 1,
                     });
+                    symbol.ValueTokens.Append(')');
 
                     break;
+                case BinaryExpression binExpr:
+                    ValidateAndCollectTokens(binExpr.Left, symbol);
+                    ValidateAndCollectTokens(binExpr.Operator, symbol);
+                    ValidateAndCollectTokens(binExpr.Right, symbol);
+                    break;
+                case OperatorExpression opExpr: // Check valid operator type
+                    token = opExpr.ParseSymbol!;
+                    symbolType = symbol.Type;
+
+                    if (symbolType == TokenType.Character) // Cannot be applied operator for char
+                    {
+                        throw new AnalyzerError(
+                              "234",
+                              string.Format(MessageRegistry.GetMessage(234).Text, token.TokenType, symbol.Type, token.TokenLine, token.TokenColumn));
+                    }
+                    else if (symbolType == TokenType.Text)
+                    {
+                        if (!IsStringOperator(token.TokenType))
+                        {
+                            throw new AnalyzerError(
+                               "234",
+                               string.Format(MessageRegistry.GetMessage(234).Text, token.TokenType, symbol.Type, token.TokenLine, token.TokenColumn));
+                        }
+                    }
+                    else if (symbolType == TokenType.Boolean) // mapping it into valid C# operator
+                    {
+                        var op = GetCSharpOperator(token.TokenType.ToString());
+                        symbol.Value.Add(token);
+                        symbol.ValueTokens.Append(op);
+                        break;
+                    }
+                    else
+                    {
+                        if (!IsMathOperator(token.TokenType))
+                        {
+                            throw new AnalyzerError(
+                               "234",
+                               string.Format(MessageRegistry.GetMessage(234).Text, token.TokenType, symbol.Type, token.TokenLine, token.TokenColumn));
+                        }
+                    }
+
+                    symbol.Value.Add(token);
+                    symbol.ValueTokens.Append(token.TokenValue);
+                    break;
+                case OperandExpression operand:
+                    Token operandtoken = operand.ParseSymbol!;
+                    TokenType operandtype = GetSemanticType(operand.ParseSymbol);
+                    symbolType = symbol.Type;
+
+                    if (symbolType == TokenType.Character)
+                    {
+                        if (operandtype != TokenType.Character && operandtype != TokenType.Identifier)
+                        {
+                            throw new AnalyzerError(
+                                 "232",
+                                 string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, operandtoken.TokenType, operandtoken.TokenLine, operandtoken.TokenColumn));
+                        }
+
+                        if (operandtype == TokenType.Character) // If char
+                        {
+                            symbol.Value.Add(operandtoken);
+
+                            // wrap character into ''
+                            var c = $"'{operandtoken.TokenValue}'";
+                            symbol.ValueTokens.Append(c);
+                        }
+                        else // If identifier
+                        {
+                            ValidateIdentifierTokens(operandtoken, symbol);
+                        }
+                    }
+                    else if (symbolType == TokenType.Text)
+                    {
+                        if (operandtype != TokenType.Text && operandtype != TokenType.Identifier)
+                        {
+                            throw new AnalyzerError(
+                                 "232",
+                                 string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, operandtoken.TokenType, operandtoken.TokenLine, operandtoken.TokenColumn));
+                        }
+
+                        if (operandtype == TokenType.Text) // If string
+                        {
+                            symbol.Value.Add(operandtoken);
+                            symbol.ValueTokens.Append(operandtoken.TokenValue);
+                        }
+                        else // If identifier
+                        {
+                            ValidateIdentifierTokens(operandtoken, symbol);
+                        }
+                    }
+                    else if (symbolType == TokenType.Real)
+                    {
+                        if (operandtype != TokenType.Real && operandtype != TokenType.Integer && operandtype != TokenType.Natural && operandtype != TokenType.Identifier)
+                        {
+                            throw new AnalyzerError(
+                                 "232",
+                                 string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, operandtoken.TokenType, operandtoken.TokenLine, operandtoken.TokenColumn));
+                        }
+
+                        if (operandtype == TokenType.Real || operandtype == TokenType.Integer || operandtype == TokenType.Natural) // If Real or Integer or Naturaél
+                        {
+                            symbol.Value.Add(operandtoken);
+                            symbol.ValueTokens.Append(operandtoken.TokenValue);
+                        }
+                        else // If identifier
+                        {
+                            ValidateIdentifierTokens(operandtoken, symbol);
+                        }
+                    }
+                    else if (symbolType == TokenType.Integer)
+                    {
+                        if (operandtype != TokenType.Integer && operandtype != TokenType.Natural && operandtype != TokenType.Identifier)
+                        {
+                            throw new AnalyzerError(
+                                 "232",
+                                 string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, operandtoken.TokenType, operandtoken.TokenLine, operandtoken.TokenColumn));
+                        }
+
+                        if (operandtype == TokenType.Integer || operandtype == TokenType.Natural) // If Integer or Natural
+                        {
+                            symbol.Value.Add(operandtoken);
+                            symbol.ValueTokens.Append(operandtoken.TokenValue);
+                        }
+                        else // If identifier
+                        {
+                            ValidateIdentifierTokens(operandtoken, symbol);
+                        }
+                    }
+                    else if (symbolType == TokenType.Natural)
+                    {
+                        if (operandtype != TokenType.Natural && operandtype != TokenType.Identifier)
+                        {
+                            throw new AnalyzerError(
+                                 "232",
+                                 string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, operandtoken.TokenType, operandtoken.TokenLine, operandtoken.TokenColumn));
+                        }
+
+                        if (operandtype == TokenType.Natural) // If Natural
+                        {
+                            symbol.Value.Add(operandtoken);
+                            symbol.ValueTokens.Append(operandtoken.TokenValue);
+                        }
+                        else // If identifier
+                        {
+                            ValidateIdentifierTokens(operandtoken, symbol);
+                        }
+                    }
+                    else if (symbolType == TokenType.Boolean)
+                    {
+                        if (operandtype == TokenType.Identifier) // If Identifier
+                        {
+                            ValidateIdentifierTokens(operandtoken, symbol);
+                        }
+                        else if (operandtype == TokenType.Character)
+                        {
+                            symbol.Value.Add(operandtoken);
+
+                            // wrap character into ''
+                            var c = $"'{operandtoken.TokenValue}'";
+                            symbol.ValueTokens.Append(c);
+                        }
+                        else if (operandtype == TokenType.Boolean)
+                        {
+                            symbol.Value.Add(operandtoken);
+
+                            // Change the first character to lower (True -> true)
+                            var b = char.ToLower(operandtoken.TokenValue[0]) + operandtoken.TokenValue.Substring(1);
+                            symbol.ValueTokens.Append(b);
+                        }
+                        else
+                        {
+                            symbol.Value.Add(operandtoken);
+                            symbol.ValueTokens.Append(operandtoken.TokenValue);
+                        }
+                    }
+
+                    break;
+            }
+        }
+
+        private static void ValidateIdentifierTokens(Token operandtoken, Symbol symbol)
+        {
+            // Get the varibale values and recall the validation:
+            Symbol anothersymbol = SymbolTable.FindSymbol(operandtoken) !;
+
+            if (!anothersymbol.IsInitialized)
+            {
+                throw new AnalyzerError(
+                     "227",
+                     string.Format(MessageRegistry.GetMessage(227).Text, operandtoken.TokenValue, operandtoken.TokenLine, operandtoken.TokenColumn));
+            }
+            else if (anothersymbol.IsList)
+            {
+                // List cannot be used!
+                throw new AnalyzerError(
+                    "232",
+                    string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, "List(" + anothersymbol.Type + ")", operandtoken.TokenLine, operandtoken.TokenColumn));
+            }
+            else // If not a list
+            {
+                // Chehck type match:
+                if (symbol.Type == TokenType.Character)
+                {
+                    if (anothersymbol.Type != TokenType.Character)
+                    {
+                        throw new AnalyzerError(
+                            "232",
+                            string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, anothersymbol.Type, operandtoken.TokenLine, operandtoken.TokenColumn));
+                    }
+                    else
+                    {
+                        foreach (var item in anothersymbol.Value)
+                        {
+                            symbol.Value.Add(item);
+                        }
+
+                        symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                    }
+                }
+                else if (symbol.Type == TokenType.Text)
+                {
+                    if (anothersymbol.Type != TokenType.Text)
+                    {
+                        throw new AnalyzerError(
+                            "232",
+                            string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, anothersymbol.Type, operandtoken.TokenLine, operandtoken.TokenColumn));
+                    }
+                    else
+                    {
+                        foreach (var item in anothersymbol.Value)
+                        {
+                            symbol.Value.Add(item);
+                        }
+
+                        symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                    }
+                }
+                else if (symbol.Type == TokenType.Real)
+                {
+                    if (anothersymbol.Type != TokenType.Real && anothersymbol.Type != TokenType.Natural && anothersymbol.Type != TokenType.Integer)
+                    {
+                        throw new AnalyzerError(
+                            "232",
+                            string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, anothersymbol.Type, operandtoken.TokenLine, operandtoken.TokenColumn));
+                    }
+                    else
+                    {
+                        foreach (var item in anothersymbol.Value)
+                        {
+                            symbol.Value.Add(item);
+                        }
+
+                        symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                    }
+                }
+                else if (symbol.Type == TokenType.Integer)
+                {
+                    if (anothersymbol.Type != TokenType.Natural && anothersymbol.Type != TokenType.Integer)
+                    {
+                        throw new AnalyzerError(
+                            "232",
+                            string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, anothersymbol.Type, operandtoken.TokenLine, operandtoken.TokenColumn));
+                    }
+                    else
+                    {
+                        foreach (var item in anothersymbol.Value)
+                        {
+                            symbol.Value.Add(item);
+                        }
+
+                        symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                    }
+                }
+                else if (symbol.Type == TokenType.Natural)
+                {
+                    if (anothersymbol.Type != TokenType.Natural)
+                    {
+                        throw new AnalyzerError(
+                            "232",
+                            string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, anothersymbol.Type, operandtoken.TokenLine, operandtoken.TokenColumn));
+                    }
+                    else
+                    {
+                        foreach (var item in anothersymbol.Value)
+                        {
+                            symbol.Value.Add(item);
+                        }
+
+                        symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                    }
+                }
+                else if (symbol.Type == TokenType.Boolean)
+                {
+                    foreach (var item in anothersymbol.Value)
+                    {
+                        symbol.Value.Add(item);
+                    }
+
+                    symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                }
             }
         }
 
@@ -435,6 +657,43 @@ namespace Proton.Semantic
         }
 
         /// <summary>
+        /// Converts a high-level token type name (e.g., "NotEqual", "LogicalAnd") into its corresponding C# operator string (e.g., "!=").
+        /// </summary>
+        /// <param name="tokenTypeName">The name of the token type to convert (e.g., "GreaterThanOrEqual").</param>
+        /// <returns>The equivalent C# operator as a string (e.g., ">=").</returns>
+        /// <exception cref="ArgumentException">Thrown if the token type name is not recognized.</exception>
+        private static string GetCSharpOperator(string tokenTypeName)
+        {
+            var tokenToCSharpOperator = new Dictionary<string, string>
+            {
+                { "NotEqual", "!=" },              // ≠
+                { "GreaterThanOrEqual", ">=" },    // ≥
+                { "LessThanOrEqual", "<=" },       // ≤
+                { "LogicalAnd", "&&" },            // ∧
+                { "LogicalOr", "||" },             // ∨
+                { "LogicalNot", "!" },             // ┐
+                { "Equal", "==" },
+                { "GreaterThan", ">" },
+                { "LessThan", "<" },
+            };
+
+            if (tokenToCSharpOperator.TryGetValue(tokenTypeName, out var op))
+            {
+                return op;
+            }
+
+            throw new ArgumentException($"Unrecognized token type name: {tokenTypeName}");
+        }
+
+        /// <summary>
+        /// Determines whether the given TokenType is a valid string operator.
+        /// </summary>
+        private static bool IsStringOperator(TokenType type)
+        {
+            return type == TokenType.Addition; // for concatenation
+        }
+
+        /// <summary>
         /// Determines whether the given TokenType is a valid math operator.
         /// </summary>
         private static bool IsMathOperator(TokenType type)
@@ -446,28 +705,35 @@ namespace Proton.Semantic
                    type == TokenType.Modulus;
         }
 
-        /// <summary>
-        /// Determines whether the given TokenType is a valid boolean operator.
-        /// </summary>
-        private static bool IsBooleanOperator(TokenType type)
+        // Typecheck by param
+        private static bool IsValidExpression(string expression, string type)
         {
-            return type == TokenType.Equal ||
-                   type == TokenType.NotEqual ||
-                   type == TokenType.GreaterThan ||
-                   type == TokenType.LessThan ||
-                   type == TokenType.GreaterThanOrEqual ||
-                   type == TokenType.LessThanOrEqual ||
-                   type == TokenType.LogicalAnd ||
-                   type == TokenType.LogicalOr ||
-                   type == TokenType.LogicalNot;
-        }
+            var code = $"class Temp {{ void Test() {{ bool x = {expression}; }} }}";
+            var tree = CSharpSyntaxTree.ParseText(code);
 
-        /// <summary>
-        /// Determines whether the given TokenType is a valid string operator.
-        /// </summary>
-        private static bool IsStringOperator(TokenType type)
-        {
-            return type == TokenType.Addition; // for concatenation
+            var compilation = CSharpCompilation.Create(
+                "TempCheck",
+                new[] { tree },
+                new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) },
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+            var model = compilation.GetSemanticModel(tree);
+            var root = tree.GetRoot();
+
+            // Find the initializer expression (e.g., "1 + 2 < 0")
+            var varDecl = root.DescendantNodes()
+                              .OfType<Microsoft.CodeAnalysis.CSharp.Syntax.VariableDeclaratorSyntax>()
+                              .FirstOrDefault();
+
+            if (varDecl?.Initializer == null)
+            {
+                return false;
+            }
+
+            var expressionSyntax = varDecl.Initializer.Value;
+            var typeInfo = model.GetTypeInfo(expressionSyntax);
+
+            return typeInfo.Type?.ToDisplayString() == type;
         }
 
         // Basic (stricter) concept of variable name regex, Cant be longer than 511 character

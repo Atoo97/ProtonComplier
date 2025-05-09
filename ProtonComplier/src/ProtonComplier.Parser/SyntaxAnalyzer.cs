@@ -369,6 +369,40 @@ namespace Proton.Parser
         /// </summary>
         public static void PreconditionParser()
         {
+            List<List<Token>> splitedTokens = SplitTokensByNewline(Tokens);
+            List<Statement> preconditionDeclarations = new ();
+
+            try
+            {
+                if (splitedTokens.Count == 1)
+                {
+                    // 1) Step: Create Expression
+                    // Expression expr = ExpressionPreconditionHelper.PreconditionExpression(splitedTokens.First());
+                    // PreconditionDeclaration preconditionDeclaration = new (expr);
+
+                    // preconditionDeclarations.Add(preconditionDeclaration);
+                }
+
+                // Invalid expression if bigger than 2:
+            }
+            catch (Exception ex)
+            {
+                if (ex is AnalyzerWarning warning)
+                {
+                    Warnings.Add(warning);
+                }
+                else if (ex is AnalyzerError error)
+                {
+                    Errors.Add(error);
+                }
+                else
+                {
+                    // Fallback: Add generic errors to both lists if the type is unknown
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            Sections["Precondition"] = preconditionDeclarations;
         }
 
         /// <summary>
