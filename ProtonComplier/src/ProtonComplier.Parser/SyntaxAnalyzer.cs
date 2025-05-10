@@ -377,10 +377,10 @@ namespace Proton.Parser
                 if (splitedTokens.Count == 1)
                 {
                     // 1) Step: Create Expression
-                    // Expression expr = ExpressionPreconditionHelper.PreconditionExpression(splitedTokens.First());
-                    // PreconditionDeclaration preconditionDeclaration = new (expr);
+                    Expression expr = ExpressionParserHelper.ParseExpression(splitedTokens.First());
+                    PreconditionDeclaration preconditionDeclaration = new (expr);
 
-                    // preconditionDeclarations.Add(preconditionDeclaration);
+                    preconditionDeclarations.Add(preconditionDeclaration);
                 }
 
                 // Invalid expression if bigger than 2:

@@ -6,6 +6,8 @@ namespace Proton.CodeGenerator
     using System.Collections.Generic;
     using System.Text;
     using System.Text.RegularExpressions;
+    using System.Xml.Linq;
+    using Microsoft.CodeAnalysis;
     using Proton.CodeGenerator.Interfaces;
     using Proton.Lexer.Enums;
     using Proton.Semantic;
@@ -16,6 +18,8 @@ namespace Proton.CodeGenerator
     /// </summary>
     public partial class GenerateCode : IGenerateCode
     {
+        private static Symbol preconditionSymbol = null!;
+
         /// <summary>
         /// Generates target code by processing the provided <see cref="SymbolTable"/> and
         /// inserting generated output into the specified <paramref name="expressionShell"/>.
@@ -39,8 +43,9 @@ namespace Proton.CodeGenerator
 
             var statePlaceCode = GenerateState(symbols, indent);
             var inputCode = GenerateInput(symbolTable, symbols, indent);
+            var preconditionCode = GeneratePrecondition(preconditionSymbol, indent);
 
-            return new GeneratorResult(expressionShell.Replace("$", statePlaceCode + "\n" + inputCode), null!, null!, true);
+            return new GeneratorResult(expressionShell.Replace("$", statePlaceCode + "\n" + inputCode + "\n" + preconditionCode), null!, null!, true);
         }
 
         private static string GenerateState(List<List<Symbol>> symbols, string indent)
@@ -145,6 +150,23 @@ namespace Proton.CodeGenerator
             return sb.ToString();
         }
 
+        private static string GeneratePrecondition(Symbol symbol, string indent)
+        {
+            StringBuilder sb = new ();
+            sb.AppendLine($"{indent}//Precondition:");
+
+            // Generate the output
+            // Create the 'if' statement using the symbol's ValueTokens as the condition
+            string condition = symbol.ValueTokens.ToString().Trim();
+
+            sb.AppendLine($"{indent}if ({condition})");
+            sb.AppendLine($"{indent}{{");
+            sb.AppendLine($"{indent}    $");
+            sb.AppendLine($"{indent}}}");
+
+            return sb.ToString();
+        }
+
         private static List<List<Symbol>> GroupSymbol(SymbolTable symbolTable)
         {
             List<List<Symbol>> symbols = new ();
@@ -156,6 +178,11 @@ namespace Proton.CodeGenerator
                 {
                     currentGroup.Add(symbol);
                     continue;
+                }
+                else if (symbol.Name == "0")
+                {
+                    // Get and Delete precondition symbol from symboltable:
+                    preconditionSymbol = symbol;
                 }
                 else
                 {

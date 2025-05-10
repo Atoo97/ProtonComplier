@@ -243,6 +243,72 @@ namespace Proton.Semantic
         }
 
         /// <summary>
+        /// Semantically analyzes the Precondition macro section.
+        /// This includes checking if expression is boolean.
+        /// All semantic errors or warnings encountered during the analysis are recorded.
+        /// </summary>
+        public static void PreconditionParser()
+        {
+            foreach (var statement in Statements)
+            {
+                try
+                {
+                    // Create new fake boolean Symbol
+                    var symbol = new Symbol
+                    {
+                        Name = "0",
+                        Type = TokenType.Boolean,
+                        Category = TokenCategory.Keyword,
+                        Value = new (),
+                        SymbolLine = -1,
+                        SymbolColumn = -1,
+                        IsList = false,
+                    };
+
+                    // Add symbol to symbol table if possible
+                    SymbolTable.AddSymbol(symbol);
+
+                    if (statement is PreconditionDeclaration preconditionDeclaration)
+                    {
+                        var expr = preconditionDeclaration.RightNode as Expression;
+                        var line = expr!.ParseSymbol.TokenLine;
+                        var column = expr!.ParseSymbol.TokenColumn;
+                        ValidateAndCollectTokens(expr!, symbol);
+                        string valueStr = symbol.ValueTokens.ToString();
+
+                        // Check if boolean type is valid
+                        if (!IsValidExpression(valueStr, "bool"))
+                        {
+                            throw new AnalyzerError(
+                                 "239",
+                                 string.Format(MessageRegistry.GetMessage(239).Text, valueStr, line, column));
+                        }
+                    }
+                    else
+                    {
+                        // Add error if not statement..
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (ex is AnalyzerWarning warning)
+                    {
+                        Warnings.Add(warning);
+                    }
+                    else if (ex is AnalyzerError error)
+                    {
+                        Errors.Add(error);
+                    }
+                    else
+                    {
+                        // Fallback: Add generic errors to both lists if the type is unknown
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Analyzes the provided parsed statement sections, performing semantic validation such as
         /// type checking, symbol resolution, and logical rule enforcement. It ensures that the program's logic
         /// adheres to the defined language semantics.
@@ -288,7 +354,7 @@ namespace Proton.Semantic
                         InputSemantical();
                         break;
                     case "Precondition":
-                        // PreconditionParser();
+                        PreconditionParser();
                         break;
                     case "Postcondition":
                         // PostconditionParser();
@@ -361,7 +427,15 @@ namespace Proton.Semantic
                     {
                         var op = GetCSharpOperator(token.TokenType.ToString());
                         symbol.Value.Add(token);
-                        symbol.ValueTokens.Append(op);
+                        if (op.Item1)
+                        {
+                            symbol.ValueTokens.Append(op.Item2);
+                        }
+                        else
+                        {
+                            symbol.ValueTokens.Append(token.TokenValue);
+                        }
+
                         break;
                     }
                     else
@@ -657,12 +731,12 @@ namespace Proton.Semantic
         }
 
         /// <summary>
-        /// Converts a high-level token type name (e.g., "NotEqual", "LogicalAnd") into its corresponding C# operator string (e.g., "!=").
+        /// Converts a token type name to its corresponding C# operator.
+        /// Returns a tuple indicating whether the conversion was successful and the resulting string.
         /// </summary>
-        /// <param name="tokenTypeName">The name of the token type to convert (e.g., "GreaterThanOrEqual").</param>
-        /// <returns>The equivalent C# operator as a string (e.g., ">=").</returns>
-        /// <exception cref="ArgumentException">Thrown if the token type name is not recognized.</exception>
-        private static string GetCSharpOperator(string tokenTypeName)
+        /// <param name="tokenTypeName">The token type name (e.g., "LogicalAnd").</param>
+        /// <returns>A tuple (isFound, result), where isFound is true if the mapping exists, otherwise false.</returns>
+        private static (bool, string) GetCSharpOperator(string tokenTypeName)
         {
             var tokenToCSharpOperator = new Dictionary<string, string>
             {
@@ -679,10 +753,10 @@ namespace Proton.Semantic
 
             if (tokenToCSharpOperator.TryGetValue(tokenTypeName, out var op))
             {
-                return op;
+                return (true, op);
             }
 
-            throw new ArgumentException($"Unrecognized token type name: {tokenTypeName}");
+            return (false, tokenTypeName);
         }
 
         /// <summary>

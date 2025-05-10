@@ -445,6 +445,24 @@
             <param name="sections">A dictionary containing tokenized input grouped by sections.</param>
             <returns>A <see cref="T:Proton.Parser.ParserResult"/> containing the result of the analysis, including any errors or warnings detected during parsing.</returns>
         </member>
+        <member name="T:Proton.Parser.Statements.PreconditionDeclaration">
+            <summary>
+            Represents a precondition statement in the parse tree.
+            Typically used to define a condition that must be true before executing a block or action.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Statements.PreconditionDeclaration.#ctor(Proton.Parser.Expressions.Expression)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Statements.PreconditionDeclaration"/> class.
+            </summary>
+            <param name="exp">The boolean expression representing the precondition condition.</param>
+        </member>
+        <member name="M:Proton.Parser.Statements.PreconditionDeclaration.ToCode">
+            <summary>
+            Returns a formatted string representation of the precondition for debugging or visualization.
+            </summary>
+            <returns>A string showing the condition expression of the precondition.</returns>
+        </member>
         <member name="T:Proton.Parser.Statements.Statement">
             <summary>
             Represents the base class for all statement nodes in the parse tree.

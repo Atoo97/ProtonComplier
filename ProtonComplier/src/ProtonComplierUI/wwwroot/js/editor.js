@@ -487,6 +487,14 @@ connection.on("RightEditorOutput", function (message) {
     }
 });
 
+connection.on("RightEditorCodeOutput", function (message) {
+    window.outputText = message + "\n" + window.outputText;
+
+    if (typeof rightEditor !== 'undefined') {
+        rightEditor.setValue(window.outputText);
+    }
+});
+
 connection.on("ErrorsAndWarningsOutput", function (message) {
     if (typeof window.outputText === 'undefined') {
         window.outputText = "";

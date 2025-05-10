@@ -337,10 +337,10 @@ public class EditorController : Controller
         await Task.Delay(500);
         lock (_sbLock)
         {
-            output.AppendLine($"|===== CODE GENERATION RESULTS =====|");
+            // output.AppendLine($"|===== CODE GENERATION RESULTS =====|");
             output.AppendLine(codegenresult.code);
         }
-        await hubContext.Clients.Client(request.ConnectionId).SendAsync("RightEditorOutput", output.ToString());
+        await hubContext.Clients.Client(request.ConnectionId).SendAsync("RightEditorCodeOutput", output.ToString());
 
         if (codegenresult.isSuccessful)
         {

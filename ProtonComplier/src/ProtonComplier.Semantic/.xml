@@ -54,6 +54,13 @@
             All semantic errors or warnings encountered during the analysis are recorded.
             </summary>
         </member>
+        <member name="M:Proton.Semantic.SemanticAnalyzer.PreconditionParser">
+            <summary>
+            Semantically analyzes the Precondition macro section.
+            This includes checking if expression is boolean.
+            All semantic errors or warnings encountered during the analysis are recorded.
+            </summary>
+        </member>
         <member name="M:Proton.Semantic.SemanticAnalyzer.Analyze(System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Parser.Statements.Statement}})">
             <summary>
             Analyzes the provided parsed statement sections, performing semantic validation such as
@@ -84,11 +91,11 @@
         </member>
         <member name="M:Proton.Semantic.SemanticAnalyzer.GetCSharpOperator(System.String)">
             <summary>
-            Converts a high-level token type name (e.g., "NotEqual", "LogicalAnd") into its corresponding C# operator string (e.g., "!=").
+            Converts a token type name to its corresponding C# operator.
+            Returns a tuple indicating whether the conversion was successful and the resulting string.
             </summary>
-            <param name="tokenTypeName">The name of the token type to convert (e.g., "GreaterThanOrEqual").</param>
-            <returns>The equivalent C# operator as a string (e.g., ">=").</returns>
-            <exception cref="T:System.ArgumentException">Thrown if the token type name is not recognized.</exception>
+            <param name="tokenTypeName">The token type name (e.g., "LogicalAnd").</param>
+            <returns>A tuple (isFound, result), where isFound is true if the mapping exists, otherwise false.</returns>
         </member>
         <member name="M:Proton.Semantic.SemanticAnalyzer.IsStringOperator(Proton.Lexer.Enums.TokenType)">
             <summary>
