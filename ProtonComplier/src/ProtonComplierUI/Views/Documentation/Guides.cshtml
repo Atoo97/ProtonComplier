@@ -7,5 +7,32 @@
 }
 
 <section class="DocuBody">
+    <section class="docs-main">
+        <h1 class="docs-main-title">Try Proton Compiler without Installing</h1>
+        <p class="docs-main-paragraph">
+            This guide is a short introduction to Proton Compiler and assumes you have a basic knowledge of Proton programming language and familiarity with the command- line.
+        </p>
 
+        <h2 class="docs-main-subtitle">The Basic Structure</h2>
+        <p class="docs-main-paragraph">
+            All Proton source files are named like Main.prtn. Although, of course, 'prtn' is the file extension that suits Proton the best, and used for compatibility with systems.
+            You can even try Proton by only using online editor. Are you ready to go? <br><br>
+            
+            Try this, for example:
+        </p>
+        <div id="editor-container" class="box" style="height: 300px; max-width:600px; display: block; margin: 0 auto;">
+            <div id="editor-inner"></div>
+        </div>
+        <p class="docs-main-paragraph">
+            This is the basic structure every program must have. # are a special parts of the language after which comes a code blocks. Every code block begins with # (macro). 
+            When the program is run the code block after # is executed.
+        </p>
+
+    </section>
 </section>
+
+<script>
+    const editorContainer = document.getElementById('editor-container');
+    var editorcode: '//ProtonComplier\n\n#StateSpace\n\n#Input\n\n#Precondition\n\n#Postcondition';
+    setEditorValue(editorcode);
+</script>

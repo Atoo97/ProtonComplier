@@ -65,7 +65,7 @@ namespace Proton.Lexer
                     var match = def.TokenPattern.Match(line, linePosition);
                     if (match.Success)
                     {
-                        string value = match.Groups[1].Value;
+                        string value = match.Groups[0].Value;
                         int matchLength = match.Length;
                         int startColumn = this.column + linePosition;
 

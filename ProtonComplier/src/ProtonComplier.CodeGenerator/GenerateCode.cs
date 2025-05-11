@@ -155,14 +155,17 @@ namespace Proton.CodeGenerator
             StringBuilder sb = new ();
             sb.AppendLine($"{indent}//Precondition:");
 
-            // Generate the output
-            // Create the 'if' statement using the symbol's ValueTokens as the condition
-            string condition = symbol.ValueTokens.ToString().Trim();
+            if (symbol is not null)
+            {
+                // Generate the output
+                // Create the 'if' statement using the symbol's ValueTokens as the condition
+                string condition = symbol.ValueTokens.ToString().Trim();
 
-            sb.AppendLine($"{indent}if ({condition})");
-            sb.AppendLine($"{indent}{{");
-            sb.AppendLine($"{indent}    $");
-            sb.AppendLine($"{indent}}}");
+                sb.AppendLine($"{indent}if ({condition})");
+                sb.AppendLine($"{indent}{{");
+                sb.AppendLine($"{indent}    $");
+                sb.AppendLine($"{indent}}}");
+            }
 
             return sb.ToString();
         }
