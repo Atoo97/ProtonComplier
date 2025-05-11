@@ -138,6 +138,51 @@
             <param name="ident">The indentation level (each level equals 4 spaces).</param>
             <returns>A formatted string representing the identifier.</returns>
         </member>
+        <member name="T:Proton.Parser.Expressions.ListNthElementExpression">
+            <summary>
+            Represents an expression accessing the N-th element of a list or array by index.
+            This class handles constructs like <c>list[2]</c> or <c>array[-1]</c>, where the
+            index is provided as an operand expression within square brackets.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.ListNthElementExpression.#ctor(Proton.Parser.Expressions.OperandExpression,Proton.Lexer.Token,Proton.Parser.Expressions.OperandExpression,Proton.Lexer.Token)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.ListNthElementExpression"/> class.
+            Validates that the provided tokens form a valid list index access expression, such as <c>list[0]</c>.
+            </summary>
+            <param name="identifier">The identifier token representing the list or array name.</param>
+            <param name="openSqrBrace">The token representing the opening square bracket.</param>
+            <param name="op">The operand expression representing the index value.</param>
+            <param name="closeSqrBrace">The token representing the closing square bracket.</param>
+            <exception cref="T:Proton.ErrorHandler.AnalyzerError">Thrown when the tokens do not form a valid list index access.</exception>
+        </member>
+        <member name="P:Proton.Parser.Expressions.ListNthElementExpression.Identifier">
+            <summary>
+            Gets or sets the operand expression that represents the identifier.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.Expressions.ListNthElementExpression.OpenSqrBrace">
+            <summary>
+            Gets or sets the token that represents the open square brackets.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.Expressions.ListNthElementExpression.Operand">
+            <summary>
+            Gets or sets the operand expression that represents the index inside the square brackets.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.Expressions.ListNthElementExpression.CloseSqrBrace">
+            <summary>
+            Gets or sets the token that represents the close square brackets.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.ListNthElementExpression.ToCode(System.Int32)">
+            <summary>
+            Converts the list index expression into its string representation for debugging or visualization.
+            </summary>
+            <param name="ident">The indentation level used to format the output.</param>
+            <returns>A string representing the list element access expression.</returns>
+        </member>
         <member name="T:Proton.Parser.Expressions.LiteralExpression">
             <summary>
             Represents an literal expression in the parse tree (e.g., "abc", True/False, -2.34, 'c').

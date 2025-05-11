@@ -28,21 +28,30 @@ namespace Proton.CodeGenerator
             // Parse and compile the source code
             var tree = SyntaxFactory.ParseSyntaxTree(code);
 
+            var refs = new List<MetadataReference>
+            {
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location), // System.Private.CoreLib
+                MetadataReference.CreateFromFile(typeof(Console).Assembly.Location), // System.Console
+                MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location), // System.Linq
+                MetadataReference.CreateFromFile(typeof(List<>).Assembly.Location), // System.Collections
+                MetadataReference.CreateFromFile(Assembly.Load("System.Runtime").Location), // System.Runtime
+            };
+
             var compilation = CSharpCompilation.Create(
                "prog.dll",
-               options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
+               options: new CSharpCompilationOptions(OutputKind.ConsoleApplication),
                syntaxTrees: new[] { tree },
-               references: new[] { MetadataReference.CreateFromFile(typeof(uint).Assembly.Location) });
+               references: refs);
 
             // Check for errors
             var diagnostics = compilation.GetDiagnostics();
-            if (diagnostics.Any())
+            if (diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error))
             {
-                foreach (var diagnostic in diagnostics)
+                foreach (var diagnostic in diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error))
                 {
-                    var location = diagnostic.Location.GetLineSpan(); // Get line & column info
-                    int line = location.StartLinePosition.Line + 1;    // Line number (1-based index)
-                    int column = location.StartLinePosition.Character + 1; // Column number (1-based index)
+                    var location = diagnostic.Location.GetLineSpan();
+                    int line = location.StartLinePosition.Line + 1;
+                    int column = location.StartLinePosition.Character + 1;
 
                     string errorMessage = $"Error at Line {line}, Column {column}: {diagnostic.GetMessage()}";
                     errors.Add(errorMessage);
@@ -55,31 +64,46 @@ namespace Proton.CodeGenerator
                 try
                 {
                     // Emit assembly in-memory (no DLL is generated on disk)
-                    Assembly compiledAssembly;
-                    using (var stream = new MemoryStream())
-                    {
-                        var compileResult = compilation.Emit(stream);
-                        if (!compileResult.Success)
-                        {
-                            errors.Add("Compilation failed.");
-                            return new GeneratorResult(code, string.Empty, errors, false);
-                        }
+                    using var stream = new MemoryStream();
+                    var emitResult = compilation.Emit(stream);
 
-                        compiledAssembly = Assembly.Load(stream.GetBuffer());
+                    if (!emitResult.Success)
+                    {
+                        errors.Add("Compilation failed.");
+                        return new GeneratorResult(code, string.Empty, errors, false);
                     }
 
-                    // Dynamically call method and print result
-                    var calculator = compiledAssembly.GetType("Program");
-                    var evaluate = calculator?.GetMethod("Main");
+                    stream.Seek(0, SeekOrigin.Begin);
+                    var compiledAssembly = Assembly.Load(stream.ToArray());
 
-                    if (evaluate != null)
+                    // Dynamically call method and print result
+                    var programType = compiledAssembly.GetTypes().FirstOrDefault(t => t.Name == "Program");
+                    var mainMethod = programType?.GetMethod("Main", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+
+                    if (mainMethod != null)
                     {
-                        var result = evaluate.Invoke(null, null);
-                        return new GeneratorResult(code, (string)result!, errors, true);
+                        var originalOut = Console.Out;
+                        using var sw = new StringWriter();
+                        Console.SetOut(sw);
+
+                        try
+                        {
+                            var parameters = mainMethod.GetParameters().Length == 1
+                                ? new object[] { new string[0] }
+                                : null;
+
+                            mainMethod.Invoke(null, parameters);
+                        }
+                        finally
+                        {
+                            Console.SetOut(originalOut);
+                        }
+
+                        return new GeneratorResult(code, sw.ToString(), errors, true);
                     }
                     else
                     {
-                        errors.Add("Error: No entry method found in compiled code.");
+                        errors.Add("Error: No static Main method found in compiled code.");
                         return new GeneratorResult(code, string.Empty, errors, false);
                     }
                 }

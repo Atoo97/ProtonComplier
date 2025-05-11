@@ -118,7 +118,7 @@ namespace Proton.Semantic
 
         /// <summary>
         /// Returns a formatted table of all symbols currently stored in the symbol table.
-        /// Each symbol is displayed with its name, type, category, position, list status, initialization state, and value.
+        /// Each symbol is displayed with its name, type, category, position, list status, initialization state, value, and result status.
         /// If no symbols are found, a default message is returned.
         /// </summary>
         /// <returns>A string representing the formatted symbol table or a message indicating no symbols were found.</returns>
@@ -134,13 +134,20 @@ namespace Proton.Semantic
                 $"| {{0,-{SymbolTableFormat.NameWidth}}} | {{1,-{SymbolTableFormat.TypeWidth}}} | " +
                 $"{{2,-{SymbolTableFormat.CategoryWidth}}} | {{3,-{SymbolTableFormat.LineWidth}}} | " +
                 $"{{4,-{SymbolTableFormat.ColWidth}}} | {{5,-{SymbolTableFormat.ListWidth}}} | " +
-                $"{{6,-{SymbolTableFormat.InitializedWidth}}} | {{7,-{SymbolTableFormat.ValueWidth}}} |",
-                "Name", "Type", "Category", "Line", "Col", "List", "Initialized", "Value"));
+                $"{{6,-{SymbolTableFormat.InitializedWidth}}} | {{7,-{SymbolTableFormat.ValueWidth}}} | " +
+                $"{{8,-{SymbolTableFormat.ValueWidth}}} | {{9,-{SymbolTableFormat.ResultWidth}}} |",
+                "Name", "Type", "Category", "Line", "Col", "List", "Initialized", "Value", "Tokens", "Result"));
 
-            int totalWidth = SymbolTableFormat.NameWidth + SymbolTableFormat.TypeWidth +
-                             SymbolTableFormat.CategoryWidth + SymbolTableFormat.LineWidth +
-                             SymbolTableFormat.ColWidth + SymbolTableFormat.ListWidth +
-                             SymbolTableFormat.InitializedWidth + SymbolTableFormat.ValueWidth + 25;
+            int totalWidth = SymbolTableFormat.NameWidth +
+                             SymbolTableFormat.TypeWidth +
+                             SymbolTableFormat.CategoryWidth +
+                             SymbolTableFormat.LineWidth +
+                             SymbolTableFormat.ColWidth +
+                             SymbolTableFormat.ListWidth +
+                             SymbolTableFormat.InitializedWidth +
+                             SymbolTableFormat.ValueWidth * 2 +  // for value and valueTokens
+                             SymbolTableFormat.ResultWidth +
+                             11 * 3 + 1; // padding and dividers
 
             sb.AppendLine(new string('-', totalWidth));
 

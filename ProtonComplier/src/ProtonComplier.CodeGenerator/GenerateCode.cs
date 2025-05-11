@@ -44,8 +44,12 @@ namespace Proton.CodeGenerator
             var statePlaceCode = GenerateState(symbols, indent);
             var inputCode = GenerateInput(symbolTable, symbols, indent);
             var preconditionCode = GeneratePrecondition(preconditionSymbol, indent);
+            var postconditionCode = GeneratePostcondition(symbolTable, symbols, indent + "    ");
 
-            return new GeneratorResult(expressionShell.Replace("$", statePlaceCode + "\n" + inputCode + "\n" + preconditionCode), null!, null!, true);
+            // Replace $ in the precondition string with the generated postcondition code
+            string mergedCode = preconditionCode.Replace("$", postconditionCode);
+
+            return new GeneratorResult(expressionShell.Replace("$", statePlaceCode + "\n" + inputCode + "\n" + mergedCode), null!, null!, true);
         }
 
         private static string GenerateState(List<List<Symbol>> symbols, string indent)
@@ -74,13 +78,78 @@ namespace Proton.CodeGenerator
         private static string GenerateInput(SymbolTable symbolTable, List<List<Symbol>> symbols, string indent)
         {
             StringBuilder sb = new ();
-            sb.AppendLine($"{indent}//Input:");
+            sb.AppendLine($"{indent}// Input:");
+
+            // Create a dictionary to group symbols by their serialized value string
+            var groupedByValue = symbolTable.Symbols
+                .Where(s => s.Name != "0" && !s.IsResult && s.IsInitialized) // skip precondition
+                .GroupBy(s => string.Join(" ", s.Value.Select(t => t.TokenValue)))
+                .ToDictionary(g => g.Key, g => g.OrderBy(sym => symbolTable.Symbols
+                    .ToList()
+                    .FindIndex(s => s.Name == sym.Name)).ToList());
+
+            foreach (var group in groupedByValue.Values)
+            {
+                if (group.Count == 0)
+                {
+                    continue;
+                }
+
+                var firstSymbol = group.First();
+                string variableType = firstSymbol.Type.ToString();  // Get the type of the first symbol
+                string csharpType = TypeMapping.ToCSharpType(variableType);
+                bool isList = firstSymbol.IsList;
+                string value;
+
+                if (isList && firstSymbol.Value.First().TokenType == TokenType.QuestionMarks)
+                {
+                    value = string.Empty;
+                }
+                else
+                {
+                    value = firstSymbol.ValueTokens.ToString().TrimEnd(',');
+                }
+
+                string declaration = isList
+                    ? $"{string.Join(" = ", group.Select(s => s.Name))} = new {csharpType}[] {{{value}}};"
+                    : $"{string.Join(" = ", group.Select(s => s.Name))} = {value};";
+
+                sb.AppendLine($"{indent}{declaration}");  // Add the declaration to the StringBuilder
+            }
+
+            return sb.ToString();
+        }
+
+        private static string GeneratePrecondition(Symbol symbol, string indent)
+        {
+            StringBuilder sb = new ();
+            sb.AppendLine($"{indent}//Precondition:");
+
+            if (symbol is not null)
+            {
+                // Generate the output
+                // Create the 'if' statement using the symbol's ValueTokens as the condition
+                string condition = symbol.ValueTokens.ToString().Trim();
+
+                sb.AppendLine($"{indent}if ({condition})");
+                sb.AppendLine($"{indent}{{");
+                sb.AppendLine($"{indent}    $");
+                sb.AppendLine($"{indent}}}");
+            }
+
+            return sb.ToString();
+        }
+
+        private static string GeneratePostcondition(SymbolTable symbolTable, List<List<Symbol>> symbols, string indent)
+        {
+            StringBuilder sb = new ();
+            sb.AppendLine($"//PostCondition:");
 
             foreach (var groupitems in symbols)
             {
                 // Get the initialized items only from the groupitems
                 var group = groupitems
-                    .Where(s => s.IsInitialized)
+                    .Where(s => s.IsResult)
                     .ToList();
 
                 if (group.Count == 0)
@@ -117,6 +186,7 @@ namespace Proton.CodeGenerator
                         : $"{string.Join(" = ", group.Select(s => s.Name))} = {value};";
 
                     sb.AppendLine($"{indent}{declaration}");  // Add the declaration to the StringBuilder
+                    sb.AppendLine($"{indent}Console.WriteLine(\"Result: \" + {firstSymbol.Name});");
                 }
                 else
                 {
@@ -143,28 +213,9 @@ namespace Proton.CodeGenerator
                             : $"{string.Join(" = ", group.Select(s => s.Name))} = {value};";
 
                         sb.AppendLine($"{indent}{declaration}");  // Add the declaration to the StringBuilder
+                        sb.AppendLine($"{indent}Console.WriteLine(\"Result: \" + {item.Name});");
                     }
                 }
-            }
-
-            return sb.ToString();
-        }
-
-        private static string GeneratePrecondition(Symbol symbol, string indent)
-        {
-            StringBuilder sb = new ();
-            sb.AppendLine($"{indent}//Precondition:");
-
-            if (symbol is not null)
-            {
-                // Generate the output
-                // Create the 'if' statement using the symbol's ValueTokens as the condition
-                string condition = symbol.ValueTokens.ToString().Trim();
-
-                sb.AppendLine($"{indent}if ({condition})");
-                sb.AppendLine($"{indent}{{");
-                sb.AppendLine($"{indent}    $");
-                sb.AppendLine($"{indent}}}");
             }
 
             return sb.ToString();
@@ -172,46 +223,48 @@ namespace Proton.CodeGenerator
 
         private static List<List<Symbol>> GroupSymbol(SymbolTable symbolTable)
         {
-            List<List<Symbol>> symbols = new ();
-            List<Symbol> currentGroup = new ();
+            List<List<Symbol>> groupedSymbols = new ();
+            List<Symbol> remainingSymbols = symbolTable.Symbols
+                .Where(s => s.Name != "0") // exclude precondition
+                .OrderBy(s => s.SymbolLine)
+                .ThenBy(s => s.SymbolColumn)
+                .ToList();
 
-            foreach (Symbol symbol in symbolTable.Symbols)
+            // Extract precondition symbol if it exists
+            preconditionSymbol = symbolTable.Symbols.FirstOrDefault(s => s.Name == "0") !;
+
+            while (remainingSymbols.Any())
             {
-                if (currentGroup.Count == 0)
+                Symbol first = remainingSymbols[0];
+                List<Symbol> group = new () { first };
+                remainingSymbols.RemoveAt(0);
+
+                int line = first.SymbolLine;
+
+                // Collect all adjacent symbols on the same line
+                for (int i = 0; i < remainingSymbols.Count;)
                 {
-                    currentGroup.Add(symbol);
-                    continue;
-                }
-                else if (symbol.Name == "0")
-                {
-                    // Get and Delete precondition symbol from symboltable:
-                    preconditionSymbol = symbol;
-                }
-                else
-                {
-                    // Check if the current symbol is on the same line and if the name of the current symbol is +1 from the last one
-                    int lastEndColumn = currentGroup[^1].SymbolColumn + currentGroup[^1].Name.Length;
-                    if (currentGroup[^1].SymbolLine == symbol.SymbolLine &&
-                        Math.Abs(lastEndColumn - symbol.SymbolColumn) <= 1) // allow small offset
+                    Symbol current = remainingSymbols[i];
+                    Symbol lastInGroup = group[^1];
+
+                    int expectedNextColumn = lastInGroup.SymbolColumn + lastInGroup.Name.Length;
+
+                    if (current.SymbolLine == line &&
+                        Math.Abs(current.SymbolColumn - expectedNextColumn) <= 1)
                     {
-                        currentGroup.Add(symbol);
+                        group.Add(current);
+                        remainingSymbols.RemoveAt(i);
                     }
                     else
                     {
-                        symbols.Add(new List<Symbol>(currentGroup));  // Add the current group to symbols
-                        currentGroup.Clear();
-                        currentGroup.Add(symbol);
+                        i++;
                     }
                 }
+
+                groupedSymbols.Add(group);
             }
 
-            // Add the last group to symbols if it exists
-            if (currentGroup.Count > 0)
-            {
-                symbols.Add(currentGroup);
-            }
-
-            return symbols;
+            return groupedSymbols;
         }
 
         /// <summary>

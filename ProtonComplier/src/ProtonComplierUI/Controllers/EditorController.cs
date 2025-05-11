@@ -170,7 +170,7 @@ public class EditorController : Controller
         var lexicalresult = lexicalService.Complie(request.Code);
         stopwatch.Stop();
         var lexicalelapsedTime = stopwatch.Elapsed;
-        var timeMessage = $"[ProtonComplier]: Total Lexical Analysis time: {lexicalelapsedTime.TotalSeconds:F8} seconds";
+        var timeMessage = $"[ProtonCompiler]: Total Lexical Analysis time: {lexicalelapsedTime.TotalSeconds:F8} seconds";
 
         string statusMessage = lexicalresult.isSuccessful
         ? $"[ProtonComplier]: Lexical Analyzing ({request.FileName}.prtn) complete | Status: Succesfull"
@@ -223,7 +223,7 @@ public class EditorController : Controller
         var parserresult = parserService.Complie(result.sections);
         stopwatch.Stop();
         var parseelapsedTime = stopwatch.Elapsed;
-        var timeMessage = $"[ProtonComplier]: Total Syntax Analysis time: {parseelapsedTime.TotalSeconds:F8} seconds";
+        var timeMessage = $"[ProtonCompiler]: Total Syntax Analysis time: {parseelapsedTime.TotalSeconds:F8} seconds";
 
         string statusMessage = parserresult.isSuccessful
         ? $"[ProtonComplier]: Syntax Analyzing ({request.FileName}.prtn) complete | Status: Succesfull"
@@ -276,7 +276,7 @@ public class EditorController : Controller
         var semanticresult = semanticService.Complie(result.sections);
         stopwatch.Stop();
         var semanticelapsedTime = stopwatch.Elapsed;
-        var timeMessage = $"[ProtonComplier]: Total Semantic Analysis time: {semanticelapsedTime.TotalSeconds:F8} seconds";
+        var timeMessage = $"[ProtonCompiler]: Total Semantic Analysis time: {semanticelapsedTime.TotalSeconds:F8} seconds";
 
         string statusMessage = semanticresult.isSuccessful
         ? $"[ProtonComplier]: Semantic Analyzing ({request.FileName}.prtn) complete | Status: Succesfull"
@@ -326,7 +326,7 @@ public class EditorController : Controller
         var codegenresult = await codeGeneratorService.GenerateAndExecute(result.table);
         stopwatch.Stop();
         var codegenelapsedTime = stopwatch.Elapsed;
-        var timeMessage = $"[ProtonComplier]: Total Code Generation time: {codegenelapsedTime.TotalSeconds:F8} seconds";
+        var timeMessage = $"[ProtonCompiler]: Total Code Generation time: {codegenelapsedTime.TotalSeconds:F8} seconds";
 
         string statusMessage = codegenresult.isSuccessful
         ? $"[ProtonComplier]: Code Generation ({request.FileName}.prtn) complete | Status: Succesfull"

@@ -259,11 +259,6 @@ namespace Proton.Lexer.Enums
         ListSpecifier,
 
         /// <summary>
-        /// [n] or [-n]
-        /// </summary>
-        ListNthElement,
-
-        /// <summary>
         /// [
         /// </summary>
         OpenSqrBrace,

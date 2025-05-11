@@ -57,6 +57,11 @@ namespace Proton.ErrorHandler
                 "ParserError: Unexpected token: '{0}' at line {1}, column {2}. Expected token: '{3}'.")
             },
             {
+                105, new Message(
+                "invalid-list-index",
+                "ParserError: Invalid defined list index '{0}' at line {1}, column {2}.")
+            },
+            {
                 107, new Message(
                 "multiple-commas",
                 "ParserWarning: Multiple consecutive commas detected at line {0}, column {1}.")
@@ -137,6 +142,11 @@ namespace Proton.ErrorHandler
                 239, new Message(
                 "invalid-boolean-expression",
                 "SemanticalError: Invalid boolean expression '{0}' at line {1}, column {2}.")
+            },
+            {
+                244, new Message(
+                "index-out-of-range",
+                "SemanticalError: Index out of range. Index '{0}' at line {1}, column {2}.")
             },
         };
 

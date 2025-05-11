@@ -116,10 +116,25 @@ namespace Proton.Parser.Expressions
             }
             else
             {
-                OperandExpression left = new (tokens[0]);
-                OperatorExpression op = new (tokens[1]);
-                List<Token> remaining = tokens.Skip(2).ToList();
-                return new BinaryExpression(left, op, remaining);
+                // Chehck if listNthElement
+                if (tokens.Count == 4 && tokens[1].TokenType == TokenType.OpenSqrBrace)
+                {
+                    return new ListNthElementExpression(new OperandExpression(tokens[0]), tokens[1], new OperandExpression(tokens[2]), tokens[3]);
+                }
+                else if (tokens.Count > 4 && tokens[1].TokenType == TokenType.OpenSqrBrace)
+                {
+                    ListNthElementExpression listNthElementExpression = new(new OperandExpression(tokens[0]), tokens[1], new OperandExpression(tokens[2]), tokens[3]);
+                    OperatorExpression op = new(tokens[4]);
+                    List<Token> remaining = tokens.Skip(5).ToList();
+                    return new BinaryExpression(listNthElementExpression, op, remaining);
+                }
+                else
+                {
+                    OperandExpression left = new(tokens[0]);
+                    OperatorExpression op = new(tokens[1]);
+                    List<Token> remaining = tokens.Skip(2).ToList();
+                    return new BinaryExpression(left, op, remaining);
+                }
             }
         }
     }

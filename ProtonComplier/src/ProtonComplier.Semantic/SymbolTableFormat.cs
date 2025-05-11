@@ -49,5 +49,10 @@ namespace ProtonComplier.Semantic
         /// The column width allocated for displaying the symbol's value(s).
         /// </summary>
         public const int ValueWidth = 20;
+
+        /// <summary>
+        /// The column width allocated to indicate if the symbol is a result.
+        /// </summary>
+        public const int ResultWidth = 8;
     }
 }

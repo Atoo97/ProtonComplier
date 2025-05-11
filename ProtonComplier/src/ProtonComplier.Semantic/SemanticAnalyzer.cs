@@ -3,6 +3,7 @@
 // </copyright>
 namespace Proton.Semantic
 {
+    using System.Data;
     using System.Text.RegularExpressions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -23,13 +24,13 @@ namespace Proton.Semantic
     {
         // Stores statement grouped by macro sections
         private static readonly Dictionary<string, List<Statement>> Sections = new ();
-
-        private static readonly SymbolTable SymbolTable = new ();
         private static readonly List<Statement> Statements = new ();
 
         // List to store errors and warnings
         private static readonly List<BaseException> Errors = new ();
         private static readonly List<BaseException> Warnings = new ();
+
+        private static SymbolTable symbolTable = new ();
 
         /// <summary>
         /// Before starting a new semantic analysis, reset everything.
@@ -37,7 +38,7 @@ namespace Proton.Semantic
         public static void Reset()
         {
             Sections.Clear();
-            SymbolTable.Clear();
+            symbolTable.Clear();
             Errors.Clear();
             Warnings.Clear();
         }
@@ -78,7 +79,7 @@ namespace Proton.Semantic
                         };
 
                         // Add symbol to symbol table if possible
-                        SymbolTable.AddSymbol(symbol);
+                        symbolTable.AddSymbol(symbol);
                     }
                     else
                     {
@@ -112,12 +113,16 @@ namespace Proton.Semantic
         /// </summary>
         public static void InputSemantical()
         {
+            // Ensure the order of names follows the order in symbolTable.symbols
+            SymbolTable newSymbolTable = new ();
+
             foreach (var statement in Statements)
             {
                 try
                 {
                     // 1) Chehck if varibale is exist in symboltable
-                    Symbol symbol = SymbolTable.FindSymbol(statement.LeftNode!.ParseSymbol) !;
+                    Symbol symbol = symbolTable.FindSymbol(statement.LeftNode!.ParseSymbol) !;
+                    newSymbolTable.AddSymbol(symbol);
 
                     if (statement is VariableInitialization variableInitialization)
                     {
@@ -132,10 +137,16 @@ namespace Proton.Semantic
                                 string.Format(MessageRegistry.GetMessage(212).Text, symbol.Name, declaredAs, token.TokenLine, token.TokenColumn));
                         }
 
-                        // 3) Add values to the Symbol, plus chehck typecorrectness
+                        // 3) Add values to the Symbol, plus check typecorrectness
                         if (variableInitialization.IsList)
                         {
-                            symbol.Value.Clear();
+                            if (symbol.IsInitialized)
+                            {
+                                throw new AnalyzerError(
+                                   "207",
+                                   string.Format(MessageRegistry.GetMessage(207).Text, symbol.Name, symbol.SymbolLine, symbol.SymbolColumn));
+                            }
+
                             var listexpr = variableInitialization.RightNode as ListExpression;
 
                             if (listexpr!.ParseSymbol.TokenType == TokenType.ValueSpecifier) // Empty list
@@ -194,7 +205,13 @@ namespace Proton.Semantic
                         else
                         {
                             var rightnode = variableInitialization.RightNode as Expression;
-                            symbol.Value.Clear();
+                            if (symbol.IsInitialized)
+                            {
+                                throw new AnalyzerError(
+                                   "207",
+                                   string.Format(MessageRegistry.GetMessage(207).Text, symbol.Name, symbol.SymbolLine, symbol.SymbolColumn));
+                            }
+
                             ValidateAndCollectTokens(rightnode!, symbol);
 
                             if (symbol.Type == TokenType.Boolean)
@@ -240,6 +257,17 @@ namespace Proton.Semantic
                     }
                 }
             }
+
+            foreach (var symbol in symbolTable.Symbols)
+            {
+                if (!newSymbolTable.Symbols.Any(s => s.Name == symbol.Name))
+                {
+                    newSymbolTable.AddSymbol(symbol);
+                }
+            }
+
+            symbolTable.Clear();
+            symbolTable = newSymbolTable;
         }
 
         /// <summary>
@@ -266,7 +294,7 @@ namespace Proton.Semantic
                     };
 
                     // Add symbol to symbol table if possible
-                    SymbolTable.AddSymbol(symbol);
+                    symbolTable.AddSymbol(symbol);
 
                     if (statement is PreconditionDeclaration preconditionDeclaration)
                     {
@@ -282,6 +310,158 @@ namespace Proton.Semantic
                             throw new AnalyzerError(
                                  "239",
                                  string.Format(MessageRegistry.GetMessage(239).Text, valueStr, line, column));
+                        }
+                    }
+                    else
+                    {
+                        // Add error if not statement..
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (ex is AnalyzerWarning warning)
+                    {
+                        Warnings.Add(warning);
+                    }
+                    else if (ex is AnalyzerError error)
+                    {
+                        Errors.Add(error);
+                    }
+                    else
+                    {
+                        // Fallback: Add generic errors to both lists if the type is unknown
+                        Console.WriteLine(ex.Message);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Semantically analyzes the Postcondition macro section.
+        /// This includes checking if expression is boolean.
+        /// All semantic errors or warnings encountered during the analysis are recorded.
+        /// </summary>
+        public static void PostconditionParser()
+        {
+            foreach (var statement in Statements)
+            {
+                try
+                {
+                    // 1) Chehck if varibale is exist in symboltable
+                    Symbol symbol = symbolTable.FindSymbol(statement.LeftNode!.ParseSymbol)!;
+
+                    if (statement is VariableInitialization variableInitialization)
+                    {
+                        // 2) Chehck if defined as list or not
+                        if (symbol.IsList != variableInitialization.IsList)
+                        {
+                            var token = variableInitialization.LeftNode!.ParseSymbol;
+                            string declaredAs = symbol.IsList ? "a list" : "not a list";
+
+                            throw new AnalyzerError(
+                                "212",
+                                string.Format(MessageRegistry.GetMessage(212).Text, symbol.Name, declaredAs, token.TokenLine, token.TokenColumn));
+                        }
+
+                        // 3) Add values to the Symbol, plus check typecorrectness
+                        if (variableInitialization.IsList)
+                        {
+                            if (symbol.IsInitialized)
+                            {
+                                throw new AnalyzerError(
+                                   "207",
+                                   string.Format(MessageRegistry.GetMessage(207).Text, symbol.Name, symbol.SymbolLine, symbol.SymbolColumn));
+                            }
+
+                            var listexpr = variableInitialization.RightNode as ListExpression;
+
+                            if (listexpr!.ParseSymbol.TokenType == TokenType.ValueSpecifier) // Empty list
+                            {
+                                // Add ?? as indicate empty list:
+                                symbol.Value.Add(new Token
+                                {
+                                    TokenType = TokenType.QuestionMarks,
+                                    TokenCategory = TokenCategory.Special,
+                                    TokenValue = "??",
+                                    TokenLine = 0,
+                                    TokenColumn = 0,
+                                });
+
+                                symbol.IsInitialized = true;
+                                symbol.IsResult = true;
+                                continue;
+                            }
+
+                            foreach (var item in listexpr!.Elements)
+                            {
+                                ValidateAndCollectTokens(item, symbol);
+
+                                if (symbol.Type == TokenType.Boolean)
+                                {
+                                    string valueStr = symbol.ValueTokens.ToString();
+                                    int lastCommaIndex = valueStr.LastIndexOf(',');
+
+                                    string lastSegment = lastCommaIndex >= 0
+                                        ? valueStr.Substring(lastCommaIndex + 1).Trim()
+                                        : valueStr.Trim();
+
+                                    // Check if boolean type is valid
+                                    if (!IsValidExpression(lastSegment, "bool"))
+                                    {
+                                        throw new AnalyzerError(
+                                             "239",
+                                             string.Format(MessageRegistry.GetMessage(239).Text, lastSegment, symbol.SymbolLine, symbol.SymbolColumn));
+                                    }
+                                }
+
+                                symbol.ValueTokens.Append(',');
+
+                                // Add semicolon as list separator:
+                                symbol.Value.Add(new Token
+                                {
+                                    TokenType = TokenType.Semicolon,
+                                    TokenCategory = TokenCategory.Punctuator,
+                                    TokenValue = ";",
+                                    TokenLine = 0,
+                                    TokenColumn = 0,
+                                });
+                            }
+
+                            symbol.IsInitialized = true;
+                            symbol.IsResult = true;
+                        }
+                        else
+                        {
+                            var rightnode = variableInitialization.RightNode as Expression;
+                            if (symbol.IsInitialized)
+                            {
+                                throw new AnalyzerError(
+                                   "207",
+                                   string.Format(MessageRegistry.GetMessage(207).Text, symbol.Name, symbol.SymbolLine, symbol.SymbolColumn));
+                            }
+
+                            ValidateAndCollectTokens(rightnode!, symbol);
+
+                            if (symbol.Type == TokenType.Boolean)
+                            {
+                                string valueStr = symbol.ValueTokens.ToString();
+                                int lastCommaIndex = valueStr.LastIndexOf(',');
+
+                                string lastSegment = lastCommaIndex >= 0
+                                    ? valueStr.Substring(lastCommaIndex + 1).Trim()
+                                    : valueStr.Trim();
+
+                                // Check if boolean type is valid
+                                if (!IsValidExpression(lastSegment, "bool"))
+                                {
+                                    throw new AnalyzerError(
+                                         "239",
+                                         string.Format(MessageRegistry.GetMessage(239).Text, lastSegment, symbol.SymbolLine, symbol.SymbolColumn));
+                                }
+                            }
+
+                            symbol.IsInitialized = true;
+                            symbol.IsResult = true;
                         }
                     }
                     else
@@ -357,7 +537,7 @@ namespace Proton.Semantic
                         PreconditionParser();
                         break;
                     case "Postcondition":
-                        // PostconditionParser();
+                        PostconditionParser();
                         break;
                     default:
                         throw new Exception();
@@ -366,7 +546,7 @@ namespace Proton.Semantic
 
             // Return results
             bool isSuccessful = Errors.Count == 0;
-            return new SemanticResult(Errors, Warnings, Sections, SymbolTable, isSuccessful);
+            return new SemanticResult(Errors, Warnings, Sections, symbolTable, isSuccessful);
         }
 
         private static void ValidateAndCollectTokens(Expression expr, Symbol symbol)
@@ -403,6 +583,14 @@ namespace Proton.Semantic
                     ValidateAndCollectTokens(binExpr.Left, symbol);
                     ValidateAndCollectTokens(binExpr.Operator, symbol);
                     ValidateAndCollectTokens(binExpr.Right, symbol);
+                    break;
+                case ListNthElementExpression listNExp:
+                    symbol.ValueTokens.Append(listNExp.Identifier.ParseSymbol.TokenValue);
+                    symbol.ValueTokens.Append('[');
+
+                    // Get valid identifier element:
+                    ValidateIdentifierTokens(listNExp.Identifier.ParseSymbol, symbol, listNExp.Operand.ParseSymbol);
+                    symbol.ValueTokens.Append(']');
                     break;
                 case OperatorExpression opExpr: // Check valid operator type
                     token = opExpr.ParseSymbol!;
@@ -475,7 +663,7 @@ namespace Proton.Semantic
                         }
                         else // If identifier
                         {
-                            ValidateIdentifierTokens(operandtoken, symbol);
+                            ValidateIdentifierTokens(operandtoken, symbol, null!);
                         }
                     }
                     else if (symbolType == TokenType.Text)
@@ -494,7 +682,7 @@ namespace Proton.Semantic
                         }
                         else // If identifier
                         {
-                            ValidateIdentifierTokens(operandtoken, symbol);
+                            ValidateIdentifierTokens(operandtoken, symbol, null!);
                         }
                     }
                     else if (symbolType == TokenType.Real)
@@ -513,7 +701,7 @@ namespace Proton.Semantic
                         }
                         else // If identifier
                         {
-                            ValidateIdentifierTokens(operandtoken, symbol);
+                            ValidateIdentifierTokens(operandtoken, symbol, null!);
                         }
                     }
                     else if (symbolType == TokenType.Integer)
@@ -532,7 +720,7 @@ namespace Proton.Semantic
                         }
                         else // If identifier
                         {
-                            ValidateIdentifierTokens(operandtoken, symbol);
+                            ValidateIdentifierTokens(operandtoken, symbol, null!);
                         }
                     }
                     else if (symbolType == TokenType.Natural)
@@ -551,14 +739,14 @@ namespace Proton.Semantic
                         }
                         else // If identifier
                         {
-                            ValidateIdentifierTokens(operandtoken, symbol);
+                            ValidateIdentifierTokens(operandtoken, symbol, null!);
                         }
                     }
                     else if (symbolType == TokenType.Boolean)
                     {
                         if (operandtype == TokenType.Identifier) // If Identifier
                         {
-                            ValidateIdentifierTokens(operandtoken, symbol);
+                            ValidateIdentifierTokens(operandtoken, symbol, null!);
                         }
                         else if (operandtype == TokenType.Character)
                         {
@@ -587,10 +775,10 @@ namespace Proton.Semantic
             }
         }
 
-        private static void ValidateIdentifierTokens(Token operandtoken, Symbol symbol)
+        private static void ValidateIdentifierTokens(Token operandtoken, Symbol symbol, Token nthElement)
         {
             // Get the varibale values and recall the validation:
-            Symbol anothersymbol = SymbolTable.FindSymbol(operandtoken) !;
+            Symbol anothersymbol = symbolTable.FindSymbol(operandtoken) !;
 
             if (!anothersymbol.IsInitialized)
             {
@@ -598,12 +786,168 @@ namespace Proton.Semantic
                      "227",
                      string.Format(MessageRegistry.GetMessage(227).Text, operandtoken.TokenValue, operandtoken.TokenLine, operandtoken.TokenColumn));
             }
-            else if (anothersymbol.IsList)
+            else if (anothersymbol.IsList && nthElement == null)
             {
                 // List cannot be used!
                 throw new AnalyzerError(
                     "232",
                     string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, "List(" + anothersymbol.Type + ")", operandtoken.TokenLine, operandtoken.TokenColumn));
+            }
+            else if (!anothersymbol.IsList && nthElement != null)
+            {
+                // Not a list cannot be used!
+                throw new AnalyzerError(
+                    "232",
+                    string.Format(MessageRegistry.GetMessage(232).Text, "List(" + symbol.Type + ")", anothersymbol.Type, operandtoken.TokenLine, operandtoken.TokenColumn));
+            }
+            else if (anothersymbol.IsList && nthElement != null)
+            {
+                if (nthElement.TokenType == TokenType.Identifier) // Get identifier value
+                {
+                    // Get the varibale values and recall the validation:
+                    Symbol indexsymbol = symbolTable.FindSymbol(nthElement) !;
+
+                    // Chehck if index is Natural or Integer
+                    if (indexsymbol.Type != TokenType.Natural && indexsymbol.Type != TokenType.Integer)
+                    {
+                        // Generate error message
+                        throw new AnalyzerError(
+                            "232",
+                            string.Format(MessageRegistry.GetMessage(232).Text, "Natural or Integer", indexsymbol.Type, indexsymbol.SymbolLine, indexsymbol.SymbolColumn));
+                    }
+                    else if (indexsymbol.IsList)
+                    {
+                        // List cannot be used!
+                        throw new AnalyzerError(
+                            "232",
+                            string.Format(MessageRegistry.GetMessage(232).Text, symbol.Type, "List(" + anothersymbol.Type + ")", operandtoken.TokenLine, operandtoken.TokenColumn));
+                    }
+
+                    try
+                    {
+                        // int result = Convert.ToInt32(new DataTable().Compute(indexsymbol.ValueTokens, null));
+                        int i = Convert.ToInt32(new DataTable().Compute(indexsymbol.ValueTokens.ToString(), null));
+
+                        // Separate tokens into list according semmicolons
+                        List<List<Token>> result = new ();
+                        List<Token> currentGroup = new ();
+
+                        foreach (var token in anothersymbol.Value)
+                        {
+                            if (token.TokenType == TokenType.Semicolon)
+                            {
+                                if (currentGroup.Count > 0)
+                                {
+                                    result.Add(new List<Token>(currentGroup));
+                                    currentGroup.Clear();
+                                }
+                            }
+                            else
+                            {
+                                currentGroup.Add(token);
+                            }
+                        }
+
+                        // Add any remaining tokens as the last group
+                        if (currentGroup.Count > 0)
+                        {
+                            result.Add(currentGroup);
+                        }
+
+                        if (i < 0)
+                        {
+                            i *= -1;
+                            currentGroup = result[^i];
+                            symbol.ValueTokens.Append("^" + nthElement.TokenValue);
+                        }
+                        else
+                        {
+                            currentGroup = result[i];
+                            symbol.ValueTokens.Append(nthElement.TokenValue);
+                        }
+
+                        // Add tokens
+                        foreach (var item in currentGroup)
+                        {
+                            symbol.Value.Add(item);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Over indexed
+                        throw new AnalyzerError(
+                            "244",
+                            string.Format(MessageRegistry.GetMessage(244).Text, nthElement.TokenValue, nthElement.TokenLine, nthElement.TokenColumn));
+                    }
+                }
+                else
+                {
+                    // Chehck if index is Natural or Integer
+                    if (anothersymbol.Type != TokenType.Natural && anothersymbol.Type != TokenType.Integer)
+                    {
+                        // Generate error message
+                        throw new AnalyzerError(
+                            "232",
+                            string.Format(MessageRegistry.GetMessage(232).Text, "Natural or Integer", anothersymbol.Type, nthElement.TokenLine, nthElement.TokenColumn));
+                    }
+
+                    // Get N'th element value
+                    try
+                    {
+                        int i = int.Parse(nthElement.TokenValue);
+
+                        // Separate tokens into list according semmicolons
+                        List<List<Token>> result = new ();
+                        List<Token> currentGroup = new ();
+
+                        foreach (var token in anothersymbol.Value)
+                        {
+                            if (token.TokenType == TokenType.Semicolon)
+                            {
+                                if (currentGroup.Count > 0)
+                                {
+                                    result.Add(new List<Token>(currentGroup));
+                                    currentGroup.Clear();
+                                }
+                            }
+                            else
+                            {
+                                currentGroup.Add(token);
+                            }
+                        }
+
+                        // Add any remaining tokens as the last group
+                        if (currentGroup.Count > 0)
+                        {
+                            result.Add(currentGroup);
+                        }
+
+                        if (i < 0)
+                        {
+                            i *= -1;
+                            currentGroup = result[^i];
+                            symbol.ValueTokens.Append("^" + i);
+                        }
+                        else
+                        {
+                            currentGroup = result[i];
+                            symbol.ValueTokens.Append(nthElement.TokenValue);
+                        }
+
+                        // Add tokens
+                        foreach (var item in currentGroup)
+                        {
+                            symbol.Value.Add(item);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Over indexed
+                        throw new AnalyzerError(
+                            "244",
+                            string.Format(MessageRegistry.GetMessage(244).Text, int.Parse(nthElement.TokenValue), nthElement.TokenLine, nthElement.TokenColumn));
+                    }
+                }
             }
             else // If not a list
             {

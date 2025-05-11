@@ -61,6 +61,13 @@
             All semantic errors or warnings encountered during the analysis are recorded.
             </summary>
         </member>
+        <member name="M:Proton.Semantic.SemanticAnalyzer.PostconditionParser">
+            <summary>
+            Semantically analyzes the Postcondition macro section.
+            This includes checking if expression is boolean.
+            All semantic errors or warnings encountered during the analysis are recorded.
+            </summary>
+        </member>
         <member name="M:Proton.Semantic.SemanticAnalyzer.Analyze(System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{Proton.Parser.Statements.Statement}})">
             <summary>
             Analyzes the provided parsed statement sections, performing semantic validation such as
@@ -208,6 +215,11 @@
             Gets or sets a value indicating whether the symbol is list.
             </summary>
         </member>
+        <member name="P:Proton.Semantic.Symbol.IsResult">
+            <summary>
+            Gets or sets a value indicating whether the symbol is result or not.
+            </summary>
+        </member>
         <member name="P:Proton.Semantic.Symbol.IsInitialized">
             <summary>
             Gets or sets a value indicating whether the symbol has been initialized.
@@ -278,7 +290,7 @@
         <member name="M:Proton.Semantic.SymbolTable.DisplaySymbols">
             <summary>
             Returns a formatted table of all symbols currently stored in the symbol table.
-            Each symbol is displayed with its name, type, category, position, list status, initialization state, and value.
+            Each symbol is displayed with its name, type, category, position, list status, initialization state, value, and result status.
             If no symbols are found, a default message is returned.
             </summary>
             <returns>A string representing the formatted symbol table or a message indicating no symbols were found.</returns>
@@ -335,6 +347,11 @@
         <member name="F:ProtonComplier.Semantic.SymbolTableFormat.ValueWidth">
             <summary>
             The column width allocated for displaying the symbol's value(s).
+            </summary>
+        </member>
+        <member name="F:ProtonComplier.Semantic.SymbolTableFormat.ResultWidth">
+            <summary>
+            The column width allocated to indicate if the symbol is a result.
             </summary>
         </member>
         <member name="T:System.Text.RegularExpressions.Generated.IdentifierRegex_0">

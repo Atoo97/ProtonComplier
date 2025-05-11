@@ -3,10 +3,10 @@
 // </copyright>
 namespace Proton.Semantic
 {
+    using System.Text;
     using Proton.Lexer;
     using Proton.Lexer.Enums;
     using ProtonComplier.Semantic;
-    using System.Text;
 
     /// <summary>
     /// Represents a symbol (such as a variable) in the semantic model.
@@ -57,6 +57,11 @@ namespace Proton.Semantic
         required public bool IsList { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the symbol is result or not.
+        /// </summary>
+        public bool IsResult { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets a value indicating whether the symbol has been initialized.
         /// </summary>
         public bool IsInitialized { get; set; } = false;
@@ -89,7 +94,7 @@ namespace Proton.Semantic
                 $"{{2,-{SymbolTableFormat.CategoryWidth}}} | {{3,-{SymbolTableFormat.LineWidth}}} | " +
                 $"{{4,-{SymbolTableFormat.ColWidth}}} | {{5,-{SymbolTableFormat.ListWidth}}} | " +
                 $"{{6,-{SymbolTableFormat.InitializedWidth}}} | {{7,-{SymbolTableFormat.ValueWidth}}} | " +
-                $"{{8,-{SymbolTableFormat.ValueWidth}}} |",
+                $"{{8,-{SymbolTableFormat.ValueWidth}}} | {{9,-{SymbolTableFormat.ResultWidth}}} |",
                 this.Name,
                 this.Type,
                 this.Category,
@@ -98,7 +103,8 @@ namespace Proton.Semantic
                 this.IsList ? "Yes" : "No",
                 this.IsInitialized ? "Yes" : "No",
                 valueStr,
-                valueTokensStr);
+                valueTokensStr,
+                this.IsResult ? "Yes" : "No");
         }
     }
 }

@@ -35,7 +35,7 @@ namespace Proton.Lexer
 
                 foreach (var line in lines)
                 {
-                    var lineTokens = this.TokenizeLine(line);
+                    var lineTokens = this.TokenizeLine(line + " ");
                     tokens.AddRange(lineTokens);
                     this.line++;
                 }
