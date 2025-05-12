@@ -16,6 +16,7 @@ function applySavedTheme() {
     const docuMainTitle = document.querySelectorAll('.docs-main-title');
     const linkbox = document.querySelectorAll('.link-box');
     const docsSidebar = document.querySelectorAll('.sidebar');
+    const syntax = document.querySelectorAll('.syntax');
 
     if (theme === 'dark') {
         body.classList.add('dark-mode');
@@ -31,6 +32,7 @@ function applySavedTheme() {
         docuMainTitle.forEach(section => section.classList.add('dark-mode')); 
         linkbox.forEach(section => section.classList.add('dark-mode')); 
         docsSidebar.forEach(section => section.classList.add('dark-mode')); 
+        syntax.forEach(section => section.classList.add('dark-mode')); 
         themeToggle.checked = true;
         if (logo) logo.src = '/images/proton_logo_darkmode.png';
     } else {
@@ -47,6 +49,7 @@ function applySavedTheme() {
         docuMainTitle.forEach(section => section.classList.remove('dark-mode')); 
         linkbox.forEach(section => section.classList.remove('dark-mode')); 
         docsSidebar.forEach(section => section.classList.remove('dark-mode')); 
+        syntax.forEach(section => section.classList.remove('dark-mode')); 
         themeToggle.checked = false;
         if (logo) logo.src = '/images/proton_logo.png';
     }
@@ -69,6 +72,7 @@ function toggleTheme() {
     const linkbox = document.querySelectorAll('.link-box');
     const isDark = document.getElementById('themeToggle').checked;
     const docsSidebar = document.querySelectorAll('.sidebar');
+    const syntax = document.querySelectorAll('.syntax');
 
     if (isDark) {
         body.classList.add('dark-mode');
@@ -84,6 +88,7 @@ function toggleTheme() {
         docuMainTitle.forEach(section => section.classList.add('dark-mode')); 
         linkbox.forEach(section => section.classList.add('dark-mode')); 
         docsSidebar.forEach(section => section.classList.add('dark-mode')); 
+        syntax.forEach(section => section.classList.add('dark-mode')); 
         if (logo) logo.src = '/images/proton_logo_darkmode.png';
         localStorage.setItem('theme', 'dark');
     } else {
@@ -100,6 +105,7 @@ function toggleTheme() {
         docuMainTitle.forEach(section => section.classList.remove('dark-mode')); 
         linkbox.forEach(section => section.classList.remove('dark-mode')); 
         docsSidebar.forEach(section => section.classList.remove('dark-mode')); 
+        syntax.forEach(section => section.classList.remove('dark-mode')); 
         if (logo) logo.src = '/images/proton_logo.png';
         localStorage.setItem('theme', 'light');
     }

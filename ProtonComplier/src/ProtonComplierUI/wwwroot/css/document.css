@@ -82,12 +82,13 @@ nav {
     background-color: #fff;
     max-width: 1000px;
     margin: 0 auto;
+    color: #555;
 }
 
 /* Dark Mode */
 .docs-main.dark-mode {
     background-color: #1d1e23;
-       
+    color: #fefefe;
 }
 
 .docs-main-title {
@@ -106,7 +107,6 @@ nav {
     font-size: 1.5rem;
     font-weight: 600;
     margin: 2rem 0 1rem 0;
-    color: #555;
 }
 
 .nav-link-item {
@@ -143,7 +143,7 @@ nav {
 
 /* Dark Mode */
 .link-box.dark-mode {
-    background-color: #cecece;
+    background-color: white;
 }
 
 .link-box:hover {
@@ -162,7 +162,6 @@ nav {
 
 .docs-main-paragraph {
     font-size: 1rem;
-    color: #666;
 }
 
 .docs-main-paragraph a {
@@ -193,10 +192,15 @@ nav {
 
 pre.syntax {
     font-family: 'Roboto Mono', Monaco, monospace;
-    background-color: #f9f9fb;
-    padding: 10px;
-    border-radius: 5px;
+    font-size: large;
+    background-color: #e7e7e7;
+    border-radius: 10px;
     overflow-x: auto;
+}
+
+/* Dark Mode */
+pre.syntax.dark-mode {
+    background-color: black;
 }
 
 /* Additional styles for the code and span elements if needed */
@@ -213,6 +217,22 @@ pre.syntax code {
 
 .syntax-placeholder:hover {
     text-decoration: underline; /* Optional: adds underline on hover */
+}
+
+.docs-main-image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0;
+    box-sizing: border-box;
+}
+
+.docs-main-image {
+    width: 100%;
+    max-width: 600px; /* Limits image size on larger screens */
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
 }
 
 #errortable {

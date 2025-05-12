@@ -19,14 +19,57 @@
             You can even try Proton by only using online editor. Are you ready to go? <br><br>
             
             Try this, for example:
-        </p>
-        <div id="editor-container" class="box" style="height: 300px; max-width:600px; display: block; margin: 0 auto;">
-            <div id="editor-inner"></div>
-        </div>
+            <pre class="syntax"><code>
+            <span class="syntax-custom" style="color:#2DB500; font-style:italic;">//ProtonCompiler</span>
+            <span class="syntax-custom" style="color:#328f81; font-weight:bold;">#StateSpace</span>
+
+            <span class="syntax-custom" style="color:#328f81; font-weight:bold;">#Precondition</span>
+
+            <span class="syntax-custom" style="color:#328f81; font-weight:bold;">#Postcondition</span>
+
+            <span class="syntax-custom" style="color:#328f81; font-weight:bold;">#Input</span>
+            </code></pre>
         <p class="docs-main-paragraph">
             This is the basic structure every program must have. # are a special parts of the language after which comes a code blocks. Every code block begins with # (macro). 
             When the program is run the code block after # is executed.
         </p>
+
+        <h2 class="docs-main-subtitle">How to Compile & Run?</h2>
+
+        <div class="docs-main-image-container">
+            <img src="@Url.Content("~/images/compileAndRun.png")" class="docs-main-image" alt="Compile and Run Button">
+        </div>
+
+        <p class="docs-main-paragraph">
+            Press the <strong>Run & Compile</strong> button as you can see highlighted in the picture above. This action will compile your Proton code and run it instantly inside the web editor.
+            As you can see our program does not do anything special at the moment, so let’s add some more complex logic.<br><br>
+            Try this, for example:
+
+            <pre class="syntax"><code>
+            <span class="syntax-custom" style="color:#2DB500; font-style:italic;">//ProtonCompiler</span>
+            <span class="syntax-custom" style="color:#328f81; font-weight:bold;">#StateSpace</span>
+            <span class="syntax-custom">    v,s,t:R</span>
+
+            <span class="syntax-custom" style="color:#328f81; font-weight:bold;">#Precondition</span>
+            <span class="syntax-custom">    s≥0 ∧ t≥0</span>
+
+            <span class="syntax-custom" style="color:#328f81; font-weight:bold;">#Postcondition</span>
+            <span class="syntax-custom">    v = s/t</span>
+
+            <span class="syntax-custom" style="color:#328f81; font-weight:bold;">#Input</span>
+            <span class="syntax-custom">    s = 2;</span>
+            <span class="syntax-custom">    t = 2</span>
+            </code></pre>
+        </p>
+
+        <p class="docs-main-paragraph">
+            Congratulations! You’ve written your first program.  After you click the <strong>Compile&Run</strong> button, the result would be something like this: "Result: 1". But how does it actually work? It’s simple mathematical abstraction — it calculates the velocity (<strong>v</strong>) of an object by dividing the distance traveled (<strong>s</strong>) by the time taken (<strong>t</strong>), following the basic physics formula <em>v = s / t</em>.
+            <br><br>
+            We use Proton to describe such problems using simple mathematical formulas, and from these abstract descriptions, Proton automatically generates an executable C# orient program. If the description is done correctly, the resulting program will output the correct solution to the problem.
+        </p>
+
+        
+
 
     </section>
 </section>

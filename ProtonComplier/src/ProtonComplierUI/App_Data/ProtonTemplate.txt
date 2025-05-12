@@ -1,8 +1,8 @@
-﻿// @ProtonComplier 
+﻿// ProtonCompiler 
 #StateSpace  
-
-#Input  
 
 #Precondition  
 
 #Postcondition
+
+#Input  
