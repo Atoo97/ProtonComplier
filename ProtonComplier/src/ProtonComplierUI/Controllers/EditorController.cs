@@ -58,8 +58,34 @@ public class EditorController : Controller
     [HttpPost]
     public async Task<IActionResult> Compile([FromForm] CompileRequest request)
     {
-        await Task.Delay(500);
-        return Ok();
+        // Insted of: Clients.All.. this now support multiple users simultaneously:
+        await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", $"[ProtonComplier]: Compiling ({request.FileName}.prtn) started..");
+        await Task.Delay(2000);
+
+        // ===== LEXICAL ANALYSIS =====
+        var lexicalresult = await LexicalAnalyze(request);
+
+        if (lexicalresult.isSuccessful)
+        {
+            // ===== SYNTAX ANALYSIS =====
+            var syntaxresult = await SyntaxAnalyze(request, lexicalresult);
+
+            if (syntaxresult.isSuccessful)
+            {
+                // ===== SEMANTIC ANALYSIS =====
+                var semanticalresult = await SemanticAnalyze(request, syntaxresult);
+
+                if (semanticalresult.isSuccessful)
+                {
+                    var status = $"[ProtonCompiler]: Compile ({request.FileName}.prtn) complete | Status: Succesfull";
+                    await hubContext.Clients.Client(request.ConnectionId).SendAsync("ConsoleOutput", status);
+                    return Ok();
+                }
+                return BadRequest();
+            }
+            return BadRequest();
+        }
+        return BadRequest();
     }
 
     [HttpPost]

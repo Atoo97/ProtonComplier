@@ -40,14 +40,22 @@ namespace Proton.CodeGenerator
             string indent = match.Success ? match.Groups[1].Value : string.Empty;
 
             var symbols = GroupSymbol(symbolTable);
+            string mergedCode;
 
             var statePlaceCode = GenerateState(symbols, indent);
             var inputCode = GenerateInput(symbolTable, symbols, indent);
             var preconditionCode = GeneratePrecondition(preconditionSymbol, indent);
-            var postconditionCode = GeneratePostcondition(symbolTable, symbols, indent + "    ");
 
-            // Replace $ in the precondition string with the generated postcondition code
-            string mergedCode = preconditionCode.Replace("$", postconditionCode);
+            // Check if the precondition code contains "@"
+            if (preconditionCode.Contains('@'))
+            {
+                // Replace @ in the precondition string with the generated postcondition code
+                mergedCode = preconditionCode.Replace("@", GeneratePostcondition(symbolTable, symbols, indent + "    "));
+            }
+            else
+            {
+                mergedCode = preconditionCode.Replace(preconditionCode, indent + GeneratePostcondition(symbolTable, symbols, indent));
+            }
 
             return new GeneratorResult(expressionShell.Replace("$", statePlaceCode + "\n" + inputCode + "\n" + mergedCode), null!, null!, true);
         }
@@ -133,7 +141,7 @@ namespace Proton.CodeGenerator
 
                 sb.AppendLine($"{indent}if ({condition})");
                 sb.AppendLine($"{indent}{{");
-                sb.AppendLine($"{indent}    $");
+                sb.AppendLine($"{indent}    @");
                 sb.AppendLine($"{indent}}}");
             }
 
@@ -186,7 +194,18 @@ namespace Proton.CodeGenerator
                         : $"{string.Join(" = ", group.Select(s => s.Name))} = {value};";
 
                     sb.AppendLine($"{indent}{declaration}");  // Add the declaration to the StringBuilder
-                    sb.AppendLine($"{indent}Console.WriteLine(\"Result: \" + {firstSymbol.Name});");
+
+                    if (isList)
+                    {
+                        sb.AppendLine($"{indent}foreach (var item in {firstSymbol.Name})");
+                        sb.AppendLine($"{indent}{{");
+                        sb.AppendLine($"{indent}    Console.WriteLine(\"Result: \" + item);");
+                        sb.AppendLine($"{indent}}}");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"{indent}Console.WriteLine(\"Result: \" + {firstSymbol.Name});");
+                    }
                 }
                 else
                 {
@@ -213,7 +232,18 @@ namespace Proton.CodeGenerator
                             : $"{string.Join(" = ", group.Select(s => s.Name))} = {value};";
 
                         sb.AppendLine($"{indent}{declaration}");  // Add the declaration to the StringBuilder
-                        sb.AppendLine($"{indent}Console.WriteLine(\"Result: \" + {item.Name});");
+
+                        if (isList)
+                        {
+                            sb.AppendLine($"{indent}foreach (var item in {firstSymbol.Name})");
+                            sb.AppendLine($"{indent}{{");
+                            sb.AppendLine($"{indent}    Console.WriteLine(\"Result: \" + item);");
+                            sb.AppendLine($"{indent}}}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"{indent}Console.WriteLine(\"Result: \" + {firstSymbol.Name});");
+                        }
                     }
                 }
             }

@@ -77,6 +77,11 @@ namespace Proton.ErrorHandler
                 "ParserError: Multiple list specifier detected at line {0}, column {1}.")
             },
             {
+                120, new Message(
+                "missing-opening-paren",
+                "ParserError: Unopened parenthesis detected at line {0}, column {1}.")
+            },
+            {
                 121, new Message(
                 "missing-closing-paren",
                 "ParserError: Unclosed parenthesis detected at line {0}, column {1}.")

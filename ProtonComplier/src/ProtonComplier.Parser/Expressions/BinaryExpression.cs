@@ -114,6 +114,75 @@ namespace Proton.Parser.Expressions
             {
                 return new OperandExpression(tokens[0]);
             }
+            else if (tokens[0].TokenType == TokenType.Max)
+            {
+                // Parse Max Expression (max(a, b))
+                if (tokens[1].TokenType != TokenType.OpenParen)
+                {
+                    // Generate error message
+                    throw new AnalyzerError(
+                        "120",
+                        string.Format(MessageRegistry.GetMessage(120).Text, tokens[1].TokenLine, tokens[1].TokenColumn));
+                }
+
+                List<Token> leftTokens = new ();
+                List<Token> rightTokens = new ();
+                int i = 2;
+
+                // Collect left side tokens until the comma
+                while (i < tokens.Count && tokens[i].TokenType != TokenType.Comma)
+                {
+                    leftTokens.Add(tokens[i]);
+                    i++;
+                }
+
+                // Check if we found the comma
+                if (i >= tokens.Count || tokens[i].TokenType != TokenType.Comma)
+                {
+                    // Generate error message
+                    throw new AnalyzerError(
+                       "104",
+                       string.Format(MessageRegistry.GetMessage(104).Text, tokens[i - 1].TokenType, tokens[i - 1].TokenLine, tokens[i - 1].TokenColumn, TokenType.Comma));
+                }
+
+                i++; // Skip the comma
+
+                // Collect right side tokens after the comma
+                while (i < tokens.Count && tokens[i].TokenType != TokenType.CloseParen)
+                {
+                    rightTokens.Add(tokens[i]);
+                    i++;
+                }
+
+                // Check if closing paren exists
+                if (i >= tokens.Count || tokens[i].TokenType != TokenType.CloseParen)
+                {
+                    // Generate error message
+                    throw new AnalyzerError(
+                        "121",
+                        string.Format(MessageRegistry.GetMessage(121).Text, tokens.Last().TokenLine, tokens.Last().TokenColumn));
+                }
+
+                // Parse both expressions
+                var leftExpr = ExpressionParserHelper.ParseExpression(leftTokens);
+                var rightExpr = ExpressionParserHelper.ParseExpression(rightTokens);
+
+                // Create the MaxExpression
+                var maxExpr = new MaxExpression(leftExpr, rightExpr);
+
+                // Now check if there are additional tokens (operator + operand for BinaryExpression)
+                List<Token> remainingTokens = tokens.Skip(i + 1).ToList();
+
+                if (remainingTokens.Count > 0)
+                {
+                    OperatorExpression op = new (remainingTokens[0]);  // Assuming first token is operator
+                    remainingTokens = remainingTokens.Skip(1).ToList();  // Skip the operator
+                    return new BinaryExpression(maxExpr, op, remainingTokens);
+                }
+
+                // If no remaining tokens, return the MaxExpression itself
+                return maxExpr;
+            }
             else
             {
                 // Chehck if listNthElement
@@ -123,15 +192,15 @@ namespace Proton.Parser.Expressions
                 }
                 else if (tokens.Count > 4 && tokens[1].TokenType == TokenType.OpenSqrBrace)
                 {
-                    ListNthElementExpression listNthElementExpression = new(new OperandExpression(tokens[0]), tokens[1], new OperandExpression(tokens[2]), tokens[3]);
-                    OperatorExpression op = new(tokens[4]);
+                    ListNthElementExpression listNthElementExpression = new (new OperandExpression(tokens[0]), tokens[1], new OperandExpression(tokens[2]), tokens[3]);
+                    OperatorExpression op = new (tokens[4]);
                     List<Token> remaining = tokens.Skip(5).ToList();
                     return new BinaryExpression(listNthElementExpression, op, remaining);
                 }
                 else
                 {
-                    OperandExpression left = new(tokens[0]);
-                    OperatorExpression op = new(tokens[1]);
+                    OperandExpression left = new (tokens[0]);
+                    OperatorExpression op = new (tokens[1]);
                     List<Token> remaining = tokens.Skip(2).ToList();
                     return new BinaryExpression(left, op, remaining);
                 }

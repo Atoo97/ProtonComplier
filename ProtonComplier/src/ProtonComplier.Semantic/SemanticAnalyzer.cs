@@ -592,6 +592,40 @@ namespace Proton.Semantic
                     ValidateIdentifierTokens(listNExp.Identifier.ParseSymbol, symbol, listNExp.Operand.ParseSymbol);
                     symbol.ValueTokens.Append(']');
                     break;
+                case MaxExpression maxExpr:
+                    symbol.Value.Add(new Token // Add max:
+                    {
+                        TokenType = TokenType.Max,
+                        TokenCategory = TokenCategory.Keyword,
+                        TokenValue = "Max",
+                        TokenLine = maxExpr.ParseSymbol.TokenLine,
+                        TokenColumn = maxExpr.ParseSymbol.TokenColumn - 1,
+                    });
+
+                    symbol.ValueTokens.Append("Math.Max");
+                    symbol.ValueTokens.Append('(');
+                    ValidateAndCollectTokens(maxExpr.LeftExpression, symbol);
+                    symbol.ValueTokens.Append(',');
+                    ValidateAndCollectTokens(maxExpr.RightExpression, symbol);
+                    symbol.ValueTokens.Append(')');
+                    break;
+                case MinExpression minExpr:
+                    symbol.Value.Add(new Token // Add min:
+                    {
+                        TokenType = TokenType.Max,
+                        TokenCategory = TokenCategory.Keyword,
+                        TokenValue = "Min",
+                        TokenLine = minExpr.ParseSymbol.TokenLine,
+                        TokenColumn = minExpr.ParseSymbol.TokenColumn - 1,
+                    });
+
+                    symbol.ValueTokens.Append("Math.Min");
+                    symbol.ValueTokens.Append('(');
+                    ValidateAndCollectTokens(minExpr.LeftExpression, symbol);
+                    symbol.ValueTokens.Append(',');
+                    ValidateAndCollectTokens(minExpr.RightExpression, symbol);
+                    symbol.ValueTokens.Append(')');
+                    break;
                 case OperatorExpression opExpr: // Check valid operator type
                     token = opExpr.ParseSymbol!;
                     symbolType = symbol.Type;
@@ -813,7 +847,7 @@ namespace Proton.Semantic
                         // Generate error message
                         throw new AnalyzerError(
                             "232",
-                            string.Format(MessageRegistry.GetMessage(232).Text, "Natural or Integer", indexsymbol.Type, indexsymbol.SymbolLine, indexsymbol.SymbolColumn));
+                            string.Format(MessageRegistry.GetMessage(232).Text, "Natural or Integer", indexsymbol.Type, nthElement.TokenLine, nthElement.TokenColumn));
                     }
                     else if (indexsymbol.IsList)
                     {
@@ -883,7 +917,7 @@ namespace Proton.Semantic
                 else
                 {
                     // Chehck if index is Natural or Integer
-                    if (anothersymbol.Type != TokenType.Natural && anothersymbol.Type != TokenType.Integer)
+                    if (anothersymbol.Type != TokenType.Natural && anothersymbol.Type != TokenType.Integer && anothersymbol.Type != symbol.Type)
                     {
                         // Generate error message
                         throw new AnalyzerError(

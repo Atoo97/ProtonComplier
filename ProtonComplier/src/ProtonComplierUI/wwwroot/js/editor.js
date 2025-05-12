@@ -540,6 +540,54 @@ connection.start()
     })
     .catch(err => console.error(err.toString()));
 
+document.getElementById("compileButton").addEventListener("click", async function () {
+    // Disable all buttons with the class 'xbutton'
+    document.querySelectorAll("button.xbutton").forEach(btn => {
+        btn.disabled = true;
+    });
+
+    const editorContent = editor.getValue();
+    const fileName = document.getElementById("fileNameInputDesktop").value;
+    const lexicalEnabled = document.getElementById("toggleLexicalAnalyzer").checked;
+    const syntaxEnabled = document.getElementById("toggleSyntaxAnalyzer").checked;
+    const semanticEnabled = document.getElementById("toggleSemanticalAnalyzer").checked;
+
+    // Sync editor content to hidden input if needed
+    document.getElementById("InputText").value = editorContent;
+    window.outputText = "";
+
+    // Clear right editor
+    if (typeof rightEditor !== 'undefined') {
+        rightEditor.setValue("");
+    }
+
+    // Reset console output
+    const output = document.getElementById("compilerOutput");
+    if (output) {
+        output.innerHTML = '<span id="blinkingArrow">ProtonCompiler &gt;&gt; </span>';
+    }
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append("ConnectionId", connectionId);
+    formData.append("Code", editorContent);
+    formData.append("FileName", fileName);
+    formData.append("Lexical", lexicalEnabled);
+    formData.append("Syntax", syntaxEnabled);
+    formData.append("Semantical", semanticEnabled);
+
+    // Post to backend
+    const response = await fetch("/Editor/Compile", {
+        method: "POST",
+        body: formData, // do NOT set Content-Type manually
+    });
+
+    // Enable all buttons with the class 'xbutton'
+    document.querySelectorAll("button.xbutton").forEach(btn => {
+        btn.disabled = false;
+    });
+});
+
 document.getElementById("compileAndRunButton").addEventListener("click", async function () {
     // Disable all buttons with the class 'xbutton'
     document.querySelectorAll("button.xbutton").forEach(btn => {

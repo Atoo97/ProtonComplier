@@ -62,6 +62,9 @@ namespace Proton.Parser.Expressions
                 OperatorExpression op => op.ParseSymbol!,
                 BinaryExpression binary => GetLastToken(binary.Right), // Last token is in the rightmost sub-expression
                 ParenthesisExpression paren => paren.LastToken,
+                ListNthElementExpression listNth => listNth.CloseSqrBrace,
+                MaxExpression max => GetLastToken(max.RightExpression),
+                MinExpression min => GetLastToken(min.RightExpression),
 
                 // Add other cases as needed
                 _ => throw new InvalidOperationException("Unsupported expression type for retrieving last token."),

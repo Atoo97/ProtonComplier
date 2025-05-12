@@ -4,6 +4,31 @@
         <name>ProtonComplier.Parser</name>
     </assembly>
     <members>
+        <member name="T:Proton.Parser.Expressions.ExpressionParserHelper">
+            <summary>
+            Provides helper methods for parsing expressions in the Proton parser.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.ExpressionParserHelper.ParseExpression(System.Collections.Generic.List{Proton.Lexer.Token})">
+            <summary>
+            Parses a list of tokens into an <see cref="T:Proton.Parser.Expressions.Expression"/> object.
+            Supports parenthesis grouping and binary expressions.
+            </summary>
+            <param name="tokens">The list of tokens to parse.</param>
+            <returns>An <see cref="T:Proton.Parser.Expressions.Expression"/> representing the parsed expression tree.</returns>
+            <exception cref="T:Proton.ErrorHandler.AnalyzerError">
+            Thrown when parentheses are empty or unmatched, or if tokens are invalid for an expression.
+            </exception>
+        </member>
+        <member name="M:Proton.Parser.Expressions.ExpressionParserHelper.FindMatchingParen(System.Collections.Generic.List{Proton.Lexer.Token},System.Int32)">
+            <summary>
+            Finds the index of the matching closing parenthesis for the opening parenthesis at the specified index.
+            </summary>
+            <param name="tokens">The list of tokens.</param>
+            <param name="startIndex">The index of the opening parenthesis.</param>
+            <returns>The index of the matching closing parenthesis.</returns>
+            <exception cref="T:Proton.ErrorHandler.AnalyzerError">Thrown when no matching closing parenthesis is found.</exception>
+        </member>
         <member name="T:Proton.Parser.Expressions.AssignExpression">
             <summary>
             Represents an assignment expression, such as the "=" operator used to assign values.
@@ -93,31 +118,6 @@
             <param name="ident">Set the ident size of display.</param>
             <returns>A string representation of the expression prefixed with "Exp:".</returns>
         </member>
-        <member name="T:Proton.Parser.Expressions.ExpressionParserHelper">
-            <summary>
-            Provides helper methods for parsing expressions in the Proton parser.
-            </summary>
-        </member>
-        <member name="M:Proton.Parser.Expressions.ExpressionParserHelper.ParseExpression(System.Collections.Generic.List{Proton.Lexer.Token})">
-            <summary>
-            Parses a list of tokens into an <see cref="T:Proton.Parser.Expressions.Expression"/> object.
-            Supports parenthesis grouping and binary expressions.
-            </summary>
-            <param name="tokens">The list of tokens to parse.</param>
-            <returns>An <see cref="T:Proton.Parser.Expressions.Expression"/> representing the parsed expression tree.</returns>
-            <exception cref="T:Proton.ErrorHandler.AnalyzerError">
-            Thrown when parentheses are empty or unmatched, or if tokens are invalid for an expression.
-            </exception>
-        </member>
-        <member name="M:Proton.Parser.Expressions.ExpressionParserHelper.FindMatchingParen(System.Collections.Generic.List{Proton.Lexer.Token},System.Int32)">
-            <summary>
-            Finds the index of the matching closing parenthesis for the opening parenthesis at the specified index.
-            </summary>
-            <param name="tokens">The list of tokens.</param>
-            <param name="startIndex">The index of the opening parenthesis.</param>
-            <returns>The index of the matching closing parenthesis.</returns>
-            <exception cref="T:Proton.ErrorHandler.AnalyzerError">Thrown when no matching closing parenthesis is found.</exception>
-        </member>
         <member name="T:Proton.Parser.Expressions.IdentifierExpression">
             <summary>
             Represents an identifier expression in the parse tree (e.g., variable names like "_varX").
@@ -203,6 +203,64 @@
             </summary>
             <param name="ident">The indentation level (each level equals 4 spaces).</param>
             <returns>A formatted string representing the literal expression with indentation.</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.MaxExpression">
+            <summary>
+            Represents a Max expression that evaluates the maximum value between two sub-expressions.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.MaxExpression.#ctor(Proton.Parser.Expressions.Expression,Proton.Parser.Expressions.Expression)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.MaxExpression"/> class with the specified left and right expressions.
+            </summary>
+            <param name="left">The left-hand expression.</param>
+            <param name="right">The right-hand expression.</param>
+        </member>
+        <member name="P:Proton.Parser.Expressions.MaxExpression.LeftExpression">
+            <summary>
+            Gets the left-hand expression of the Max operation.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.Expressions.MaxExpression.RightExpression">
+            <summary>
+            Gets the right-hand expression of the Max operation.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.MaxExpression.ToCode(System.Int32)">
+            <summary>
+            Returns a formatted string representing the structure of the Max expression.
+            </summary>
+            <param name="ident">The indentation level.</param>
+            <returns>A string that describes the Max expression tree.</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.MinExpression">
+            <summary>
+            Represents a Min expression that evaluates the minimum value between two sub-expressions.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.MinExpression.#ctor(Proton.Parser.Expressions.Expression,Proton.Parser.Expressions.Expression)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.MinExpression"/> class with the specified left and right expressions.
+            </summary>
+            <param name="left">The left-hand expression.</param>
+            <param name="right">The right-hand expression.</param>
+        </member>
+        <member name="P:Proton.Parser.Expressions.MinExpression.LeftExpression">
+            <summary>
+            Gets the left-hand expression of the Max operation.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.Expressions.MinExpression.RightExpression">
+            <summary>
+            Gets the right-hand expression of the Max operation.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.MinExpression.ToCode(System.Int32)">
+            <summary>
+            Returns a formatted string representing the structure of the Min expression.
+            </summary>
+            <param name="ident">The indentation level.</param>
+            <returns>A string that describes the Max expression tree.</returns>
         </member>
         <member name="T:Proton.Parser.Expressions.OperandExpression">
             <summary>
