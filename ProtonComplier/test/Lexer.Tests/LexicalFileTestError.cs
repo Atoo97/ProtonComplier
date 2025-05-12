@@ -21,7 +21,7 @@ namespace Lexer.Tests
                 { "error01.prtn", (1, 0, new List<string> { "001" }, new List<string>(), false) },
                 { "error02.prtn", (4, 0, new List<string> { "005" }, new List<string>(), false) },
                 { "error03.prtn", (3, 1, new List<string> { "005" }, new List<string> { "006" }, false) },
-                { "error04.prtn", (4, 0, new List<string> { "005" }, new List<string>(), false) },
+                { "error04.prtn", (5, 0, new List<string> { "005" }, new List<string>(), false) },
                 { "error05.prtn", (2, 0, new List<string> { "004", "008" }, new List<string>(), false) },
                 { "error06.prtn", (5, 1, new List<string> { "004", "005", "011" }, new List<string> { "006" }, true) },
             };

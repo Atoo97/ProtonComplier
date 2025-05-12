@@ -1,0 +1,14 @@
+﻿// @ProtonCompiler 
+#StateSpace  
+a:$;
+b:Z
+c:Z
+
+#Precondition  
+
+#Postcondition
+c=b
+
+#Input  
+a="str";
+b=a.Length

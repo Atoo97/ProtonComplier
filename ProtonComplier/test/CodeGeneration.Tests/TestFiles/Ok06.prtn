@@ -1,0 +1,19 @@
+﻿// @ProtonCompiler 
+#StateSpace  
+i,j:N;
+g:N;
+str:$[]
+var,var2:N;
+vlm:N[];
+
+#Precondition  
+vlm[0]+2>20
+
+#Postcondition 
+j=20+8-vlm[0]
+
+#Input  
+str={"str"}
+g,i=1-1
+vlm={20,g}
+var=2+vlm[i]+2

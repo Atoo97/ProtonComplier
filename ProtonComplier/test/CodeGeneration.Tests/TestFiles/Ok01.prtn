@@ -1,0 +1,13 @@
+﻿//ProtonCompiler
+#StateSpace
+v,s,t:R
+
+#Precondition
+s≥0 ∧ t≥0
+
+#Postcondition
+v = (s/t)
+
+#Input
+s = 2;
+t = 2 

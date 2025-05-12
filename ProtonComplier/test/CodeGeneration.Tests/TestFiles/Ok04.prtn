@@ -1,0 +1,15 @@
+﻿// @ProtonCompiler 
+#StateSpace  
+a:$[];
+b:Z
+c:Z
+
+#Precondition  
+b>0
+
+#Postcondition
+c=b
+
+#Input  
+a={"str1","str22","str333"};
+b=(a.Length-1)

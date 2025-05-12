@@ -1,0 +1,14 @@
+﻿// @ProtonCompiler 
+#StateSpace  
+i:Z;
+a,result:Z[];
+b:Z;
+
+#Precondition  
+
+#Postcondition
+b=a[i]
+
+#Input  
+result={23,34,56}; i=0
+a={(Min(3,result[i])) , 23}

@@ -10,6 +10,56 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="App_Data\codestructure.txt" />
+    <None Remove="TestFiles\ok01.prtn" />
+    <None Remove="TestFiles\Ok02.prtn" />
+    <None Remove="TestFiles\Ok03.prtn" />
+    <None Remove="TestFiles\Ok04.prtn" />
+    <None Remove="TestFiles\Ok05.prtn" />
+    <None Remove="TestFiles\Ok06.prtn" />
+    <None Remove="TestFiles\Ok07.prtn" />
+    <None Remove="TestFiles\Ok08.prtn" />
+    <None Remove="TestFiles\Ok09.prtn" />
+    <None Remove="TestFiles\Ok10.prtn" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="App_Data\codestructure.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok10.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok09.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok08.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok07.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok06.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok05.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok04.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok03.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok02.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok01.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
@@ -35,6 +85,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\ProtonComplier.CodeGenerator\ProtonComplier.CodeGenerator.csproj" />
     <ProjectReference Include="..\..\src\ProtonComplier.ErrorHandler\ProtonComplier.ErrorHandler.csproj" />
+    <ProjectReference Include="..\..\src\ProtonComplier.Lexer\ProtonComplier.Lexer.csproj" />
+    <ProjectReference Include="..\..\src\ProtonComplier.Parser\ProtonComplier.Parser.csproj" />
+    <ProjectReference Include="..\..\src\ProtonComplier.Semantic\ProtonComplier.Semantic.csproj" />
   </ItemGroup>
 
 </Project>
