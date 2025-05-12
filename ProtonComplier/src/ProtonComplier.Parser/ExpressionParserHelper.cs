@@ -58,7 +58,7 @@ namespace Proton.Parser.Expressions
             }
             else
             {
-                // Chehck if listNthElement or Max/Min
+                // Chehck if listNthElement or Max/Min or .Length
                 if (tokens.Count == 4 && tokens[1].TokenType == TokenType.OpenSqrBrace)
                 {
                     return new ListNthElementExpression(new OperandExpression(tokens[0]), tokens[1], new OperandExpression(tokens[2]), tokens[3]);
@@ -69,6 +69,17 @@ namespace Proton.Parser.Expressions
                     OperatorExpression op = new (tokens[4]);
                     List<Token> remaining = tokens.Skip(5).ToList();
                     return new BinaryExpression(listNthElementExpression, op, remaining);
+                }
+                else if (tokens.Count == 3 && tokens[0].TokenType == TokenType.Identifier && tokens[1].TokenType == TokenType.Period)
+                {
+                    return new LengthExpression(new OperandExpression(tokens[0]), tokens[1], tokens[2]);
+                }
+                else if (tokens.Count > 3 && tokens[0].TokenType == TokenType.Identifier && tokens[1].TokenType == TokenType.Period)
+                {
+                    LengthExpression lengthExpression = new (new OperandExpression(tokens[0]), tokens[1], tokens[2]);
+                    OperatorExpression op = new (tokens[3]);
+                    List<Token> remaining = tokens.Skip(4).ToList();
+                    return new BinaryExpression(lengthExpression, op, remaining);
                 }
                 else if (tokens[0].TokenType == TokenType.Max)
                 {

@@ -63,6 +63,7 @@ namespace Proton.Parser.Expressions
                 BinaryExpression binary => GetLastToken(binary.Right), // Last token is in the rightmost sub-expression
                 ParenthesisExpression paren => paren.LastToken,
                 ListNthElementExpression listNth => listNth.CloseSqrBrace,
+                LengthExpression lnexpr => lnexpr.Lenght,
                 MaxExpression max => GetLastToken(max.RightExpression),
                 MinExpression min => GetLastToken(min.RightExpression),
 

@@ -579,6 +579,30 @@ namespace Proton.Semantic
                     symbol.ValueTokens.Append(')');
 
                     break;
+                case LengthExpression lenExpr: // Identifier can be only list of any tpye or text type variable
+                    // Get the varibale values and recall the validation:
+                    Symbol anothersymbol = symbolTable.FindSymbol(lenExpr.Identifier.ParseSymbol) !;
+                    if (!anothersymbol.IsList && anothersymbol.Type != TokenType.Text)
+                    {
+                        // Not a list and not Text type — invalid usage
+                        throw new AnalyzerError(
+                            "232",
+                            string.Format(
+                                MessageRegistry.GetMessage(232).Text,
+                                "List or Text",
+                                anothersymbol.Type,
+                                lenExpr.Identifier.ParseSymbol.TokenLine,
+                                lenExpr.Identifier.ParseSymbol.TokenColumn));
+                    }
+
+                    symbol.Value.Add(lenExpr.Identifier.ParseSymbol);
+                    var tokenValue = lenExpr.Identifier.ParseSymbol.TokenValue;
+                    symbol.ValueTokens.Append($"{tokenValue}");
+                    symbol.Value.Add(lenExpr.ParseSymbol);
+                    symbol.ValueTokens.Append('.');
+                    symbol.Value.Add(lenExpr.Lenght);
+                    symbol.ValueTokens.Append($"Length");
+                    break;
                 case BinaryExpression binExpr:
                     ValidateAndCollectTokens(binExpr.Left, symbol);
                     ValidateAndCollectTokens(binExpr.Operator, symbol);
@@ -1001,7 +1025,8 @@ namespace Proton.Semantic
                             symbol.Value.Add(item);
                         }
 
-                        symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                        // symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                        symbol.ValueTokens.Append(anothersymbol.Name);
                     }
                 }
                 else if (symbol.Type == TokenType.Text)
@@ -1019,7 +1044,8 @@ namespace Proton.Semantic
                             symbol.Value.Add(item);
                         }
 
-                        symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                        // symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                        symbol.ValueTokens.Append(anothersymbol.Name);
                     }
                 }
                 else if (symbol.Type == TokenType.Real)
@@ -1037,7 +1063,8 @@ namespace Proton.Semantic
                             symbol.Value.Add(item);
                         }
 
-                        symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                        // symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                        symbol.ValueTokens.Append(anothersymbol.Name);
                     }
                 }
                 else if (symbol.Type == TokenType.Integer)
@@ -1055,7 +1082,8 @@ namespace Proton.Semantic
                             symbol.Value.Add(item);
                         }
 
-                        symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                        // symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                        symbol.ValueTokens.Append(anothersymbol.Name);
                     }
                 }
                 else if (symbol.Type == TokenType.Natural)
@@ -1073,7 +1101,8 @@ namespace Proton.Semantic
                             symbol.Value.Add(item);
                         }
 
-                        symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                        // symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                        symbol.ValueTokens.Append(anothersymbol.Name);
                     }
                 }
                 else if (symbol.Type == TokenType.Boolean)
@@ -1083,7 +1112,8 @@ namespace Proton.Semantic
                         symbol.Value.Add(item);
                     }
 
-                    symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                    // symbol.ValueTokens.Append(anothersymbol.ValueTokens);
+                    symbol.ValueTokens.Append(anothersymbol.Name);
                 }
             }
         }

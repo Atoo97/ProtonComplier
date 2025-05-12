@@ -92,14 +92,6 @@
             </summary>
             <param name="right">The right-hand side expression to assign.</param>
         </member>
-        <member name="M:Proton.Parser.Expressions.BinaryExpression.ParseRightExpression(System.Collections.Generic.List{Proton.Lexer.Token})">
-            <summary>
-            Parses the right-hand side of the binary expression, handling parentheses and nested expressions.
-            </summary>
-            <param name="tokens">The tokens that represent the right-hand side expression.</param>
-            <returns>An <see cref="T:Proton.Parser.Expressions.Expression"/> object representing the parsed right-hand side.</returns>
-            <exception cref="T:Proton.ErrorHandler.AnalyzerError">Thrown if the parentheses are empty or malformed.</exception>
-        </member>
         <member name="T:Proton.Parser.Expressions.Expression">
             <summary>
             Represents the base class for all expression nodes in the parse tree.
@@ -137,6 +129,37 @@
             </summary>
             <param name="ident">The indentation level (each level equals 4 spaces).</param>
             <returns>A formatted string representing the identifier.</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.LengthExpression">
+            <summary>
+            Represents an expression that accesses the length of a list or array-like identifier (e.g., `list.Length`).
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.LengthExpression.#ctor(Proton.Parser.Expressions.OperandExpression,Proton.Lexer.Token,Proton.Lexer.Token)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.LengthExpression"/> class.
+            </summary>
+            <param name="operand">The operand identifier expression.</param>
+            <param name="period">The token representing the period (`.`).</param>
+            <param name="length">The token representing the `Length` keyword.</param>
+            <exception cref="T:Proton.ErrorHandler.AnalyzerError">Thrown if any of the tokens are invalid.</exception>
+        </member>
+        <member name="P:Proton.Parser.Expressions.LengthExpression.Identifier">
+            <summary>
+            Gets the operand identifier representing the list or array whose length is being accessed.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.Expressions.LengthExpression.Lenght">
+            <summary>
+            Gets the length token.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.LengthExpression.ToCode(System.Int32)">
+            <summary>
+            Generates a formatted string representation of the length expression for debugging or code visualization.
+            </summary>
+            <param name="ident">The indentation level.</param>
+            <returns>A string representing the expression tree.</returns>
         </member>
         <member name="T:Proton.Parser.Expressions.ListNthElementExpression">
             <summary>
