@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtonComplier.Semantic", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtonComplier.CodeGenerator", "src\ProtonComplier.CodeGenerator\ProtonComplier.CodeGenerator.csproj", "{FC471020-9518-4F57-BD29-DC7782753251}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeGeneration.Tests", "test\CodeGeneration.Tests\CodeGeneration.Tests.csproj", "{CEFA6FB5-4D10-49C7-98B6-E197238A1E4D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,10 @@ Global
 		{FC471020-9518-4F57-BD29-DC7782753251}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC471020-9518-4F57-BD29-DC7782753251}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC471020-9518-4F57-BD29-DC7782753251}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEFA6FB5-4D10-49C7-98B6-E197238A1E4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEFA6FB5-4D10-49C7-98B6-E197238A1E4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEFA6FB5-4D10-49C7-98B6-E197238A1E4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEFA6FB5-4D10-49C7-98B6-E197238A1E4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DCC9350B-F5A8-4263-9F18-702AEFB0AB1E} = {5F48250E-8B3B-49DD-9ED1-C1E6C6FA6297}
@@ -67,5 +73,6 @@ Global
 		{23635B1E-8F66-42A0-8AEC-568F4AA81744} = {5F48250E-8B3B-49DD-9ED1-C1E6C6FA6297}
 		{C63B95A3-871E-4E0B-91C9-2B45B05EDF1B} = {5F48250E-8B3B-49DD-9ED1-C1E6C6FA6297}
 		{FC471020-9518-4F57-BD29-DC7782753251} = {5F48250E-8B3B-49DD-9ED1-C1E6C6FA6297}
+		{CEFA6FB5-4D10-49C7-98B6-E197238A1E4D} = {D790F85E-998D-458A-974E-C880E8E96575}
 	EndGlobalSection
 EndGlobal
