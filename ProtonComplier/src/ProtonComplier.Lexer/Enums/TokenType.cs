@@ -268,6 +268,11 @@ namespace Proton.Lexer.Enums
         /// </summary>
         CloseSqrBrace,
 
+        /// <summary>
+        /// and operator
+        /// </summary>
+        SemanticalAnd,
+
         // ******************************************//
         //              Special Tokens               //
         // ******************************************//

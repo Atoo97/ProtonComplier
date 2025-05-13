@@ -3,6 +3,7 @@
 // </copyright>
 namespace Proton.CodeGenerator
 {
+    using System.Collections;
     using System.Collections.Generic;
     using System.Text;
     using System.Text.RegularExpressions;
@@ -39,7 +40,7 @@ namespace Proton.CodeGenerator
             var match = MyRegex().Match(expressionShell);
             string indent = match.Success ? match.Groups[1].Value : string.Empty;
 
-            var symbols = GroupSymbol(symbolTable);
+            var symbols = GroupSymbol(symbolTable, true);
             string mergedCode;
 
             var statePlaceCode = GenerateState(symbols, indent);
@@ -50,7 +51,7 @@ namespace Proton.CodeGenerator
             if (preconditionCode.Contains('@'))
             {
                 // Replace @ in the precondition string with the generated postcondition code
-                mergedCode = preconditionCode.Replace("@", GeneratePostcondition(symbolTable, symbols, indent + "    "));
+                mergedCode = preconditionCode.Replace("@", GeneratePostcondition(symbolTable, GroupSymbol(symbolTable, false), indent + "    "));
             }
             else
             {
@@ -90,7 +91,7 @@ namespace Proton.CodeGenerator
 
             // Create a dictionary to group symbols by their serialized value string
             var groupedByValue = symbolTable.Symbols
-                .Where(s => s.Name != "0" && !s.IsResult && s.IsInitialized) // skip precondition
+                .Where(s => s.Name != "0" && s.Name != "0C" && !s.IsResult && s.IsInitialized) // skip precondition
                 .GroupBy(s => string.Join(" ", s.Value.Select(t => t.TokenValue)))
                 .ToDictionary(g => g.Key, g => g.OrderBy(sym => symbolTable.Symbols
                     .ToList()
@@ -153,7 +154,6 @@ namespace Proton.CodeGenerator
             StringBuilder sb = new ();
             sb.AppendLine($"//PostCondition:");
 
-
             foreach (var groupitems in symbols)
             {
                 // Get the initialized items only from the groupitems
@@ -163,6 +163,76 @@ namespace Proton.CodeGenerator
 
                 if (group.Count == 0)
                 {
+                    continue;
+                }
+
+                // Check if group contains a symbol with Name == "0C"
+                if (group.Any(s => s.Name == "0C"))
+                {
+                    var parts = group.First().ValueTokens.ToString().Split('|').ToList();
+                    if (parts.Count() > 0 && parts.Last() == "")
+                    {
+                        parts.RemoveAt(parts.Count - 1);
+                    }
+
+                    int count = 0;
+                    int cnt = 0;
+                    for (var i = 0; i < parts.Count(); i += 2)
+                    {
+                        sb.AppendLine($"{indent}{parts[i]}");
+                        sb.AppendLine($"{indent}" + '{');
+
+                        count += int.Parse(parts[i + 1]);
+                        for (var j = cnt; j < count; j++)
+                        {
+                            var firstSymbol = symbolTable.FindSymbol(group.First().Value[j]) !;
+                            string csharpType = TypeMapping.ToCSharpType(firstSymbol.Type.ToString());
+                            bool isList = firstSymbol.IsList;
+                            string value;
+
+                            if (isList && firstSymbol.Value.First().TokenType == TokenType.QuestionMarks)
+                            {
+                                value = string.Empty;
+                            }
+                            else
+                            {
+                                value = firstSymbol.ValueTokens.ToString().TrimEnd(',');
+                            }
+
+                            string declaration = isList
+                                ? $"{firstSymbol.Name} = new {csharpType}[] {{{value}}};"
+                                : $"{firstSymbol.Name} = {value};";
+
+                            sb.AppendLine($"{indent}    {declaration}");  // Add the declaration to the StringBuilder
+
+                            if (isList)
+                            {
+                                sb.AppendLine($"{indent}    foreach (var item in {firstSymbol.Name})");
+                                sb.AppendLine($"{indent}    {{");
+                                sb.AppendLine($"{indent}        Console.WriteLine(\"Result: \" + item);");
+                                sb.AppendLine($"{indent}    }}");
+                            }
+                            else
+                            {
+                                sb.AppendLine($"{indent}    Console.WriteLine(\"Result: \" + {firstSymbol.Name});");
+                            }
+
+                            sb.AppendLine($"{indent}");
+                        }
+
+                        cnt += count;
+
+                        if (i + 1 == count)
+                        {
+                            sb.AppendLine($"{indent}" + "};");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"{indent}" + '}');
+                        }
+                    }
+
+                    sb.AppendLine($"{indent}");
                     continue;
                 }
 
@@ -252,14 +322,27 @@ namespace Proton.CodeGenerator
             return sb.ToString();
         }
 
-        private static List<List<Symbol>> GroupSymbol(SymbolTable symbolTable)
+        private static List<List<Symbol>> GroupSymbol(SymbolTable symbolTable, bool b)
         {
             List<List<Symbol>> groupedSymbols = new ();
-            List<Symbol> remainingSymbols = symbolTable.Symbols
+            List<Symbol> remainingSymbols = new ();
+
+            if (b)
+            {
+                remainingSymbols = symbolTable.Symbols
+                .Where(s => s.Name != "0" && s.Name != "0C") // exclude precondition
+                .OrderBy(s => s.SymbolLine)
+                .ThenBy(s => s.SymbolColumn)
+                .ToList();
+            }
+            else
+            {
+                remainingSymbols = symbolTable.Symbols
                 .Where(s => s.Name != "0") // exclude precondition
                 .OrderBy(s => s.SymbolLine)
                 .ThenBy(s => s.SymbolColumn)
                 .ToList();
+            }
 
             // Extract precondition symbol if it exists
             preconditionSymbol = symbolTable.Symbols.FirstOrDefault(s => s.Name == "0") !;

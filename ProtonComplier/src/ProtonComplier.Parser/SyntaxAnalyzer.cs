@@ -410,8 +410,13 @@ namespace Proton.Parser
         /// </summary>
         public static void PostconditionParser()
         {
+            // TokenLists for implication
+            List<Token> leftTokens = new ();
+            Token implicationToken = null!;
+            List<Token> rightTokens = new ();
+
             // Split tokens by new lines (each row is a list of tokens)
-            List<List<Token>> splitedTokens = SplitTokensByNewline(Tokens);
+            List<List<Token>> splitedTokens = SplitTokensByNewlineAndSeparator(Tokens);
 
             // Create a list to store variable initialization for this macro section
             List<Statement> postvariableInitializations = new ();
@@ -426,141 +431,308 @@ namespace Proton.Parser
                     break;
                 }
 
-                try
+                // Contain implication:
+                if (Tokens.Any(t => t.TokenType == TokenType.Implication) && Tokens.First().TokenType == TokenType.OpenParen)
                 {
-                    position = 0; // Reset token position for each row
-                    List<IdentifierExpression> variables = new ();
+                    // Find the index of the first Implication token
+                    int implicationIndex = Tokens.FindIndex(t => t.TokenType == TokenType.Implication);
 
-                    do
+                    // Split into left and right tokens
+                    leftTokens = Tokens.Take(implicationIndex).ToList();
+                    implicationToken = Tokens[implicationIndex];
+                    rightTokens = Tokens.Skip(implicationIndex + 1).ToList();
+
+                    // Find and split by SemanticalAnd tokens
+                    var splitGroups = new List<List<Token>>();
+                    var currentGroup = new List<Token>();
+
+                    foreach (var token in rightTokens)
                     {
-                        // 1) Step: Create identifier expression + check next expression exist
-                        variables.Add(new IdentifierExpression(CurrentToken));
-                        Eat(CurrentToken, "Assign");
-
-                        bool warned = false;       // Track if we've already warned about consecutive commas
-                        bool lastWasComma = false; // Tracks if the last token was a comma
-
-                        // 2) Step: Check multiple identifier initialization order
-                        while (CurrentToken.TokenType != TokenType.EndOfInput)
+                        if (token.TokenType == TokenType.SemanticalAnd)
                         {
-                            if (CurrentToken.TokenType == TokenType.Identifier)
+                            if (currentGroup.Count > 0)
                             {
-                                variables.Add(new IdentifierExpression(CurrentToken));
-                                Eat(CurrentToken, "Assign");
-
-                                warned = false;         // Reset warning since we found a valid variable
-                                lastWasComma = false;   // Reset comma tracker
+                                splitGroups.Add(new List<Token>(currentGroup));
+                                currentGroup.Clear();
                             }
-                            else if (CurrentToken.TokenType == TokenType.Comma)
-                            {
-                                if (lastWasComma) // Detect multiple consecutive commas (var1,,,var2)
-                                {
-                                    if (!warned)
-                                    {
-                                        Warnings.Add(new AnalyzerWarning(
-                                            "107",
-                                            string.Format(MessageRegistry.GetMessage(107).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
-
-                                        warned = true; // Prevent duplicate warnings
-                                    }
-                                }
-
-                                Eat(CurrentToken, "Identifier");
-                                lastWasComma = true; // Mark last token as comma
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-
-                        // If the last token before '=' was a comma (e.g., var2,=), issue a warning
-                        if (lastWasComma)
-                        {
-                            Warnings.Add(new AnalyzerWarning(
-                                "107", // Unique ID for trailing comma
-                                string.Format(MessageRegistry.GetMessage(107).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
-                        }
-
-                        // 3) Step: Create assign expression
-                        AssignExpression assign = new (CurrentToken);
-                        Eat(CurrentToken, "Literals");
-
-                        // 4) Step: Collect Specifier type expression until not find new identifier
-                        // (allows operator followed by identifier to be kept going collected).
-                        var typeTokens = Tokens.Skip(position)
-                        .TakeWhile(t => t.TokenType != TokenType.Semicolon && t.TokenType != TokenType.EndOfInput)
-                        .ToList();
-
-                        position += typeTokens.Count + 1;
-
-                        // Add remaining tokens to the end of the row. Support multiple declaration in one line.
-                        if (CurrentToken.TokenType != TokenType.EndOfInput && typeTokens.Count > 0)
-                        {
-                            // Handle multiple separator warning:
-                            // Skip over all leading ',' or ';' and add warnings
-                            while (position < Tokens.Count &&
-                                  (Tokens[position].TokenType == TokenType.Comma || Tokens[position].TokenType == TokenType.Semicolon))
-                            {
-                                var warningToken = Tokens[position];
-
-                                Warnings.Add(new AnalyzerWarning(
-                                        "108",
-                                        string.Format(MessageRegistry.GetMessage(108).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
-
-                                position++; // Skip this token
-                            }
-
-                            var tokens = Tokens.Skip(position).ToList();
-                            splitedTokens.Insert(i + 1, tokens);
-                        }
-                        else if (typeTokens.Count == 0)
-                        {
-                            // Error if assign not followed Expression
-                            // Generate error message
-                            throw new AnalyzerError(
-                                "101",
-                                string.Format(MessageRegistry.GetMessage(101).Text, Tokens[position - 1].TokenLine, Tokens[position - 1].TokenColumn, "TypeSpecifier Literals X"));
-                        }
-
-                        // 5) Step: Create Expression
-                        Expression expr;
-
-                        if (typeTokens[0].TokenType == TokenType.OpenBrace || typeTokens[0].TokenType == TokenType.ValueSpecifier)
-                        {
-                            expr = new ListExpression(typeTokens, Warnings);
                         }
                         else
                         {
-                            expr = ExpressionParserHelper.ParseExpression(typeTokens);
+                            currentGroup.Add(token);
                         }
+                    }
 
-                        // 6) Step: Create VariableInitialize for each variable
-                        foreach (var varExpr in variables)
+                    // Add remaining group
+                    if (currentGroup.Count > 0)
+                    {
+                        splitGroups.Add(currentGroup);
+                    }
+
+                    List<VariableInitialization> initializations = new ();
+                    foreach (var initialization in splitGroups)
+                    {
+                        Tokens.Clear();
+                        Tokens.AddRange(initialization);  // it makes work the Eat/Peak() methods
+
+                        if (Tokens.Count == 0)
                         {
-                            VariableInitialization variableInit = new (varExpr, assign, expr);
-
-                            postvariableInitializations.Add(variableInit); // Add to the list of variable initialization
+                            break;
                         }
 
-                        break;
+                        try
+                        {
+                            position = 0; // Reset token position for each row
+                            List<IdentifierExpression> variables = new ();
+
+                            do
+                            {
+                                // 1) Step: Create identifier expression + check next expression exist
+                                variables.Add(new IdentifierExpression(CurrentToken));
+                                Eat(CurrentToken, "Assign");
+
+                                bool warned = false;       // Track if we've already warned about consecutive commas
+                                bool lastWasComma = false; // Tracks if the last token was a comma
+
+                                // 2) Step: Check multiple identifier initialization order
+                                while (CurrentToken.TokenType != TokenType.EndOfInput)
+                                {
+                                    if (CurrentToken.TokenType == TokenType.Identifier)
+                                    {
+                                        variables.Add(new IdentifierExpression(CurrentToken));
+                                        Eat(CurrentToken, "Assign");
+
+                                        warned = false;         // Reset warning since we found a valid variable
+                                        lastWasComma = false;   // Reset comma tracker
+                                    }
+                                    else if (CurrentToken.TokenType == TokenType.Comma)
+                                    {
+                                        if (lastWasComma) // Detect multiple consecutive commas (var1,,,var2)
+                                        {
+                                            if (!warned)
+                                            {
+                                                Warnings.Add(new AnalyzerWarning(
+                                                    "107",
+                                                    string.Format(MessageRegistry.GetMessage(107).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
+
+                                                warned = true; // Prevent duplicate warnings
+                                            }
+                                        }
+
+                                        Eat(CurrentToken, "Identifier");
+                                        lastWasComma = true; // Mark last token as comma
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+
+                                // If the last token before '=' was a comma (e.g., var2,=), issue a warning
+                                if (lastWasComma)
+                                {
+                                    Warnings.Add(new AnalyzerWarning(
+                                        "107", // Unique ID for trailing comma
+                                        string.Format(MessageRegistry.GetMessage(107).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
+                                }
+
+                                // 3) Step: Create assign expression
+                                AssignExpression assign = new (CurrentToken);
+                                Eat(CurrentToken, "Literals");
+
+                                // 4) Step: Collect Specifier type expression
+                                var typeTokens = Tokens.Skip(position).ToList();
+
+                                // 5) Step: Create Expression
+                                Expression expr;
+
+                                if (typeTokens[0].TokenType == TokenType.OpenBrace || typeTokens[0].TokenType == TokenType.ValueSpecifier)
+                                {
+                                    expr = new ListExpression(typeTokens, Warnings);
+                                }
+                                else
+                                {
+                                    expr = ExpressionParserHelper.ParseExpression(typeTokens);
+                                }
+
+                                // 6) Step: Create VariableInitialize for each variable
+                                foreach (var varExpr in variables)
+                                {
+                                    VariableInitialization variableInit = new (varExpr, assign, expr);
+
+                                    initializations.Add(variableInit);
+                                }
+
+                                break;
+                            }
+                            while (false);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (ex is AnalyzerWarning warning)
+                            {
+                                Warnings.Add(warning);
+                            }
+                            else if (ex is AnalyzerError error)
+                            {
+                                Errors.Add(error);
+                            }
+                            else
+                            {
+                                // Fallback: Add generic errors to both lists if the type is unknown
+                                Console.WriteLine(ex.Message);
+                            }
+                        }
                     }
-                    while (false);
+
+                    // 7) Create the statement
+                    Expression leftExpression = ExpressionParserHelper.ParseExpression(leftTokens);
+                    ImplicationExpression imp = new (implicationToken);
+                    PostconditionImplication postconditionImplication = new (leftExpression, imp, initializations);
+                    postvariableInitializations.Add(postconditionImplication); // Add to the list of variable initialization
+
+                    // Reset TokenLists for implication
+                    leftTokens = new ();
+                    implicationToken = null!;
+                    rightTokens = new ();
                 }
-                catch (Exception ex)
+                else
                 {
-                    if (ex is AnalyzerWarning warning)
+                    try
                     {
-                        Warnings.Add(warning);
+                        position = 0; // Reset token position for each row
+                        List<IdentifierExpression> variables = new ();
+
+                        do
+                        {
+                            // 1) Step: Create identifier expression + check next expression exist
+                            variables.Add(new IdentifierExpression(CurrentToken));
+                            Eat(CurrentToken, "Assign");
+
+                            bool warned = false;       // Track if we've already warned about consecutive commas
+                            bool lastWasComma = false; // Tracks if the last token was a comma
+
+                            // 2) Step: Check multiple identifier initialization order
+                            while (CurrentToken.TokenType != TokenType.EndOfInput)
+                            {
+                                if (CurrentToken.TokenType == TokenType.Identifier)
+                                {
+                                    variables.Add(new IdentifierExpression(CurrentToken));
+                                    Eat(CurrentToken, "Assign");
+
+                                    warned = false;         // Reset warning since we found a valid variable
+                                    lastWasComma = false;   // Reset comma tracker
+                                }
+                                else if (CurrentToken.TokenType == TokenType.Comma)
+                                {
+                                    if (lastWasComma) // Detect multiple consecutive commas (var1,,,var2)
+                                    {
+                                        if (!warned)
+                                        {
+                                            Warnings.Add(new AnalyzerWarning(
+                                                "107",
+                                                string.Format(MessageRegistry.GetMessage(107).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
+
+                                            warned = true; // Prevent duplicate warnings
+                                        }
+                                    }
+
+                                    Eat(CurrentToken, "Identifier");
+                                    lastWasComma = true; // Mark last token as comma
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+
+                            // If the last token before '=' was a comma (e.g., var2,=), issue a warning
+                            if (lastWasComma)
+                            {
+                                Warnings.Add(new AnalyzerWarning(
+                                    "107", // Unique ID for trailing comma
+                                    string.Format(MessageRegistry.GetMessage(107).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
+                            }
+
+                            // 3) Step: Create assign expression
+                            AssignExpression assign = new (CurrentToken);
+                            Eat(CurrentToken, "Literals");
+
+                            // 4) Step: Collect Specifier type expression until not find new identifier
+                            // (allows operator followed by identifier to be kept going collected).
+                            var typeTokens = Tokens.Skip(position)
+                            .TakeWhile(t => t.TokenType != TokenType.Semicolon && t.TokenType != TokenType.EndOfInput)
+                            .ToList();
+
+                            position += typeTokens.Count + 1;
+
+                            // Add remaining tokens to the end of the row. Support multiple declaration in one line.
+                            if (CurrentToken.TokenType != TokenType.EndOfInput && typeTokens.Count > 0)
+                            {
+                                // Handle multiple separator warning:
+                                // Skip over all leading ',' or ';' and add warnings
+                                while (position < Tokens.Count &&
+                                      (Tokens[position].TokenType == TokenType.Comma || Tokens[position].TokenType == TokenType.Semicolon))
+                                {
+                                    var warningToken = Tokens[position];
+
+                                    Warnings.Add(new AnalyzerWarning(
+                                            "108",
+                                            string.Format(MessageRegistry.GetMessage(108).Text, CurrentToken.TokenLine, CurrentToken.TokenColumn - 1)));
+
+                                    position++; // Skip this token
+                                }
+
+                                var tokens = Tokens.Skip(position).ToList();
+                                splitedTokens.Insert(i + 1, tokens);
+                            }
+                            else if (typeTokens.Count == 0)
+                            {
+                                // Error if assign not followed Expression
+                                // Generate error message
+                                throw new AnalyzerError(
+                                    "101",
+                                    string.Format(MessageRegistry.GetMessage(101).Text, Tokens[position - 1].TokenLine, Tokens[position - 1].TokenColumn, "TypeSpecifier Literals X"));
+                            }
+
+                            // 5) Step: Create Expression
+                            Expression expr;
+
+                            if (typeTokens[0].TokenType == TokenType.OpenBrace || typeTokens[0].TokenType == TokenType.ValueSpecifier)
+                            {
+                                expr = new ListExpression(typeTokens, Warnings);
+                            }
+                            else
+                            {
+                                expr = ExpressionParserHelper.ParseExpression(typeTokens);
+                            }
+
+                            // 6) Step: Create VariableInitialize for each variable
+                            foreach (var varExpr in variables)
+                            {
+                                VariableInitialization variableInit = new (varExpr, assign, expr);
+
+                                postvariableInitializations.Add(variableInit); // Add to the list of variable initialization
+                            }
+
+                            break;
+                        }
+                        while (false);
                     }
-                    else if (ex is AnalyzerError error)
+                    catch (Exception ex)
                     {
-                        Errors.Add(error);
-                    }
-                    else
-                    {
-                        // Fallback: Add generic errors to both lists if the type is unknown
-                        Console.WriteLine(ex.Message);
+                        if (ex is AnalyzerWarning warning)
+                        {
+                            Warnings.Add(warning);
+                        }
+                        else if (ex is AnalyzerError error)
+                        {
+                            Errors.Add(error);
+                        }
+                        else
+                        {
+                            // Fallback: Add generic errors to both lists if the type is unknown
+                            Console.WriteLine(ex.Message);
+                        }
                     }
                 }
             }
@@ -645,6 +817,37 @@ namespace Proton.Parser
                     return acc;
                 })
                 .Where(group => group.Count > 0) // Remove empty groups
+                .ToList();
+        }
+
+        /// <summary>
+        /// Splits a flat list of tokens into rows of tokens separated by newlines and semicolon,
+        /// removing whitespace and comment tokens.
+        /// </summary>
+        /// <param name="tokens">The input token list.</param>
+        /// <returns>A list of token rows (line-based).</returns>
+        private static List<List<Token>> SplitTokensByNewlineAndSeparator(List<Token> tokens)
+        {
+            return tokens
+                .Aggregate(new List<List<Token>> { new () }, (acc, token) =>
+                {
+                    if (token.TokenType == TokenType.Newline || token.TokenType == TokenType.Semicolon)
+                    {
+                        // Only start a new group if the current one has content
+                        if (acc.Last().Count > 0)
+                        {
+                            acc.Add(new List<Token>());
+                        }
+                    }
+                    else if (token.TokenType != TokenType.Whitespace &&
+                             token.TokenType != TokenType.Comment)
+                    {
+                        acc.Last().Add(token); // Add token to the current group
+                    }
+
+                    return acc;
+                })
+                .Where(group => group.Count > 0) // Remove any empty groups
                 .ToList();
         }
 

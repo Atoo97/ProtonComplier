@@ -3,7 +3,9 @@
 // </copyright>
 namespace Proton.Semantic
 {
+    using System.Collections.Generic;
     using System.Data;
+    using System.Data.Common;
     using System.Text.RegularExpressions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -343,126 +345,88 @@ namespace Proton.Semantic
         /// </summary>
         public static void PostconditionParser()
         {
+            // Create new fake condition Symbol
+            var implicationsymbol = new Symbol
+            {
+                Name = "0C",
+                Type = TokenType.Boolean,
+                Category = TokenCategory.Keyword,
+                Value = new (),
+                SymbolLine = -1,
+                SymbolColumn = -1,
+                IsList = false,
+                IsResult = false,
+            };
+
+            // Add symbol to symbol table if possible
+            symbolTable.AddSymbol(implicationsymbol);
+
             foreach (var statement in Statements)
             {
                 try
                 {
-                    // 1) Chehck if varibale is exist in symboltable
-                    Symbol symbol = symbolTable.FindSymbol(statement.LeftNode!.ParseSymbol)!;
-
-                    if (statement is VariableInitialization variableInitialization)
+                    if (statement is PostconditionImplication postcondition)
                     {
-                        // 2) Chehck if defined as list or not
-                        if (symbol.IsList != variableInitialization.IsList)
+                        // Create new fake condition Symbol
+                        var symbol = new Symbol
                         {
-                            var token = variableInitialization.LeftNode!.ParseSymbol;
-                            string declaredAs = symbol.IsList ? "a list" : "not a list";
+                            Name = "0C_Fake",
+                            Type = TokenType.Boolean,
+                            Category = TokenCategory.Keyword,
+                            Value = new (),
+                            SymbolLine = -1,
+                            SymbolColumn = -1,
+                            IsList = false,
+                            IsResult = false,
+                        };
 
-                            throw new AnalyzerError(
-                                "212",
-                                string.Format(MessageRegistry.GetMessage(212).Text, symbol.Name, declaredAs, token.TokenLine, token.TokenColumn));
-                        }
+                        var expr = postcondition.LeftNode as Expression;
+                        var line = expr!.ParseSymbol.TokenLine;
+                        var column = expr!.ParseSymbol.TokenColumn;
 
-                        // 3) Add values to the Symbol, plus check typecorrectness
-                        if (variableInitialization.IsList)
+                        if (!implicationsymbol.IsResult)
                         {
-                            if (symbol.IsInitialized)
-                            {
-                                throw new AnalyzerError(
-                                   "207",
-                                   string.Format(MessageRegistry.GetMessage(207).Text, symbol.Name, symbol.SymbolLine, symbol.SymbolColumn));
-                            }
-
-                            var listexpr = variableInitialization.RightNode as ListExpression;
-
-                            if (listexpr!.ParseSymbol.TokenType == TokenType.ValueSpecifier) // Empty list
-                            {
-                                // Add ?? as indicate empty list:
-                                symbol.Value.Add(new Token
-                                {
-                                    TokenType = TokenType.QuestionMarks,
-                                    TokenCategory = TokenCategory.Special,
-                                    TokenValue = "??",
-                                    TokenLine = 0,
-                                    TokenColumn = 0,
-                                });
-
-                                symbol.IsInitialized = true;
-                                symbol.IsResult = true;
-                                continue;
-                            }
-
-                            foreach (var item in listexpr!.Elements)
-                            {
-                                ValidateAndCollectTokens(item, symbol);
-
-                                if (symbol.Type == TokenType.Boolean)
-                                {
-                                    string valueStr = symbol.ValueTokens.ToString();
-                                    int lastCommaIndex = valueStr.LastIndexOf(',');
-
-                                    string lastSegment = lastCommaIndex >= 0
-                                        ? valueStr.Substring(lastCommaIndex + 1).Trim()
-                                        : valueStr.Trim();
-
-                                    // Check if boolean type is valid
-                                    if (!IsValidExpression(lastSegment, "bool"))
-                                    {
-                                        throw new AnalyzerError(
-                                             "239",
-                                             string.Format(MessageRegistry.GetMessage(239).Text, lastSegment, symbol.SymbolLine, symbol.SymbolColumn));
-                                    }
-                                }
-
-                                symbol.ValueTokens.Append(',');
-
-                                // Add semicolon as list separator:
-                                symbol.Value.Add(new Token
-                                {
-                                    TokenType = TokenType.Semicolon,
-                                    TokenCategory = TokenCategory.Punctuator,
-                                    TokenValue = ";",
-                                    TokenLine = 0,
-                                    TokenColumn = 0,
-                                });
-                            }
-
-                            symbol.IsInitialized = true;
-                            symbol.IsResult = true;
+                            implicationsymbol.ValueTokens.Append("if");
                         }
                         else
                         {
-                            var rightnode = variableInitialization.RightNode as Expression;
-                            if (symbol.IsInitialized)
-                            {
-                                throw new AnalyzerError(
-                                   "207",
-                                   string.Format(MessageRegistry.GetMessage(207).Text, symbol.Name, symbol.SymbolLine, symbol.SymbolColumn));
-                            }
-
-                            ValidateAndCollectTokens(rightnode!, symbol);
-
-                            if (symbol.Type == TokenType.Boolean)
-                            {
-                                string valueStr = symbol.ValueTokens.ToString();
-                                int lastCommaIndex = valueStr.LastIndexOf(',');
-
-                                string lastSegment = lastCommaIndex >= 0
-                                    ? valueStr.Substring(lastCommaIndex + 1).Trim()
-                                    : valueStr.Trim();
-
-                                // Check if boolean type is valid
-                                if (!IsValidExpression(lastSegment, "bool"))
-                                {
-                                    throw new AnalyzerError(
-                                         "239",
-                                         string.Format(MessageRegistry.GetMessage(239).Text, lastSegment, symbol.SymbolLine, symbol.SymbolColumn));
-                                }
-                            }
-
-                            symbol.IsInitialized = true;
-                            symbol.IsResult = true;
+                            implicationsymbol.ValueTokens.Append("else if");
                         }
+
+                        ValidateAndCollectTokens(expr!, symbol);
+                        string valueStr = symbol.ValueTokens.ToString();
+
+                        // Check if boolean type is valid
+                        if (!IsValidExpression(valueStr, "bool"))
+                        {
+                            throw new AnalyzerError(
+                                 "239",
+                                 string.Format(MessageRegistry.GetMessage(239).Text, valueStr, line, column));
+                        }
+
+                        implicationsymbol.IsResult = true;
+                        implicationsymbol.ValueTokens.Append(symbol.ValueTokens);
+                        implicationsymbol.ValueTokens.Append('|');
+
+                        List<Token> variables = new ();
+                        foreach (var variableInitialization in postcondition.Initializations)
+                        {
+                            variables.Add(variableInitialization.LeftNode!.ParseSymbol);
+
+                            // 1) Chehck if varibale is exist in symboltable
+                            Symbol symbol2 = symbolTable.FindSymbol(variableInitialization.LeftNode!.ParseSymbol) !;
+                            variableInitializationHelper(symbol2, variableInitialization);
+                        }
+
+                        implicationsymbol.Value.AddRange(variables);
+                        implicationsymbol.ValueTokens.Append($"{variables.Count}");
+                        implicationsymbol.ValueTokens.Append('|');
+                    }
+                    else if (statement is VariableInitialization variableInitialization)
+                    {
+                        // 1) Chehck if varibale is exist in symboltable
+                        Symbol symbol = symbolTable.FindSymbol(statement.LeftNode!.ParseSymbol) !;
+                        variableInitializationHelper(symbol, variableInitialization);
                     }
                     else
                     {
@@ -485,6 +449,132 @@ namespace Proton.Semantic
                         Console.WriteLine(ex.Message);
                     }
                 }
+            }
+
+            // if 0C is result:
+            if (implicationsymbol.IsResult)
+            {
+                foreach (var token in implicationsymbol.Value)
+                {
+                    Symbol symbol = symbolTable.FindSymbol(token) !;
+                    symbol.IsResult = false;
+                    symbol.IsInitialized = false;
+                }
+            }
+        }
+
+        public static void variableInitializationHelper(Symbol symbol, VariableInitialization variableInitialization)
+        {
+            // 2) Chehck if defined as list or not
+            if (symbol.IsList != variableInitialization.IsList)
+            {
+                var token = variableInitialization.LeftNode!.ParseSymbol;
+                string declaredAs = symbol.IsList ? "a list" : "not a list";
+
+                throw new AnalyzerError(
+                    "212",
+                    string.Format(MessageRegistry.GetMessage(212).Text, symbol.Name, declaredAs, token.TokenLine, token.TokenColumn));
+            }
+
+            // 3) Add values to the Symbol, plus check typecorrectness
+            if (variableInitialization.IsList)
+            {
+                if (symbol.IsInitialized)
+                {
+                    throw new AnalyzerError(
+                       "207",
+                       string.Format(MessageRegistry.GetMessage(207).Text, symbol.Name, symbol.SymbolLine, symbol.SymbolColumn));
+                }
+
+                var listexpr = variableInitialization.RightNode as ListExpression;
+
+                if (listexpr!.ParseSymbol.TokenType == TokenType.ValueSpecifier) // Empty list
+                {
+                    // Add ?? as indicate empty list:
+                    symbol.Value.Add(new Token
+                    {
+                        TokenType = TokenType.QuestionMarks,
+                        TokenCategory = TokenCategory.Special,
+                        TokenValue = "??",
+                        TokenLine = 0,
+                        TokenColumn = 0,
+                    });
+
+                    symbol.IsInitialized = true;
+                    symbol.IsResult = true;
+                    return;
+                }
+
+                foreach (var item in listexpr!.Elements)
+                {
+                    ValidateAndCollectTokens(item, symbol);
+
+                    if (symbol.Type == TokenType.Boolean)
+                    {
+                        string valueStr = symbol.ValueTokens.ToString();
+                        int lastCommaIndex = valueStr.LastIndexOf(',');
+
+                        string lastSegment = lastCommaIndex >= 0
+                            ? valueStr.Substring(lastCommaIndex + 1).Trim()
+                            : valueStr.Trim();
+
+                        // Check if boolean type is valid
+                        if (!IsValidExpression(lastSegment, "bool"))
+                        {
+                            throw new AnalyzerError(
+                                 "239",
+                                 string.Format(MessageRegistry.GetMessage(239).Text, lastSegment, symbol.SymbolLine, symbol.SymbolColumn));
+                        }
+                    }
+
+                    symbol.ValueTokens.Append(',');
+
+                    // Add semicolon as list separator:
+                    symbol.Value.Add(new Token
+                    {
+                        TokenType = TokenType.Semicolon,
+                        TokenCategory = TokenCategory.Punctuator,
+                        TokenValue = ";",
+                        TokenLine = 0,
+                        TokenColumn = 0,
+                    });
+                }
+
+                symbol.IsInitialized = true;
+                symbol.IsResult = true;
+            }
+            else
+            {
+                var rightnode = variableInitialization.RightNode as Expression;
+                if (symbol.IsInitialized)
+                {
+                    throw new AnalyzerError(
+                       "207",
+                       string.Format(MessageRegistry.GetMessage(207).Text, symbol.Name, symbol.SymbolLine, symbol.SymbolColumn));
+                }
+
+                ValidateAndCollectTokens(rightnode!, symbol);
+
+                if (symbol.Type == TokenType.Boolean)
+                {
+                    string valueStr = symbol.ValueTokens.ToString();
+                    int lastCommaIndex = valueStr.LastIndexOf(',');
+
+                    string lastSegment = lastCommaIndex >= 0
+                        ? valueStr.Substring(lastCommaIndex + 1).Trim()
+                        : valueStr.Trim();
+
+                    // Check if boolean type is valid
+                    if (!IsValidExpression(lastSegment, "bool"))
+                    {
+                        throw new AnalyzerError(
+                             "239",
+                             string.Format(MessageRegistry.GetMessage(239).Text, lastSegment, symbol.SymbolLine, symbol.SymbolColumn));
+                    }
+                }
+
+                symbol.IsInitialized = true;
+                symbol.IsResult = true;
             }
         }
 

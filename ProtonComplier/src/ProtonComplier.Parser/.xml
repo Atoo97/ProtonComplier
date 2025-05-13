@@ -130,6 +130,27 @@
             <param name="ident">The indentation level (each level equals 4 spaces).</param>
             <returns>A formatted string representing the identifier.</returns>
         </member>
+        <member name="T:Proton.Parser.Expressions.ImplicationExpression">
+            <summary>
+            Represents an implication expression.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.ImplicationExpression.#ctor(Proton.Lexer.Token)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.ImplicationExpression"/> class.
+            Validates that the provided token is of type "Implication".
+            </summary>
+            <param name="implication">The token representing the implication operator ("->"). </param>
+            <exception cref="T:System.Exception">Thrown if the token is not of type "Assign".</exception>
+        </member>
+        <member name="M:Proton.Parser.Expressions.ImplicationExpression.ToCode(System.Int32)">
+            <summary>
+            Generates the string representation of the implication expression for code generation,
+            including the implication operator and proper indentation.
+            </summary>
+            <param name="ident">The indentation level (each level equals 4 spaces).</param>
+            <returns>A formatted string representing the implication expression.</returns>
+        </member>
         <member name="T:Proton.Parser.Expressions.LengthExpression">
             <summary>
             Represents an expression that accesses the length of a list or array-like identifier (e.g., `list.Length`).
@@ -571,6 +592,32 @@
             <param name="sections">A dictionary containing tokenized input grouped by sections.</param>
             <returns>A <see cref="T:Proton.Parser.ParserResult"/> containing the result of the analysis, including any errors or warnings detected during parsing.</returns>
         </member>
+        <member name="T:Proton.Parser.Statements.PostconditionImplication">
+            <summary>
+            Represents a postcondition implication statement that includes a condition,
+            an implication expression, and a list of variable initializations to execute
+            when the implication is satisfied.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Statements.PostconditionImplication.#ctor(Proton.Parser.Expressions.Expression,Proton.Parser.Expressions.ImplicationExpression,System.Collections.Generic.List{ProtonComplier.Parser.Statements.VariableInitialization})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Statements.PostconditionImplication"/> class.
+            </summary>
+            <param name="condition">The logical condition to evaluate.</param>
+            <param name="implication">The implication expression associated with the condition.</param>
+            <param name="statements">The variable initialization statements to execute if the implication holds.</param>
+        </member>
+        <member name="P:Proton.Parser.Statements.PostconditionImplication.Initializations">
+            <summary>
+            Gets the list of variable initialization statements.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Statements.PostconditionImplication.ToCode">
+            <summary>
+            Converts the postcondition implication statement to its formatted code string representation.
+            </summary>
+            <returns>A string representing the structure of the postcondition implication.</returns>
+        </member>
         <member name="T:Proton.Parser.Statements.PreconditionDeclaration">
             <summary>
             Represents a precondition statement in the parse tree.
@@ -694,6 +741,14 @@
         <member name="M:Proton.Parser.SyntaxAnalyzer.SplitTokensByNewline(System.Collections.Generic.List{Proton.Lexer.Token})">
             <summary>
             Splits a flat list of tokens into rows of tokens separated by newlines,
+            removing whitespace and comment tokens.
+            </summary>
+            <param name="tokens">The input token list.</param>
+            <returns>A list of token rows (line-based).</returns>
+        </member>
+        <member name="M:Proton.Parser.SyntaxAnalyzer.SplitTokensByNewlineAndSeparator(System.Collections.Generic.List{Proton.Lexer.Token})">
+            <summary>
+            Splits a flat list of tokens into rows of tokens separated by newlines and semicolon,
             removing whitespace and comment tokens.
             </summary>
             <param name="tokens">The input token list.</param>

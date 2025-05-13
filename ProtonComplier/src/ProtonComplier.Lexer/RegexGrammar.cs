@@ -84,6 +84,7 @@ namespace Proton.Lexer
                 new (TokenType.ListSpecifier, TokenCategory.Punctuator, ListSpecifierRegex()),
                 new (TokenType.OpenSqrBrace, TokenCategory.Punctuator, OpenSqrBraceRegex()),
                 new (TokenType.CloseSqrBrace, TokenCategory.Punctuator, CloseSqrBraceRegex()),
+                new (TokenType.SemanticalAnd, TokenCategory.Punctuator, SemanticalAndRegex()),
 
                 // Special Tokens
                 new (TokenType.Macro, TokenCategory.Special, MacroRegex()),
@@ -245,6 +246,9 @@ namespace Proton.Lexer
 
         [GeneratedRegex("\\G(\\])", RegexOptions.Compiled)]
         private static partial Regex CloseSqrBraceRegex();
+
+        [GeneratedRegex("\\G(&)", RegexOptions.Compiled)]
+        private static partial Regex SemanticalAndRegex();
 
         // Special Regex:
         [GeneratedRegex(@"\G(#([^\r\n]*))", RegexOptions.Compiled)]
