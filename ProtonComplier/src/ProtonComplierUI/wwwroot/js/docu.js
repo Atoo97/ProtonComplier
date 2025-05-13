@@ -163,8 +163,32 @@ const messages = {
     },
 };
 
+// Define reference messages in an object
+const messages2 = {
+    R001: {
+        code: 'R001',
+        severity: 'Syntax',
+        text: 'LexerError: during complie Proton project',
+        example: 'The error is caused when an empty file or a file containing only comments is compiled by the compiler.\n ' +
+            'Please define at least the macros to run the code correctly.',
+        editorcode: '?',
+    },
+    R002: {
+        code: 'R002',
+        severity: 'The Basics',
+        text: 'LexerError: Invalid macro: {0} at line {1}, column {2}. Expected one of: {3}.',
+        example: 'The error is caused when file contains an invalid macro type. You can fix this error if you define one of the following macro type:\n' +
+            '<ul><li><b>#StateSpace</b></li><li><b>#Input</b></li><li><b>#Precondition</b></li><li><b>#Postcondition</b></li> </ul >\n' +
+            '<h2><b>Example</b></h2><p>The following example generates P004:</p>',
+        editorcode: '// @ProtonComplier\n\n#StateSpace\n\n#NotdefinedMacro\n\n#Precondition\n\n#Postcondition',
+    }
+};
+
+
+
 // Get an ordered list of error codes
 const errorCodes = Object.keys(messages);
+const refernceCodes = Object.keys(messages2);
 
 // Function to display error details in the content section
 function showMessage(code) {
@@ -229,6 +253,68 @@ function showMessage(code) {
     `;
 }
 
+// Function to display reference details in the content section
+function showMessage2(code) {
+
+    //Update URL hash without page reload
+    window.location.hash = code;
+
+    const content = document.getElementById('content');
+    const content2 = document.getElementById('content2');
+    const editorContainer = document.getElementById('editor-container');
+
+    // Handle special "Main" page case
+    if (code === 'R000') {
+        content.innerHTML = `
+            <h1>Proton Language Reference</h1>
+            <p>Welcome to the Proton Language Reference section. <br />
+                Here.....</p>
+                <button class="btn btn-primary" onclick="showMessage2('R001')">
+                    Next Up: “Welcome to Proton Compiler” →
+                </button>
+        `;
+        content2.innerHTML = "";
+        editorContainer.style.display = 'none';
+        return;
+    }
+
+    const msg = messages2[code];
+    if (!msg) {
+        console.error(`Unknown error code: ${code}`);
+        return;
+    }
+
+    // Dynamically update the content area with error details
+    content.innerHTML = `
+        <h2>Error ${msg.code}</h2>
+        <table id="errortable"> 
+            <tr><th>Code</th><td><b>${msg.code}</b></td></tr>
+            <tr><th>Severity</th><td>${msg.severity}</td></tr>
+            <tr><th>Message</th><td>${msg.text}</td></tr>
+        </table>
+        <br>
+        <h2>${msg.severity} description:</h2>
+           ${msg.example}
+        </p>
+    `;
+
+    // Event listener to trigger setting the editor value
+    if (msg.editorcode !== '?') {
+        setEditorValue(msg.editorcode);
+        document.getElementById('editor-container').style.display = 'block';
+    } else {
+        document.getElementById('editor-container').style.display = 'none';
+    }
+
+    content2.innerHTML = `
+        <hr />
+        <div class="d-flex justify-content-between">
+            ${getPrevLink2(code)}
+            ${getNextLink2(code)}
+        </div>
+    `;
+}
+
 // Function to get the previous error link
 function getPrevLink(code) {
     const index = errorCodes.indexOf(code);
@@ -236,6 +322,20 @@ function getPrevLink(code) {
         const prevCode = errorCodes[index - 1];
         return `<button class="btn btn-secondary" onclick="showMessage('${prevCode}')">
                   ← Previous: “${prevCode}”
+                </button>`;
+    } else {
+        return ''; // No previous error
+    }
+}
+
+// Prev link
+function getPrevLink2(code) {
+    const index = refernceCodes.indexOf(code);
+    if (index > 0) {
+        const prevCode = refernceCodes[index - 1];
+        const severity = messages2[prevCode]?.severity || 'Unknown';
+        return `<button class="btn btn-secondary" onclick="showMessage2('${prevCode}')">
+                  ← Previous: ${severity}
                 </button>`;
     } else {
         return ''; // No previous error
@@ -255,6 +355,20 @@ function getNextLink(code) {
     }
 }
 
+// Next link
+function getNextLink2(code) {
+    const index = refernceCodes.indexOf(code);
+    if (index < refernceCodes.length - 1) {
+        const nextCode = refernceCodes[index + 1];
+        const severity = messages2[nextCode]?.severity || 'Unknown';
+        return `<button class="btn btn-primary" onclick="showMessage2('${nextCode}')">
+                  Next Up: ${severity} →
+                </button>`;
+    } else {
+        return ''; // No next error
+    }
+}
+
 // Optional: Add dynamic toggling for the sidebar (responsive behavior)
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
@@ -267,6 +381,9 @@ window.addEventListener('load', () => {
     if (hash && hash.startsWith("#P")) {
         const code = hash.substring(1); // "P001"
         showMessage(code);
+    } else {
+        const code = hash.substring(1); // "R001"
+        showMessage2(code);
     }
 });
 
@@ -275,5 +392,8 @@ window.addEventListener('hashchange', () => {
     if (hash && hash.startsWith("#P")) {
         const code = hash.substring(1); // "P001"
         showMessage(code);
+    } else {
+        const code = hash.substring(1); // "R001"
+        showMessage2(code);
     }
 });

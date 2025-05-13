@@ -25,79 +25,22 @@
                 <div class="collapse d-md-block mt-2" id="mobileToc">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link-item" href="#document-welcome">Welcome to Emojicode</a>
+                            <a class="nav-link-item" href="#R001" onclick="showMessage2('R001'); return false;">Welcome to Proton Compiler</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link-item" href="#document-syntax">Syntax</a>
+                            <a class="nav-link-item" href="#R002" onclick="showMessage2('R002'); return false;">Syntax</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link-item" href="#document-basics">The Basics</a>
+                            <a class="nav-link-item" href="#R003" onclick="showMessage2('R003'); return false;">The Basics</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link-item" href="#">Literals</a>
+                            <a class="nav-link-item" href="#R004" onclick="showMessage2('R004'); return false;">Literals</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link-item" href="#">Variables and Assignment</a>
+                            <a class="nav-link-item" href="#R005" onclick="showMessage2('R005'); return false;">Variables and Assignment</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link-item" href="#">Control Flow</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Classes & Value Types</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Overloading</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Operators</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Optionals</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Errors</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Inheritance and Overriding</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Protocols</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Enumerations</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Types and Namespaces</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Types as Values</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Documentation</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Generics</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Callables</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Packages</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Threads</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Safe and Unsafe Code</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Memory Management</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">References</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link-item" href="#">Appendix: The Emojicode Compiler</a>
+                            <a class="nav-link-item" href="#R006" onclick="showMessage2('R006'); return false;">Control Flow</a>
                         </li>
                     </ul>
                 </div>
@@ -105,80 +48,12 @@
 
 
             <!-- Right Main Content -->
-            <main class="col-md-9 main-content" id="document-welcome">
-                <h1>Welcome to Emojicode</h1>
-                <p><strong>Hint:</strong> Looking for a tutorial? See “Compile and Run Your First Program”.</p>
-                <p>Emojicode is a language that aims to provide the most modern and powerful features to make it easy, fast and fun to write programs. These powerful features include classes, optionals, which can handle the absence of a value, generics, closures and much more.</p>
-                <p>The Language Reference & Guide assumes that you have a basic understanding of programming. It is not a tutorial but mainly describes the features of Emojicode and its use cases. It is both a guide, in that it contains examples and tips on how to use features, and is the authoritative source that prescribes how to interpret and execute Emojicode source code.</p>
-                <p>Emojicode is a strongly typed language, which means that the compiler will verify that all of your operations are correct.</p>
-                <p>Although Emojicode only uses Emojis to express the program’s structure, it is similar to programming languages you might know, like C.</p>
-
-                <hr />
-                <!-- Navigation and buttons -->
-                <div class="d-flex justify-content-between">
-                    <a class="nav-link-item" href="#document-syntax">Next Up: “Syntax” →</a>
+            <main class="col-md-9">
+                <div class="content" id="content"></div>
+                <div id="editor-container" class="box" style="height: 200px; display: none;">
+                    <div id="editor-inner"></div>
                 </div>
-            </main>
-
-
-
-            <main class="col-md-9 main-content" id="document-syntax">
-                <h1>Syntax</h1>
-                <p>The Language Reference & Guide aims to be – as the title suggests – a reference and guide in one. Since a programming language needs formal definitions, you’ll see syntactic definitions from time to time. The notation used and the most basic syntactic definitions are described in this chapter. The meaning of these structures will be described in detail in the following chapters.</p>
-
-                <p><strong>Hint:</strong> If you don’t really care about syntactic definitions, no worries! You should be able to follow along without problems. Just skip this chapter and ignore them.</p>
-
-                <p>Note that the grammar specified in the Language Reference & Guide is not a complete description of the Emojicode language. The grammar alone allows programs that are not valid. The accompanying text will outline further rules that programs must obey.</p>
-
-                <h3>Document Syntax</h3>
-                <p>Every Emojicode source code document consists of any number of document-statements.</p>
-                <pre class="syntax"><code><span class="syntax-placeholder" id="srule-document-statement">document-statement</span> ⟶ <a class="syntax-placeholder" href="/docs/reference/packages#srule-package-import">package-import</a> | <a class="syntax-placeholder" href="/docs/reference/syntax#srule-include">include</a> | <a class="syntax-placeholder" href="/docs/reference/documentation#srule-package-documentation-comment">package-documentation-comment</a>
-                <span class="syntax-placeholder" id="srule-document-statement">document-statement</span> ⟶ <a class="syntax-placeholder" href="/docs/reference/classes-valuetypes#srule-type-definition">type-definition</a> | <a class="syntax-placeholder" href="/docs/reference/packages#srule-link-hints">link-hints</a>
-                <span class="syntax-placeholder" id="srule-document-statement">document-statement</span> ⟶ <a class="syntax-placeholder" href="/docs/reference/syntax#srule-start-flag">start-flag</a>
-                <span class="syntax-placeholder" id="srule-include">include</span> ⟶ 📜 <a class="syntax-placeholder" href="/docs/reference/literals#srule-string-literal">string-literal</a>
-                <span class="syntax-placeholder" id="srule-start-flag">start-flag</span> ⟶ 🏁 [<a class="syntax-placeholder" href="/docs/reference/classes-valuetypes#srule-return-type">return-type</a>] <a class="syntax-placeholder" href="/docs/reference/controlflow#srule-block">block</a>
-                        </code>
-                    </pre>
-
-                <!-- Navigation and buttons -->
-                <div class="d-flex justify-content-between">
-                    <a class="nav-link-item" href="#document-welcome">← Previous</a>
-                    <a class="nav-link-item" href="#document-basics">Next Up: “The Basics” →</a>
-                </div>
-
-            </main>
-
-
-            <main class="col-md-9 main-content" id="document-basics">
-                <h1>The Basics</h1>
-                <p>This chapter reviews the basics of Emojicode that occur in most programs or are of importance in the following sections of this Language Reference & Guide.</p>
-
-                <h3>Source Files</h3>
-                <p>Emojicode source files are UTF-8 encoded text documents in accordance with the syntax specified by the grammar in this documentation.</p>
-                <p>Source code files must have the extension <code>.🍇</code> or <code>.emojic</code>.</p>
-
-                <h3>The 🏁 Block</h3>
-                <p>The 🏁 block is an important part of any Emojicode program as it is the part of the program that is executed when it is started.</p>
-                <p>Here’s an example of a 🏁 block:</p>
-                <pre class="syntax"><code>🏁 🍇
-                       💭 Get things up and running here...
-                    🍉</code></pre>
-                <p>The 🏁 block can also return an integer which is then used as the exit code:</p>
-                <pre class="syntax"><code>🏁 ➡️ 🔢 🍇
-                       💭 Get things up and running here...
-                      ↩️ 0  💭 Return a code here.
-                    🍉</code></pre>
-
-                <h3>Comments</h3>
-                <p>We have seen examples of comments in the previous code samples. Comments allow you to include non-executable text in your code.</p>
-                <p>Comments begin with 💭 and end at the end of the line. For example:</p>
-                <pre class="syntax"><code>💭 This is a comment in Emojicode.</code></pre>
-
-                <!-- Navigation and buttons -->
-                <div class="d-flex justify-content-between">
-                    <button class="btn btn-secondary" id="previousButton">← Previous</button>
-                    <button class="btn btn-primary" id="nextButton">Next Up: “The Basics” →</button>
-                </div>
+                <div class="content2" id="content2"></div>
             </main>
 
         </div>
