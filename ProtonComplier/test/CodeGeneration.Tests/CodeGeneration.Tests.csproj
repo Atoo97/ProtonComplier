@@ -30,10 +30,46 @@
     <None Remove="TestFiles\Ok17.prtn" />
     <None Remove="TestFiles\Ok18.prtn" />
     <None Remove="TestFiles\Ok19.prtn" />
+    <None Remove="TestFiles\Ok20.prtn" />
+    <None Remove="TestFiles\Ok21.prtn" />
+    <None Remove="TestFiles\Ok22.prtn" />
+    <None Remove="TestFiles\Ok23.prtn" />
+    <None Remove="TestFiles\Ok24.prtn" />
+    <None Remove="TestFiles\Ok25.prtn" />
+    <None Remove="TestFiles\Ok26.prtn" />
+    <None Remove="TestFiles\Ok27.prtn" />
+    <None Remove="TestFiles\Ok28.prtn" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="App_Data\codestructure.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok28.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok27.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok26.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok25.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok24.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok23.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok22.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok21.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok20.prtn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\Ok19.prtn">
@@ -93,19 +129,6 @@
     <Content Include="TestFiles\Ok01.prtn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
-    <PackageReference Include="xunit" Version="2.4.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="6.0.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
 
 	<ItemGroup>

@@ -1,0 +1,16 @@
+﻿// ProtonCompiler
+#StateSpace  
+x,y:R
+s:Z[]
+siknegyed:Z
+
+#Precondition  
+x ≠ 0 ∧ y ≠ 0
+
+#Postcondition
+(x>0 ∧ y>0) → siknegyed=s[0]
+(x>0 ∧ y<0) → siknegyed=s[1]
+
+#Input  
+x,y = 3; 
+s={1,2,3,4}

@@ -345,6 +345,8 @@ namespace Proton.Semantic
         /// </summary>
         public static void PostconditionParser()
         {
+            int s = 0;
+
             // Create new fake condition Symbol
             var implicationsymbol = new Symbol
             {
@@ -411,11 +413,50 @@ namespace Proton.Semantic
                         List<Token> variables = new ();
                         foreach (var variableInitialization in postcondition.Initializations)
                         {
-                            variables.Add(variableInitialization.LeftNode!.ParseSymbol);
+                            // variables.Add(variableInitialization.LeftNode!.ParseSymbol);
 
                             // 1) Chehck if varibale is exist in symboltable
                             Symbol symbol2 = symbolTable.FindSymbol(variableInitialization.LeftNode!.ParseSymbol) !;
-                            variableInitializationHelper(symbol2, variableInitialization);
+
+                            if (symbol2.IsInitialized)
+                            {
+                                // Generate unique name with increment
+                                string newName = $"{s}_{symbol2.Name}";
+                                Symbol newSymbol = new Symbol
+                                {
+                                    Name = newName, // set the name with incremented suffix
+                                    Category = symbol2.Category,
+                                    Type = symbol2.Type,
+                                    Value = new (), // again assuming Token has a copy constructor
+                                    SymbolLine = symbol2.SymbolLine,
+                                    SymbolColumn = symbol2.SymbolColumn,
+                                    IsList = symbol2.IsList,
+                                    IsInitialized = false,
+                                    IsResult = true,
+                                };
+
+                                // symbol2.IsInitialized = false;
+                                variableInitializationHelper(newSymbol, variableInitialization);
+
+                                variables.Add(new Token
+                                {
+                                    TokenType = variableInitialization.LeftNode!.ParseSymbol.TokenType,
+                                    TokenCategory = variableInitialization.LeftNode!.ParseSymbol.TokenCategory,
+                                    TokenValue = newName,
+                                    TokenLine = variableInitialization.LeftNode!.ParseSymbol.TokenLine,
+                                    TokenColumn = variableInitialization.LeftNode!.ParseSymbol.TokenColumn,
+                                });
+
+                                // Add symbol to symbol table if possible
+                                symbolTable.AddSymbol(newSymbol);
+
+                                s++;
+                            }
+                            else
+                            {
+                                variableInitializationHelper(symbol2, variableInitialization);
+                                variables.Add(variableInitialization.LeftNode!.ParseSymbol);
+                            }
                         }
 
                         implicationsymbol.Value.AddRange(variables);
@@ -819,8 +860,7 @@ namespace Proton.Semantic
                         {
                             symbol.Value.Add(operandtoken);
 
-                            // wrap character into ''
-                            var c = $"'{operandtoken.TokenValue}'";
+                            var c = $"{operandtoken.TokenValue}";
                             symbol.ValueTokens.Append(c);
                         }
                         else // If identifier
@@ -914,8 +954,7 @@ namespace Proton.Semantic
                         {
                             symbol.Value.Add(operandtoken);
 
-                            // wrap character into ''
-                            var c = $"'{operandtoken.TokenValue}'";
+                            var c = $"{operandtoken.TokenValue}";
                             symbol.ValueTokens.Append(c);
                         }
                         else if (operandtype == TokenType.Boolean)
@@ -1319,7 +1358,7 @@ namespace Proton.Semantic
             var expressionSyntax = varDecl.Initializer.Value;
             var typeInfo = model.GetTypeInfo(expressionSyntax);
 
-            return typeInfo.Type?.ToDisplayString() == type;
+            return typeInfo.ConvertedType?.ToDisplayString() == type;
         }
 
         // Basic (stricter) concept of variable name regex, Cant be longer than 511 character

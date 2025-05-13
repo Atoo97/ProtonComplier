@@ -69,14 +69,23 @@ namespace Proton.CodeGenerator
             // Generate the output for the grouped symbols
             foreach (var group in symbols)
             {
-                var firstSymbol = group.First();
+                // Filter out symbols that start with a number followed by '_'
+                var filteredGroup = group.Where(s => !(char.IsDigit(s.Name.FirstOrDefault()) && s.Name.Skip(1).FirstOrDefault() == '_')).ToList();
+
+                // Skip if no valid symbols remain
+                if (!filteredGroup.Any())
+                {
+                    continue;
+                }
+
+                var firstSymbol = filteredGroup.First();
                 string variableType = firstSymbol.Type.ToString();  // Get the type of the first symbol
                 string csharpType = TypeMapping.ToCSharpType(variableType);
                 bool isList = firstSymbol.IsList;
 
                 string declaration = isList
-                    ? $"{csharpType}[] {string.Join(", ", group.Select(s => s.Name))};"
-                    : $"{csharpType} {string.Join(", ", group.Select(s => s.Name))};";
+                    ? $"{csharpType}[] {string.Join(", ", filteredGroup.Select(s => s.Name))};"
+                    : $"{csharpType} {string.Join(", ", filteredGroup.Select(s => s.Name))};";
 
                 sb.AppendLine($"{indent}{declaration}");  // Add the declaration to the StringBuilder
             }
@@ -190,6 +199,19 @@ namespace Proton.CodeGenerator
                             bool isList = firstSymbol.IsList;
                             string value;
 
+                            string CleanName(string name)
+                            {
+                                // Check if name starts with digits followed by underscore, e.g., "1_var", "23_variable"
+                                int underscoreIndex = name.IndexOf('_');
+                                if (underscoreIndex > 0 && name.Take(underscoreIndex).All(char.IsDigit))
+                                {
+                                    return name.Substring(underscoreIndex + 1);
+                                }
+                                return name;
+                            }
+
+                            string cleanName = CleanName(firstSymbol.Name);
+
                             if (isList && firstSymbol.Value.First().TokenType == TokenType.QuestionMarks)
                             {
                                 value = string.Empty;
@@ -200,21 +222,21 @@ namespace Proton.CodeGenerator
                             }
 
                             string declaration = isList
-                                ? $"{firstSymbol.Name} = new {csharpType}[] {{{value}}};"
-                                : $"{firstSymbol.Name} = {value};";
+                                ? $"{cleanName} = new {csharpType}[] {{{value}}};"
+                                : $"{cleanName} = {value};";
 
                             sb.AppendLine($"{indent}    {declaration}");  // Add the declaration to the StringBuilder
 
                             if (isList)
                             {
-                                sb.AppendLine($"{indent}    foreach (var item in {firstSymbol.Name})");
+                                sb.AppendLine($"{indent}    foreach (var item in {cleanName})");
                                 sb.AppendLine($"{indent}    {{");
                                 sb.AppendLine($"{indent}        Console.WriteLine(\"Result: \" + item);");
                                 sb.AppendLine($"{indent}    }}");
                             }
                             else
                             {
-                                sb.AppendLine($"{indent}    Console.WriteLine(\"Result: \" + {firstSymbol.Name});");
+                                sb.AppendLine($"{indent}    Console.WriteLine(\"Result: \" + {cleanName});");
                             }
 
                             sb.AppendLine($"{indent}");
@@ -222,7 +244,7 @@ namespace Proton.CodeGenerator
 
                         cnt += count;
 
-                        if (i + 1 == count)
+                        if (i > 0 && i + 1 == count)
                         {
                             sb.AppendLine($"{indent}" + "};");
                         }

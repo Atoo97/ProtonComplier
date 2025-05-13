@@ -1,0 +1,17 @@
+﻿// ProtonComplier 
+#StateSpace  
+x,y:R
+s:Z[]
+siknegyed:Z
+i:C;
+
+#Precondition  
+x ≠ 0 ∧ y ≠ 0
+
+#Postcondition
+(i=='c' ∧ s.Length ≠ 0) → y=s[0]
+
+#Input  
+x,y = 3; 
+i='c'
+s={1,2,3,4}

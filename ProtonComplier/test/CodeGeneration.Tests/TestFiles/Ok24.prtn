@@ -1,0 +1,18 @@
+﻿// @ProtonComplier 
+#StateSpace  
+osztó,osztandó:Z;
+eredmény:$[]
+eredmény2:B
+i:R
+var:R
+
+#Precondition  
+osztó ≠ 0
+
+#Postcondition
+(osztandó % osztó>0) → eredmény={"osztó","osztó2"} & i=23.5;var=4545.56
+(osztandó % osztó≠0) → eredmény2=False
+
+#Input  
+osztó = 3
+osztandó = 100

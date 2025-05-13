@@ -1,0 +1,19 @@
+﻿// ProtonCompiler
+#StateSpace  
+osztó,osztandó:Z;
+eredmény:$
+eredmény2:B
+i:R
+var:R
+
+#Precondition  
+osztó ≠ 0
+
+#Postcondition
+(osztandó % osztó<0) → eredmény="vlm"+"vlm2"
+var=4545.56
+(osztandó % osztó≠0) → i=23.5 & eredmény2=i<0 
+
+#Input  
+osztó = 3
+osztandó = 100

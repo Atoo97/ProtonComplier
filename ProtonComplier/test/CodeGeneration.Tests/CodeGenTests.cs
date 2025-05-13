@@ -44,6 +44,15 @@ namespace CodeGeneration.Tests
                 { "Ok17.prtn",  (true, "Result: 37,3\r\n", 0) },
                 { "Ok18.prtn",  (true, "Result: 8\r\nResult: 12\r\n", 0) },
                 { "Ok19.prtn",  (true, "Result: 950\r\n", 0) },
+                { "Ok20.prtn",  (true, "Result: 1\r\n", 0) },
+                { "Ok21.prtn",  (true, "Result: 5\r\n", 0) },
+                { "Ok22.prtn",  (true, "Result: 6\r\n", 0) },
+                { "Ok23.prtn",  (true, "Result: 1\r\nResult: 4\r\n", 0) },
+                { "Ok24.prtn",  (true, "Result: osztó\r\nResult: osztó2\r\nResult: 23,5\r\nResult: 4545,56\r\n", 0) },
+                { "Ok25.prtn",  (true, "Result: 23,5\r\nResult: 4545,56\r\n", 0) },
+                { "Ok26.prtn",  (true, "Result: 23,5\r\nResult: False\r\nResult: 4545,56\r\n", 0) },
+                { "Ok27.prtn",  (true, "Result: 1\r\n", 0) },
+                { "Ok28.prtn",  (true, "Result: 1\r\nResult: 34,5\r\n", 0) },
            };
 
         // Returns test case data: each file path
