@@ -23,7 +23,7 @@ namespace Proton.Parser.Expressions
         /// <param name="op">The operand expression representing the index value.</param>
         /// <param name="closeSqrBrace">The token representing the closing square bracket.</param>
         /// <exception cref="AnalyzerError">Thrown when the tokens do not form a valid list index access.</exception>
-        public ListNthElementExpression(OperandExpression identifier, Token openSqrBrace, OperandExpression op, Token closeSqrBrace)
+        public ListNthElementExpression(OperandExpression identifier, Token openSqrBrace, Expression op, Token closeSqrBrace)
           : base(identifier.ParseSymbol)
         {
             if (identifier.ParseSymbol.TokenType != TokenType.Identifier && openSqrBrace.TokenType != TokenType.OpenSqrBrace && closeSqrBrace.TokenType != TokenType.CloseSqrBrace)
@@ -61,7 +61,7 @@ namespace Proton.Parser.Expressions
         /// <summary>
         /// Gets or sets the operand expression that represents the index inside the square brackets.
         /// </summary>
-        public OperandExpression Operand { get; set; }
+        public Expression Operand { get; set; }
 
         /// <summary>
         /// Gets or sets the token that represents the close square brackets.

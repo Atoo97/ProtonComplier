@@ -1,0 +1,14 @@
+﻿// ProtonComplier 
+#StateSpace  
+price,percentage:Z
+newPrice:Z
+
+#Precondition  
+price>0 ∧ 0<percentage ∧ percentage≤100
+
+#Postcondition
+newPrice = price*(100-percentage)/100
+
+#Input  
+price=1000
+percentage=5

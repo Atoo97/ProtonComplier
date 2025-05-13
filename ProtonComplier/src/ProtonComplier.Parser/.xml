@@ -168,7 +168,7 @@
             index is provided as an operand expression within square brackets.
             </summary>
         </member>
-        <member name="M:Proton.Parser.Expressions.ListNthElementExpression.#ctor(Proton.Parser.Expressions.OperandExpression,Proton.Lexer.Token,Proton.Parser.Expressions.OperandExpression,Proton.Lexer.Token)">
+        <member name="M:Proton.Parser.Expressions.ListNthElementExpression.#ctor(Proton.Parser.Expressions.OperandExpression,Proton.Lexer.Token,Proton.Parser.Expressions.Expression,Proton.Lexer.Token)">
             <summary>
             Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.ListNthElementExpression"/> class.
             Validates that the provided tokens form a valid list index access expression, such as <c>list[0]</c>.

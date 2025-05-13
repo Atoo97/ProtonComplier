@@ -65,10 +65,47 @@ namespace Proton.Parser.Expressions
                 }
                 else if (tokens.Count > 4 && tokens[1].TokenType == TokenType.OpenSqrBrace)
                 {
+                    int openIndex = 1;
+                    int closeIndex = -1;
+
+                    // Find the first closing square bracket after the opening one
+                    for (int i = openIndex + 1; i < tokens.Count; i++)
+                    {
+                        if (tokens[i].TokenType == TokenType.CloseSqrBrace)
+                        {
+                            closeIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (closeIndex == -1)
+                    {
+                        // Generate error message
+                        throw new AnalyzerError(
+                            "122",
+                            string.Format(MessageRegistry.GetMessage(120).Text, tokens.Last().TokenLine, tokens.Last().TokenColumn));
+                    }
+
+                    var indexTokens = tokens.Skip(openIndex + 1).Take(closeIndex - openIndex - 1).ToList();
+                    var indexExpression = ParseExpression(indexTokens);
+                    var listNthElementExpression = new ListNthElementExpression(new OperandExpression(tokens[0]), tokens[openIndex], indexExpression, tokens[closeIndex]);
+
+                    // Handle optional operator and remaining tokens
+                    if (closeIndex + 1 < tokens.Count)
+                    {
+                        var op = new OperatorExpression(tokens[closeIndex + 1]);
+                        var remaining = tokens.Skip(closeIndex + 2).ToList();
+
+                        return new BinaryExpression(listNthElementExpression, op, remaining);
+                    }
+
+                    return listNthElementExpression;
+                    /*
                     ListNthElementExpression listNthElementExpression = new (new OperandExpression(tokens[0]), tokens[1], new OperandExpression(tokens[2]), tokens[3]);
                     OperatorExpression op = new (tokens[4]);
                     List<Token> remaining = tokens.Skip(5).ToList();
                     return new BinaryExpression(listNthElementExpression, op, remaining);
+                    */
                 }
                 else if (tokens.Count == 3 && tokens[0].TokenType == TokenType.Identifier && tokens[1].TokenType == TokenType.Period)
                 {

@@ -612,8 +612,22 @@ namespace Proton.Semantic
                     symbol.ValueTokens.Append(listNExp.Identifier.ParseSymbol.TokenValue);
                     symbol.ValueTokens.Append('[');
 
-                    // Get valid identifier element:
-                    ValidateIdentifierTokens(listNExp.Identifier.ParseSymbol, symbol, listNExp.Operand.ParseSymbol);
+                    if (listNExp.Operand is OperandExpression)
+                    {
+                        ValidateIdentifierTokens(listNExp.Identifier.ParseSymbol, symbol, listNExp.Operand.ParseSymbol);
+                    }
+                    else if (listNExp.Operand is BinaryExpression)
+                    {
+                        ValidateAndCollectTokens(listNExp.Operand, symbol);
+                    }
+                    else
+                    {
+                        // Error invalid index:
+                        throw new AnalyzerError(
+                              "250",
+                              string.Format(MessageRegistry.GetMessage(250).Text, listNExp.Operand.ParseSymbol.TokenLine, listNExp.Operand.ParseSymbol.TokenColumn));
+                    }
+
                     symbol.ValueTokens.Append(']');
                     break;
                 case MaxExpression maxExpr:
@@ -675,11 +689,11 @@ namespace Proton.Semantic
                         symbol.Value.Add(token);
                         if (op.Item1)
                         {
-                            symbol.ValueTokens.Append(op.Item2);
+                            symbol.ValueTokens.Append(" " + op.Item2 + " ");
                         }
                         else
                         {
-                            symbol.ValueTokens.Append(token.TokenValue);
+                            symbol.ValueTokens.Append(" " + token.TokenValue + " ");
                         }
 
                         break;
@@ -916,7 +930,7 @@ namespace Proton.Semantic
                         {
                             i *= -1;
                             currentGroup = result[^i];
-                            symbol.ValueTokens.Append("^" + nthElement.TokenValue);
+                            symbol.ValueTokens.Append($"^({nthElement.TokenValue}*-1)");
                         }
                         else
                         {
@@ -984,7 +998,7 @@ namespace Proton.Semantic
                         {
                             i *= -1;
                             currentGroup = result[^i];
-                            symbol.ValueTokens.Append("^" + i);
+                            symbol.ValueTokens.Append($"^{i}");
                         }
                         else
                         {

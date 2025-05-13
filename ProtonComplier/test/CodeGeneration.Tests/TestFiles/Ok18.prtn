@@ -1,0 +1,13 @@
+﻿// @ProtonComplier 
+#StateSpace  
+a,b,t,k:R
+
+#Precondition  
+a>0 ∧ b>0
+
+#Postcondition
+t=a*b; 
+k=2*(a+b)
+
+#Input  
+a=4;b=2

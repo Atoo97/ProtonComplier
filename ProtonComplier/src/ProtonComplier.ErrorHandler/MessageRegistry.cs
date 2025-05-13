@@ -87,6 +87,11 @@ namespace Proton.ErrorHandler
                 "ParserError: Unclosed parenthesis detected at line {0}, column {1}.")
             },
             {
+                122, new Message(
+                "missing-closing-sqrbrace",
+                "ParserError: Missing close square brace detected at line {0}, column {1}.")
+            },
+            {
                 123, new Message(
                 "missing-closing-brace",
                 "ParserError: Missing close brace detected at line {0}, column {1}.")
@@ -152,6 +157,11 @@ namespace Proton.ErrorHandler
                 244, new Message(
                 "index-out-of-range",
                 "SemanticalError: Index out of range. Index '{0}' at line {1}, column {2}.")
+            },
+            {
+                250, new Message(
+                "invalid-list-index-expression",
+                "SemanticalError: Invalid defined list index expression at line {0}, column {1}.")
             },
         };
 

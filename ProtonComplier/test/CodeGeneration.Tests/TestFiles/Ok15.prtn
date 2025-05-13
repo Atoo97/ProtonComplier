@@ -1,0 +1,13 @@
+﻿// ProtonComplier 
+#StateSpace  
+i:N;
+result:R[];
+b:R;
+
+#Precondition  
+
+#Postcondition
+b=result[0+i]+result[1]
+
+#Input  
+result={23.5,34.3,56.4}; i=1

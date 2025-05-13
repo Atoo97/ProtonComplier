@@ -1,0 +1,13 @@
+﻿// @ProtonComplier 
+#StateSpace  
+i:Z;
+result:Z[];
+b:Z;
+
+#Precondition  
+
+#Postcondition
+b=result[-2]+result[1]
+
+#Input  
+result={23,34,56}; i=-1

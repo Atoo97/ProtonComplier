@@ -153,6 +153,7 @@ namespace Proton.CodeGenerator
             StringBuilder sb = new ();
             sb.AppendLine($"//PostCondition:");
 
+
             foreach (var groupitems in symbols)
             {
                 // Get the initialized items only from the groupitems
@@ -210,7 +211,7 @@ namespace Proton.CodeGenerator
                 else
                 {
                     // Handle symbols with different values individually
-                    foreach (var item in groupitems)
+                    foreach (var item in group)
                     {
                         var firstSymbol = item;
                         string variableType = firstSymbol.Type.ToString();  // Get the type of the first symbol
@@ -228,8 +229,8 @@ namespace Proton.CodeGenerator
                         }
 
                         string declaration = isList
-                            ? $"{string.Join(" = ", group.Select(s => s.Name))} = new {csharpType}[] {{{value}}};"
-                            : $"{string.Join(" = ", group.Select(s => s.Name))} = {value};";
+                            ? $"{item.Name} = new {csharpType}[] {{{value}}};"
+                            : $"{item.Name} = {value};";
 
                         sb.AppendLine($"{indent}{declaration}");  // Add the declaration to the StringBuilder
 

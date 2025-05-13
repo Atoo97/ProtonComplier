@@ -1,0 +1,13 @@
+﻿// @ProtonComplier 
+#StateSpace  
+i:Z;
+result:R[];
+b:R;
+
+#Precondition  
+
+#Postcondition
+b=result[i-1]+result.Length
+
+#Input  
+result={23,34.3,56.4}; i=(1+1)
