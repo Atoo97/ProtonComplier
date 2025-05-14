@@ -1,0 +1,16 @@
+﻿// ProtonCompiler
+#StateSpace  
+x,y:Z
+meresek:Z[]
+siknegyed:Z
+db:Z;
+
+#Precondition  
+x ≠ 0 ∧ y ≠ 0
+
+#Postcondition
+db = ∑(c=(2+2)..meresek.Length, meresek[1]+meresek[1+1]) + x
+
+#Input  
+x,y = 3; 
+meresek={1,2,3,4}

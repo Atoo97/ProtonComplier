@@ -286,6 +286,12 @@ namespace Proton.CodeGenerator
                         ? $"{string.Join(" = ", group.Select(s => s.Name))} = new {csharpType}[] {{{value}}};"
                         : $"{string.Join(" = ", group.Select(s => s.Name))} = {value};";
 
+                    if (declaration.EndsWith("}\n\r\n;"))
+                    {
+                        // Remove the final semicolon only
+                        declaration = declaration.Substring(0, declaration.Length - 1); // removes only the semicolon
+                    }
+
                     sb.AppendLine($"{indent}{declaration}");  // Add the declaration to the StringBuilder
 
                     if (isList)
@@ -298,6 +304,7 @@ namespace Proton.CodeGenerator
                     else
                     {
                         sb.AppendLine($"{indent}Console.WriteLine(\"Result: \" + {firstSymbol.Name});");
+                        sb.AppendLine($"{indent}");
                     }
                 }
                 else
@@ -336,6 +343,7 @@ namespace Proton.CodeGenerator
                         else
                         {
                             sb.AppendLine($"{indent}Console.WriteLine(\"Result: \" + {firstSymbol.Name});");
+                            sb.AppendLine($"{indent}");
                         }
                     }
                 }

@@ -81,12 +81,18 @@ namespace Proton.Semantic
         /// <returns>A formatted string showing the symbol's properties as a table row.</returns>
         public override string ToString()
         {
+            string Clean(string input) =>
+                input.Replace("\r", string.Empty)
+                     .Replace("\n", string.Empty)
+                     .Replace(" ", string.Empty)
+                     .Trim();
+
             string valueStr = this.Value != null && this.Value.Count > 0
-                ? string.Join(", ", this.Value.Select(v => v.TokenValue))
+                ? string.Join(", ", this.Value.Select(v => Clean(v.TokenValue)))
                 : "N/A";
 
             string valueTokensStr = this.ValueTokens.Length > 0
-                ? this.ValueTokens.ToString()
+                ? Clean(this.ValueTokens.ToString())
                 : "N/A";
 
             return string.Format(

@@ -267,6 +267,12 @@
             <param name="symbol">The token of the symbol to find.</param>
             <returns>The found <see cref="T:Proton.Semantic.Symbol"/> instance, or null if not found.</returns>
         </member>
+        <member name="M:Proton.Semantic.SymbolTable.RemoveSymbol(Proton.Lexer.Token)">
+            <summary>
+            Remove a symbol by its name.
+            </summary>
+            <param name="symbol">The token of the symbol to find.</param>
+        </member>
         <member name="M:Proton.Semantic.SymbolTable.UpdateSymbol(Proton.Semantic.Symbol)">
             <summary>
             Updates an existing symbol in the symbol table.

@@ -1,0 +1,19 @@
+﻿// ProtonCompiler
+#StateSpace  
+x,y:Z
+meresek:Z[]
+siknegyed:Z
+db:Z;
+result:R;
+
+#Precondition  
+x ≠ 0
+
+#Postcondition
+y = ∑(c=1..meresek.Length, Opt(meresek[c] > 0, 1))
+db = ∑(c=1..meresek.Length, Opt(meresek[c] > 0, 2))
+result=y-db
+
+#Input  
+x = 3; 
+meresek={1,2,3,4}

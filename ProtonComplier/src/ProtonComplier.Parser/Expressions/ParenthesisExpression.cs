@@ -66,6 +66,8 @@ namespace Proton.Parser.Expressions
                 LengthExpression lnexpr => lnexpr.Lenght,
                 MaxExpression max => GetLastToken(max.RightExpression),
                 MinExpression min => GetLastToken(min.RightExpression),
+                OptionalExpression opt => GetLastToken(opt.RightExpression),
+                // VariableInitializationExpression varExpr => varExpr.RightNode,
 
                 // Add other cases as needed
                 _ => throw new InvalidOperationException("Unsupported expression type for retrieving last token."),

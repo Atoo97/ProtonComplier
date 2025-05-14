@@ -1,0 +1,17 @@
+﻿// ProtonCompiler
+#StateSpace  
+x,y:Z
+meresek:Z[]
+siknegyed:Z
+db:Z;
+
+#Precondition  
+x ≠ 0
+
+#Postcondition
+y = 23-20
+db = ∑(c=-1..10, 2) + y
+
+#Input  
+x = 3; 
+meresek={1,2,3,4}

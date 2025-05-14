@@ -39,10 +39,46 @@
     <None Remove="TestFiles\Ok26.prtn" />
     <None Remove="TestFiles\Ok27.prtn" />
     <None Remove="TestFiles\Ok28.prtn" />
+    <None Remove="TestFiles\Ok29.prtn" />
+    <None Remove="TestFiles\Ok30.prtn" />
+    <None Remove="TestFiles\Ok31.prtn" />
+    <None Remove="TestFiles\Ok32.prtn" />
+    <None Remove="TestFiles\Ok33.prtn" />
+    <None Remove="TestFiles\Ok34.prtn" />
+    <None Remove="TestFiles\Ok35.prtn" />
+    <None Remove="TestFiles\Ok36.prtn" />
+    <None Remove="TestFiles\Ok37.prtn" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="App_Data\codestructure.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok37.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok36.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok35.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok34.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok33.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok32.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok31.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok30.prtn">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Ok29.prtn">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\Ok28.prtn">

@@ -8,6 +8,7 @@ namespace Proton.Parser.Expressions
     using Proton.ErrorHandler;
     using Proton.Lexer;
     using Proton.Lexer.Enums;
+    using ProtonComplier.Parser.Statements;
 
     /// <summary>
     /// Provides helper methods for parsing expressions in the Proton parser.
@@ -106,6 +107,199 @@ namespace Proton.Parser.Expressions
                     List<Token> remaining = tokens.Skip(5).ToList();
                     return new BinaryExpression(listNthElementExpression, op, remaining);
                     */
+                }
+                else if (tokens[0].TokenType == TokenType.Summation)
+                {
+                    if (tokens[1].TokenType != TokenType.OpenParen)
+                    {
+                        // Generate error message
+                        throw new AnalyzerError(
+                            "120",
+                            string.Format(MessageRegistry.GetMessage(120).Text, tokens[1].TokenLine, tokens[1].TokenColumn));
+                    }
+
+                    List<Token> leftTokens = new ();
+                    List<Token> rightTokens = new ();
+
+                    int i = 2;
+
+                    // Parse left side: c=1..meresek.length
+                    while (i < tokens.Count && tokens[i].TokenType != TokenType.Comma)
+                    {
+                        leftTokens.Add(tokens[i]);
+                        i++;
+                    }
+
+                    // Check if we found the comma
+                    if (i >= tokens.Count || tokens[i].TokenType != TokenType.Comma)
+                    {
+                        // Generate error message
+                        throw new AnalyzerError(
+                           "104",
+                           string.Format(MessageRegistry.GetMessage(104).Text, tokens[i - 1].TokenType, tokens[i - 1].TokenLine, tokens[i - 1].TokenColumn, TokenType.Comma));
+                    }
+
+                    i++; // Skip the comma
+
+                    // Collect right side tokens until matching close paren
+                    int parenDepth = 0;
+                    while (i < tokens.Count)
+                    {
+                        if (tokens[i].TokenType == TokenType.OpenParen)
+                        {
+                            parenDepth++;
+                        }
+                        else if (tokens[i].TokenType == TokenType.CloseParen)
+                        {
+                            if (parenDepth == 0)
+                            {
+                                break; // Found final closing paren of summation
+                            }
+
+                            parenDepth--;
+                        }
+
+                        rightTokens.Add(tokens[i]);
+                        i++;
+                    }
+
+                    if (i >= tokens.Count || tokens[i].TokenType != TokenType.CloseParen)
+                    {
+                        throw new AnalyzerError(
+                            "121",
+                            string.Format(MessageRegistry.GetMessage(121).Text, tokens.Last().TokenLine, tokens.Last().TokenColumn));
+                    }
+
+                    i++; // Skip the final closing parenthesis
+
+                    // Remaining tokens can now include + 20 or anything else (optional parsing)
+                    List<Token> remaining = tokens.Skip(i).ToList();
+
+                    // Parse operand before '..' periods
+                    List<Token> operand1Tokens = new ();
+                    i = 2;
+                    while (i < leftTokens.Count && leftTokens[i].TokenType != TokenType.Period)
+                    {
+                        operand1Tokens.Add(leftTokens[i]);
+                        i++;
+                    }
+
+                    if (i >= leftTokens.Count || (leftTokens[i].TokenType != TokenType.Period && leftTokens[i + 1].TokenType != TokenType.Period))
+                    {
+                        // Generate error message
+                        throw new AnalyzerError(
+                            "104",
+                            string.Format(MessageRegistry.GetMessage(104).Text, leftTokens[i - 1].TokenValue, leftTokens[i - 1].TokenLine, leftTokens[i - 1].TokenColumn, TokenType.Period));
+                    }
+
+                    i += 2; // Move past '..'
+
+                    // Parse operand after '..'
+                    List<Token> operand2Tokens = new ();
+                    while (i < leftTokens.Count)
+                    {
+                        operand2Tokens.Add(leftTokens[i]);
+                        i++;
+                    }
+
+                    // Variable Initialization:
+                    IdentifierExpression identifier = new (leftTokens[0]);
+                    AssignExpression assign = new (leftTokens[1]);
+                    Expression operand1 = ExpressionParserHelper.ParseExpression(operand1Tokens);
+                    VariableInitializationExpression var = new (identifier, assign, operand1); // c=1 or c=(2+2)
+
+                    Expression whileNum = ExpressionParserHelper.ParseExpression(operand2Tokens); // until: meresek.length
+
+                    // Set the rigth part:
+                    Expression optExpr = null!;
+                    SummationExpression sum = null!;
+                    if (rightTokens[0].TokenType == TokenType.Options)
+                    {
+                        optExpr = ExpressionParserHelper.ParseExpression(rightTokens);
+                        sum = new (var, whileNum, optExpr);
+                    }
+                    else
+                    {
+                        optExpr = ExpressionParserHelper.ParseExpression(rightTokens);
+                        sum = new (var, whileNum, optExpr);
+                    }
+
+                    // Set the remaining part:
+                    if (remaining.Count > 0)
+                    {
+                        OperatorExpression op = new (remaining[0]);
+                        return new BinaryExpression(sum, op, remaining.Skip(1).ToList());
+                    }
+
+                    return sum;
+                }
+                else if (tokens[0].TokenType == TokenType.Options)
+                {
+                    Token mainToken = tokens[0];
+
+                    if (tokens[1].TokenType != TokenType.OpenParen)
+                    {
+                        // Generate error message
+                        throw new AnalyzerError(
+                            "120",
+                            string.Format(MessageRegistry.GetMessage(120).Text, tokens[1].TokenLine, tokens[1].TokenColumn));
+                    }
+
+                    if (tokens.Last().TokenType != TokenType.CloseParen)
+                    {
+                        // Generate error message
+                        throw new AnalyzerError(
+                           "121",
+                           string.Format(MessageRegistry.GetMessage(121).Text, tokens.Last().TokenLine, tokens.Last().TokenColumn));
+                    }
+
+                    List<Token> leftTokens = new ();
+                    List<Token> rightTokens = new ();
+
+                    int i = 2;
+                    while (i < tokens.Count && tokens[i].TokenType != TokenType.Comma)
+                    {
+                        leftTokens.Add(tokens[i]);
+                        i++;
+                    }
+
+                    // Check if we found the comma
+                    if (i >= tokens.Count || tokens[i].TokenType != TokenType.Comma)
+                    {
+                        // Generate error message
+                        throw new AnalyzerError(
+                           "104",
+                           string.Format(MessageRegistry.GetMessage(104).Text, tokens[i - 1].TokenType, tokens[i - 1].TokenLine, tokens[i - 1].TokenColumn, TokenType.Comma));
+                    }
+
+                    i++; // Skip the comma
+
+                    // Collect right side tokens until matching close paren
+                    int parenDepth = 0;
+                    while (i < tokens.Count)
+                    {
+                        if (tokens[i].TokenType == TokenType.OpenParen)
+                        {
+                            parenDepth++;
+                        }
+                        else if (tokens[i].TokenType == TokenType.CloseParen)
+                        {
+                            if (parenDepth == 0)
+                            {
+                                break; // Found final closing paren of summation
+                            }
+
+                            parenDepth--;
+                        }
+
+                        rightTokens.Add(tokens[i]);
+                        i++;
+                    }
+
+                    Expression leftExpr = ExpressionParserHelper.ParseExpression(leftTokens);
+                    Expression rightExpr = ExpressionParserHelper.ParseExpression(rightTokens);
+
+                    return new OptionalExpression(mainToken, leftExpr, rightExpr);
                 }
                 else if (tokens.Count == 3 && tokens[0].TokenType == TokenType.Identifier && tokens[1].TokenType == TokenType.Period)
                 {

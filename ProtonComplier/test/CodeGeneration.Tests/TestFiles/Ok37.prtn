@@ -1,0 +1,15 @@
+﻿// ProtonCompiler
+#StateSpace  
+y:Z
+meresek:Z[]
+db:Z;
+result:R;
+
+#Precondition  
+
+#Postcondition
+y,db=4
+result=y-db
+
+#Input  
+meresek={1,2,3,4}

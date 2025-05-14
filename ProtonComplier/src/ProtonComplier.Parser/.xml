@@ -348,6 +348,37 @@
             <param name="ident">The indentation level (each level equals 4 spaces).</param>
             <returns>A string representation of the operator expression.</returns>
         </member>
+        <member name="T:Proton.Parser.Expressions.OptionalExpression">
+            <summary>
+            Represents an optional expression, such as the "Opt" operator used to programming theorems.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.OptionalExpression.#ctor(Proton.Lexer.Token,Proton.Parser.Expressions.Expression,Proton.Parser.Expressions.Expression)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.OptionalExpression"/> class with the given token and expression.
+            </summary>
+            <param name="opt">The token representing the optional operator, which must be of type <see cref="F:Proton.Lexer.Enums.TokenType.Options"/>.</param>
+            <param name="condition">The expression that is condition of expression.</param>
+            <param name="counter">Indicates the increasing value of the expression.</param>
+            <exception cref="T:Proton.ErrorHandler.AnalyzerError">Thrown if the provided token is not of type <see cref="F:Proton.Lexer.Enums.TokenType.Options"/>.</exception>
+        </member>
+        <member name="P:Proton.Parser.Expressions.OptionalExpression.RightExpression">
+            <summary>
+            Gets the right-hand expression of the optional operation.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.Expressions.OptionalExpression.LeftExpression">
+            <summary>
+            Gets the right-hand expression of the optional operation.
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.OptionalExpression.ToCode(System.Int32)">
+            <summary>
+            Generates a formatted code-like string representing this optional expression.
+            </summary>
+            <param name="ident">The indentation level used for formatting.</param>
+            <returns>A string that visually represents the optional expression structure.</returns>
+        </member>
         <member name="T:Proton.Parser.Expressions.ParenthesisExpression">
             <summary>
             Represents an expression enclosed in parentheses, such as (2 + 3).
@@ -418,6 +449,21 @@
             <param name="ident">The indentation level (each level equals 4 spaces).</param>
             <returns>A formatted string representing the separator expression with indentation.</returns>
         </member>
+        <member name="P:Proton.Parser.Expressions.SummationExpression.LeftExpression">
+            <summary>
+            Gets the right-hand expression of the Summation operation.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.Expressions.SummationExpression.MiddleExpression">
+            <summary>
+            Gets the right-hand expression of the Summation operation.
+            </summary>
+        </member>
+        <member name="P:Proton.Parser.Expressions.SummationExpression.RightExpression">
+            <summary>
+            Gets the right-hand expression of the Summation operation.
+            </summary>
+        </member>
         <member name="T:Proton.Parser.Expressions.TypeExpression">
             <summary>
             Represents a type expression in the syntax tree, such as "N", "R",
@@ -475,6 +521,31 @@
             </summary>
             <param name="ident">The indentation level.</param>
             <returns>A formatted string representing the type specifier expression.</returns>
+        </member>
+        <member name="T:Proton.Parser.Expressions.VariableInitializationExpression">
+            <summary>
+            Represents a variable initialization expression.
+            This includes a variable identifier, assign (like "="), and type definier (like "{1,2,(2+5),4..}").
+            (e.g., "_var1,_var2=2+(4-6);).
+            </summary>
+        </member>
+        <member name="M:Proton.Parser.Expressions.VariableInitializationExpression.#ctor(Proton.Parser.Expressions.IdentifierExpression,Proton.Parser.Expressions.AssignExpression,Proton.Parser.Expressions.Expression)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Proton.Parser.Expressions.VariableInitializationExpression"/> class.
+            This constructor processes the identifier, separator, and type specifier for the variable declaration.
+            </summary>
+            <param name="identifier">The identifier expression for the variable.</param>
+            <param name="separator">The separator expression (e.g., ":=).</param>
+            <param name="valueSpecifier">The type specifier expression (e.g., "{1,2,3,4};").</param>
+            <exception cref="T:System.Exception">Thrown if there is an error in creating the variable declaration components.</exception>
+        </member>
+        <member name="M:Proton.Parser.Expressions.VariableInitializationExpression.ToCode(System.Int32)">
+            <summary>
+            Generates the string representation of the initialization expression for code generation,
+            including the assignment operator and proper valueSpecifier.
+            </summary>
+            <param name="ident">The indentation level (each level equals 4 spaces).</param>
+            <returns>A formatted string representing the assignment expression.</returns>
         </member>
         <member name="T:Proton.Parser.Interfaces.ISyntaxAnalyzer">
             <summary>

@@ -69,6 +69,25 @@ namespace Proton.Semantic
         }
 
         /// <summary>
+        /// Remove a symbol by its name.
+        /// </summary>
+        /// <param name="symbol">The token of the symbol to find.</param>
+        public void RemoveSymbol(Token symbol)
+        {
+            if (this.SymbolExists(symbol.TokenValue))
+            {
+                this.symbols.Remove(symbol.TokenValue);
+            }
+            else
+            {
+                // Generate error message
+                throw new AnalyzerError(
+                    "209",
+                    string.Format(MessageRegistry.GetMessage(209).Text, symbol.TokenValue, symbol.TokenLine, symbol.TokenColumn));
+            }
+        }
+
+        /// <summary>
         /// Updates an existing symbol in the symbol table.
         /// Throws an error if the symbol does not exist.
         /// </summary>

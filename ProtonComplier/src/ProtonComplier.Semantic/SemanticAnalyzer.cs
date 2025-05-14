@@ -6,6 +6,8 @@ namespace Proton.Semantic
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
+    using System.Diagnostics.Contracts;
+    using System.Text;
     using System.Text.RegularExpressions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -734,8 +736,170 @@ namespace Proton.Semantic
                     symbol.Value.Add(lenExpr.Lenght);
                     symbol.ValueTokens.Append($"Length");
                     break;
+                case SummationExpression sumExpr:
+                    Token i = sumExpr.LeftExpression.LeftNode!.ParseSymbol;
+                    ValidateAndCollectTokens(sumExpr.LeftExpression, symbol);
+
+                    var newSymbol = new Symbol
+                    {
+                        Name = "-1" + i.TokenValue,
+                        Type = TokenType.Boolean,
+                        Category = TokenCategory.Keyword,
+                        Value = new (),
+                        SymbolLine = -1,
+                        SymbolColumn = -1,
+                        IsList = false,
+                        IsResult = false,
+                    };
+
+                    ValidateAndCollectTokens(sumExpr.MiddleExpression!, newSymbol);
+
+                    if (newSymbol.Type == TokenType.Boolean)
+                    {
+                        string valueStr = newSymbol.ValueTokens.ToString();
+                        int lastCommaIndex = valueStr.LastIndexOf(',');
+
+                        string lastSegment = lastCommaIndex >= 0
+                            ? valueStr.Substring(lastCommaIndex + 1).Trim()
+                            : valueStr.Trim();
+
+                        // Check if boolean type is valid
+                        if (!IsValidExpression(lastSegment, "bool"))
+                        {
+                            throw new AnalyzerError(
+                                 "239",
+                                 string.Format(MessageRegistry.GetMessage(239).Text, lastSegment, symbol.SymbolLine, symbol.SymbolColumn));
+                        }
+                    }
+
+                    newSymbol.IsInitialized = true;
+                    symbolTable.AddSymbol(newSymbol);
+
+                    if (sumExpr.RightExpression is OptionalExpression optExpr)
+                    {
+                        var leftNode = optExpr.LeftExpression;
+                        var rightNode = optExpr.RightExpression;
+
+                        newSymbol.ValueTokens.Append(" | ");
+
+                        // Validate both parts
+                        ValidateAndCollectTokens(leftNode, newSymbol);
+                        ValidateAndCollectTokens(rightNode, symbol);
+
+                        Symbol indexSymbol = symbolTable.FindSymbol(i)!;
+                        var indexValue = indexSymbol.Name;
+                        var initialValue = indexSymbol.ValueTokens;
+                        symbolTable.RemoveSymbol(i);
+
+                        var newName = "-1" + i.TokenValue;
+                        i.TokenValue = newName;
+                        Symbol conditionSymbol = symbolTable.FindSymbol(i) !;
+                        var conditionValue = conditionSymbol.ValueTokens.ToString();
+                        var splitedConditionValue = conditionValue.Split(" | ", StringSplitOptions.RemoveEmptyEntries);
+                        symbolTable.RemoveSymbol(i);
+
+                        List<Token> assignValuse = new ();
+                        assignValuse.AddRange(symbol.Value);
+                        var resultValue = symbol.ValueTokens.ToString();
+                        symbol.Value.Clear();
+                        symbol.ValueTokens.Clear();
+
+                        var ident = "                ";
+                        StringBuilder sb = new ();
+                        sb.AppendLine($"0;");
+                        sb.AppendLine($"{ident}for(int {indexValue} = {initialValue}; {indexValue} < {splitedConditionValue[0]}; {indexValue}++)");
+                        sb.AppendLine($"{ident}" + '{');
+                        sb.AppendLine($"{ident}    if({splitedConditionValue[1]})");
+                        sb.AppendLine($"{ident}" + "    {");
+                        sb.AppendLine($"{ident}        {symbol.Name} += {resultValue};");
+                        sb.AppendLine($"{ident}" + "    }");
+                        sb.AppendLine($"{ident}" + "}\n");
+
+                        symbol.ValueTokens.Append(sb.ToString());
+                        break;
+                    }
+                    else
+                    {
+                        // Handle c:
+                        ValidateAndCollectTokens(sumExpr.RightExpression!, symbol);
+                        Symbol indexSymbol = symbolTable.FindSymbol(i) !;
+                        var indexValue = indexSymbol.Name;
+                        var initialValue = indexSymbol.ValueTokens;
+                        symbolTable.RemoveSymbol(i);
+
+                        var newName = "-1" + i.TokenValue;
+                        i.TokenValue = newName;
+                        Symbol conditionSymbol = symbolTable.FindSymbol(i) !;
+                        var conditionValue = conditionSymbol.ValueTokens;
+                        symbolTable.RemoveSymbol(i);
+
+                        List<Token> assignValuse = new ();
+                        assignValuse.AddRange(symbol.Value);
+                        var resultValue = symbol.ValueTokens.ToString();
+                        symbol.Value.Clear();
+                        symbol.ValueTokens.Clear();
+
+                        var ident = "                ";
+                        StringBuilder sb = new ();
+                        sb.AppendLine($"0;");
+                        sb.AppendLine($"{ident}for(int {indexValue} = {initialValue}; {indexValue} < {conditionValue}; {indexValue}++)");
+                        sb.AppendLine($"{ident}" + '{');
+                        sb.AppendLine($"{ident}    {symbol.Name} += {resultValue};");
+                        sb.AppendLine($"{ident}" + "}\n");
+
+                        symbol.ValueTokens.Append(sb.ToString());
+                    }
+
+                    break;
+                case VariableInitializationExpression varExpr:
+                    // 1) Chehck if varibale is exist in symboltable and add
+                    var newSymbol2 = new Symbol
+                    {
+                        Name = varExpr.LeftNode!.ParseSymbol!.TokenValue,
+                        Type = GetSemanticType(varExpr.RightNode!.ParseSymbol),
+                        Category = varExpr.LeftNode.ParseSymbol!.TokenCategory,
+                        Value = new (),
+                        SymbolLine = varExpr.LeftNode.ParseSymbol!.TokenLine,
+                        SymbolColumn = varExpr.LeftNode.ParseSymbol!.TokenColumn,
+                        IsList = false,
+                        IsResult = false,
+                    };
+
+                    // Add symbol to symbol table if possible
+                    symbolTable.AddSymbol(newSymbol2);
+
+                    var rightnode = varExpr.RightNode as Expression;
+                    ValidateAndCollectTokens(rightnode!, newSymbol2);
+                    newSymbol2.IsInitialized = true;
+                    break;
                 case BinaryExpression binExpr:
                     ValidateAndCollectTokens(binExpr.Left, symbol);
+
+                    if (binExpr.Left is SummationExpression)
+                    {
+                        // Create a fakeSymbol:
+                        var fakeSymbol = new Symbol
+                        {
+                            Name = symbol.Name,
+                            Type = symbol.Type,
+                            Category = symbol.Category,
+                            Value = new (),
+                            SymbolLine = symbol.SymbolLine,
+                            SymbolColumn = symbol.SymbolColumn,
+                            IsList = false,
+                            IsResult = false,
+                        };
+
+                        ValidateAndCollectTokens(binExpr.Operator, fakeSymbol);
+                        ValidateAndCollectTokens(binExpr.Right, fakeSymbol);
+
+                        var calc = fakeSymbol.ValueTokens.ToString();
+                        var ident = "                ";
+                        symbol.ValueTokens.Append($"{ident}{symbol.Name} = {symbol.Name} {calc}");
+
+                        break;
+                    }
+
                     ValidateAndCollectTokens(binExpr.Operator, symbol);
                     ValidateAndCollectTokens(binExpr.Right, symbol);
                     break;
